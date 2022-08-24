@@ -21,7 +21,11 @@ through every step of setting up proze to compiling a project for publishing.
 
 If you're interested in developing your own compiler or editor plugin for proze,
 read through the [technical specification](./doc/technical-specification.md).
-This document defines the rules
+This document defines the rules for the proze format.
+
+## Supported editors
+
+> TODO
 
 ## Acknowledgements
 
