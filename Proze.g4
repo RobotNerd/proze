@@ -1,4 +1,4 @@
-grammar proze;
+grammar Proze;
 
 /* Parser rules */
 
