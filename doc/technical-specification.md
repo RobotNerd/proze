@@ -1,34 +1,24 @@
 # Proze Syntax - English
 
-The Proze syntax for the English language is a way to bring aspects of
-programming to the process of writing literature. The main feature of is
+The proze syntax for the English language is a way to bring aspects of
+programming to the process of writing literature. Its main feature is
 syntax highlighting, which helps writers visualize the grammatical structure
 of the text. The goal is to quickly catch some common mistakes made by
 writers while writing.
 
-If you write in another language, please take the ideas here and
-adapt them to your language of choice. Related projects will be included
-here.
-
-These editor plugins provide support for proze documents:
-- vim: https://github.com/RobotNerd/proze-english-vim
-
-If your favorite editor does not have a plugin that supports .proze,
-please write one and it will be linked here.
-
-> TODO add notes a/b the intended usage; use LaTeX if you need something fancy
-
 ## Table of Contents
 
 - [File extension](#file-extension)
-- [Grammar](#grammar)
-- [Structural Markup](#structural-markup)
+- [Paragraphs](#paragraphs)
+- [Dialogue and Emphasis](#dialogue-and-emphasis)
+- [Em Dash](#em-dash)
+- [Structure Tags](#structure-tags)
 - [Comments](#comments)
 - [Brackets](#brackets)
 - [Comment tokens](#comment-tokens)
 - [Configuration file](#configuration-file)
   - [Configuration: special names](#configuration-special-names)
-  - [Configuration: project compilation options](#configuration-project-compilation-options)
+  - [Configuration: project compilation configuration](#configuration-project-compilation-configuration)
     - [File order](#file-order)
     - [Conversion options](#conversion-options)
 - [Compiling Proze](#compiling-proze)
@@ -41,16 +31,13 @@ please write one and it will be linked here.
 
 Proze files are UTF-8 and use the file extension `.proze`.
 
-## Grammar
+## Paragraphs
 
-Proze documents are structured as a series of paragraphs. The rules
-below describe how proze expects the writing to be structured.
-
+- Proze documents are structured as a series of paragraphs.
 - Paragraphs are separated by at least one blank line.
   - Multiple contiguous blank lines are allowed.
-  - Lines that contain only whitespace characters are treated as blank lines.
-- Paragraphs are left-justified, i.e. no whitespace at the
-  beginning of the line.
+  - Lines containing only whitespace characters are treated as blank lines.
+- Paragraphs are left-justified, i.e. no whitespace at the beginning of the line.
   - Any preceeding whitespace on a line turns a paragraph into a block quote.
   - All lines of a block quote should be indented by the same amount
     of whitespace. However, if there is not a blank line separating multiple
@@ -65,6 +52,9 @@ below describe how proze expects the writing to be structured.
       characters than the previous block quote, then that paragraph is
       un-indented by one level.
     - A block quote cannot be un-indented past the left margin.
+
+## Dialogue and Emphasis
+
 - Dialogue is placed in double quotes `"`.
   - A closing double quote closes the dialogue block.
   - If no closing quote is found, the dialogue block ends at a blank line.
@@ -76,12 +66,15 @@ below describe how proze expects the writing to be structured.
   - The bold block ends at the second `__`.
   - If no closing `__` is found, the bold block ends at the next
     blank line.
+
+## Em Dash
+
 - The [Em Dash](https://en.wikipedia.org/wiki/Dash#Em_dash) is represented
   by two contiguous hyphens `--` within a paragraph.
 
-## Structural markup
+## Structure tags
 
-Special markup tags can be used to define document structure.
+Tags are used to define document structure.
 
 General rules:
 - Tags must be left-justified.
@@ -94,12 +87,12 @@ General rules:
 >      for each story. Be smart enough to treat the title tag the
 >      same as a chapter in this scenario.
 
-Structural tags:
+Structure tags:
 - Title
   - The tag `Title:` followed by the title of the work.
   - There can be only one title per project.
   - The title should be in the very first document in the config
-    file (see [Configuration: project compilation options](#configuration-project-compilation-options)).
+    file (see [Configuration: project compilation configuration](#configuration-project-compilation-configuration)).
   - The title should be on the first line of the file in which it is located.
   - All text between the `Title:` tag and a line break is recognized
     as the title of the project.
@@ -168,8 +161,8 @@ The morning brought frost-covered grass on the lawn under a cold sky...
 
 ## Comments
 
-Portions of the document can be marked as comments. When converting
-to other formats, commented text is ignored. There are two types of
+Portions of the document can be marked as comments. When compiling
+a proze project, commented text is ignored. There are two types of
 comments: line comments and block comments.
 
 Line comments:
@@ -192,8 +185,8 @@ Block comments:
 
 ## Brackets
 
-Special notes are placed inside a pair of brackets `[]`. When converting
-to other formats, the bracketed block of text is ignored.
+Special notes are placed inside a pair of brackets `[]`. When compiling
+a proze project, the bracketed block of text is ignored.
 
 - Begin with a `[`.
 - End at `]` or the end of the file if no closing bracket is found.
@@ -203,8 +196,8 @@ to other formats, the bracketed block of text is ignored.
 ## Comment tokens
 
 Comment tokens are capitalized words that provide special metadata for
-an author or editor. They are recognized when placed in comments
-or bracketed blocks.
+an author or editor when placed in comments or bracketed blocks. They should have
+emphasized highlighting in editors that support proze.
 
 These tokens are recognized:
 - FIXME
@@ -220,13 +213,11 @@ that project. It is located in the project root (see
 - json
 - yaml
 
-The configuration file is named `config.*` with the appropriate file
-extension based on the file format (e.g. `config.json` or `config.yml`).
-Text editors and conversion tools that support proze should attempt to
-autodetect the file format when possible, regardless of file extension.
+The configuration file is named `config.json` or `config.yml` depending
+on the file format (e.g. `config.json` or `config.yml`).
 
 The configuration file can contain:
-- project compilation options
+- project compilation configuration
 - special names used in the project
 
 Available configuration options are detailed in the subsections below.
@@ -236,7 +227,7 @@ Available configuration options are detailed in the subsections below.
 Each project can optionally add names used in the project to the configuration
 file. These are the names of characters, places, and things unique to
 the story. Text editors can use syntax highlighting to make these names
-visually distinct from the surrounding text. This helps writers to
+visually distinct from the surrounding text. This helps writers
 quickly figure out when they misspell a character name or use the
 wrong name in a story.
 
@@ -341,10 +332,10 @@ names:
     - laser rifle
 ```
 
-### Configuration: project compilation options
+### Configuration: project compilation configuration
 
 Proze documents are compiled to other formats for publication. This
-section describes the compilation options that can be included in
+section describes the compilation configuration that can be included in
 the configuration file. All of these options are placed in the
 configuration file under the `compile` section.
 
@@ -367,7 +358,7 @@ alphabetical order.
 
 Here is an example portion of `config.yml`:
 
-```
+```yaml
 ---
 compile:
   order:
@@ -378,9 +369,9 @@ compile:
     - acknowledgements.proze
 ```
 
-#### Conversion options
+#### Compilation configuration
 
-These conversion rules are used when compiling proze to another
+Compilation rules are used when compiling proze to another
 document format. If the document type of the output document does not
 support a feature (e.g. bold, italic text), the proze-specific markup
 characters are removed but no additional changes are made.
@@ -430,7 +421,7 @@ The following rules are configurable:
   - Only applicable if `compile.paragraph.mode` is set to __tab__.
 
 - Mode and tabs example:
-  ```
+  ```yaml
   ---
   compile:
     paragraph:
@@ -447,7 +438,7 @@ The following rules are configurable:
   - Default __true__.
   - Only applicable if `compile.paragraph.mode` is set to __tab__.
   - Example:
-    ```
+    ```yaml
     ---
     compile:
       paragraph:
@@ -497,137 +488,3 @@ The following elements should be uniquely highlighted:
 - Italicized and bolded text
 - Special names
 - Structure markup tags
-
-## Folder structure
-
-Each story written with proze should be placed in its own directory.
-The configuration file must be placed in the root directory of the project.
-Proze files containing the actual narrative writing can be placed in the
-root directory or in subfolders.
-
-Here is a simple example with everything in the project root directory:
-
-```
-my-project/
-  config.yml
-  my-story-chp-1.proze
-  my-story-chp-2.proze
-  title.proze
-```
-
-A more complicated example may look like this:
-
-```
-my-project/
-  acknowledgements.proze
-  appendix.proze
-  config.json
-  part1/
-    chapter-01.proze
-    chapter-02.proze
-    chapter-03.proze
-  part2/
-    chapter-04.proze
-    chapter-05.proze
-    chapter-06.proze
-    chapter-07.proze
-  part3/
-    chapter-08.proze
-  title.proze
-```
-
-See [Configuration: project compilation options](#configuration-project-compilation-options)
-for information on how to order files when compiling a document from
-proze files.
-
-## Version control
-
-It is strongly recommended that all proze projects be placed under
-version control. The proze syntax project uses [git](https://git-scm.com/),
-but any alternative version control system can be used.
-Commits should be performed frequently while writing.
-
-At the minimum, this provides psychological safety for a writer. New
-portions of the story can be added, rewritten, or deleted without fear
-of losing any work. Old version can always be retrieved from the
-repository history.
-
-> TODO more advanced usage; collaboration between author and editor;
-> using review tools like gerrit
-
-## Best practices
-
-The following are suggested best practices for using proze:
-- Text editors should be configured to line wrap.
-  - Don't manually add line breaks within a paragraph.
-  - Line wrapping makes it much easier to edit text in paragraph form.
-- Enable spell checking in the text editor.
-- Leave __two__ blank lines after title and chapter structural markup blocks.
-  ```
-  Title: My Story
-  By: Mary Sue
-
-
-  It was a dark and story night...
-  ```
-- Leave only __one__ blank line between paragraphs.
-- Leave __two__ empty lines above and __two__ empty lines below a
-  section break.
-  ```
-  ...and that's the last I heard from him.
-
-
-  ---
-
-
-  That night, we walked down the gravel road under the light of the...
-  ```
-- Comments
-  - Leave __one__ space before the double/triple hash of a comment,
-    unless it starts at the beginning of a line.
-  - Leave __one__ space after the double/triple hash of a comment, unless
-    it is at the end of the line.
-  - Leave __one__ space before the opening and closing block comments, unless
-    it starts at the beginning of the line.
-  - Comment examples:
-    ```
-    ## This is a comment.
-    This text is part of the story. ## And this part is a comment.
-
-    This paragraph ### this comment isn't part of the paragraph ### has an
-    embedded block comment.
-
-    ###
-    This entire section is commented out.
-    ###
-    ```
-- Brackets vs. comments
-  - Use comments to cut out text that you don't want as part of the story
-    but aren't ready to delete yet.
-  - Use brackets for notes written by the author or editor. In other words,
-    these take the place of writing notes in red ink on a printout of
-    a story.
-- Comment tokens should be added to bracket blocks or comment blocks as needed.
-  - When editing, search for comment tokens in proze files to find specific
-    areas that still need to be worked on.
-  - Suggested use of comment tokens:
-    - Use `TODO` for portions of a story that haven't yet been written.
-    - Use `FIXME` for problem areas that need to be rewritten.
-    - Use `IMPORTANT` to flag areas that the writer must pay attention to
-      (e.g. a part of the story that will need to be foreshadowed earlier
-      in the story).
-    - Use `NOTE` for background or supporting information that the author
-      or editor will need when working on the story.
-  - Examples
-    ```
-    ## TODO need to write an action sequence here
-
-    [FIXME The character dialogue here is sloppy.]
-
-    ###
-      IMPORTANT This hasn't been setup at all. Need to foreshadow it
-      in Act 1.
-    ###
-
-    ## NOTE I'm pretty happy with the way this section turned out. :)
-    ```
