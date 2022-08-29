@@ -1,11 +1,11 @@
 # What is proze?
 
-> TL;DR proze is a document format that makes writing prose a little more
+> TL;DR proze is a set of tools that makes writing prose a little more
 > like writing code.
 
 Have you ever written a short story, a novel, or an essay and thought to yourself,
-"I wish this had syntax highlighting like what I get when writing code."
-Well, wait no more! Proze is a format brings the features of writing software to
+"I wish this had syntax highlighting like when I write code."
+Well, wait no more! Proze brings the features of writing software to
 writing stories.
 
 How does it work?
@@ -21,11 +21,13 @@ through every step of setting up proze to compiling a project for publishing.
 
 If you're interested in developing your own compiler or editor plugin for proze,
 read through the [technical specification](./doc/technical-specification.md).
-This document defines the rules for the proze format.
+There you'll find the gritty details of the proze format.
 
 ## Supported editors
 
-> TODO
+These editors have plugins that support syntax highlighting proze.
+
+- [vim](https://github.com/RobotNerd/proze-english-vim)
 
 ## Acknowledgements
 
