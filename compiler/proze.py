@@ -1,38 +1,11 @@
 #!/usr/bin/python3
-import antlr4
 import argparse
 
-from generated.ProzeLexer import ProzeLexer
-from generated.ProzeParser import ProzeParser
-from listeners.text import TextListener
-
-
-TEST_INPUT = 'Title: My Book\n'
+from compiler import Compiler
 
 
 class UnsupportedFormatError(Exception):
     pass
-
-
-def compile(listener, tree):
-    listener = TextListener()
-    walker = antlr4.ParseTreeWalker()
-    walker.walk(listener, tree)
-
-
-def create_listener(args):
-    if args.format == 'text':
-        return TextListener()
-    raise UnsupportedFormatError(f'No compiler for format: {args.format}')
-
-
-def create_parse_tree(input_text):
-    chars = antlr4.InputStream(input_text)
-    lexer = ProzeLexer(chars)
-    tokens = antlr4.CommonTokenStream(lexer)
-    parser = ProzeParser(tokens)
-    parser.buildParseTrees = True
-    return parser.document()
 
 
 def parse_args():
@@ -44,14 +17,18 @@ def parse_args():
         choices=['text'],
         help='output document format (defaults to text)'
     )
+    parser.add_argument(
+        '--input-string',
+        type=str,
+        help='pass formatted proze a string, mainly for testing'
+    )
     return parser.parse_args()
 
 
 def run():
     args = parse_args()
-    listener = create_listener(args)
-    tree = create_parse_tree(TEST_INPUT)
-    compile(listener, tree)
+    compiler = Compiler(args, args.input_string)
+    compiler.compile()
 
 
 if __name__ == '__main__':
