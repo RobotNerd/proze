@@ -16,3 +16,12 @@ To get `grun` working, update the `CLASSPATH` environment variable.
 ```
 export CLASSPATH=/opt/homebrew/Cellar/antlr/4.10.1/antlr-4.10.1-complete.jar:$CLASSPATH
 ```
+
+## Generating python files
+
+- Run antlr. All generated files are placed in the `./compiler/` directory.
+
+```shell
+cd grammar
+antlr -Dlanguage=Python3 -o ../compiler/generated Proze.g4
+```

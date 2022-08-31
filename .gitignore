@@ -1,1 +1,4 @@
 .antlr/
+__pycache__
+
+compiler/generated
