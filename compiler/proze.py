@@ -28,7 +28,7 @@ def parse_args():
 def run():
     args = parse_args()
     compiler = Compiler(args, args.input_string)
-    compiler.compile()
+    print(compiler.compile())
 
 
 if __name__ == '__main__':

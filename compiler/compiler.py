@@ -19,6 +19,7 @@ class Compiler:
     def compile(self):
         walker = antlr4.ParseTreeWalker()
         walker.walk(self._listener, self._tree)
+        return self._listener.get_output()
 
     @staticmethod
     def _create_listener(args):
