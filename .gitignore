@@ -1,8 +1,8 @@
 .antlr/
+dist/
+generated/
 node_modules/
-build/
 __pycache__
 compiler/generated
-compiler-typescript/generated
 
-*.js
+coverage/

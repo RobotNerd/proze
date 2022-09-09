@@ -2,10 +2,21 @@
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "allowJs": true,
-    "outDir": "build",
-    "sourceMap": true
+    "esModuleInterop": true,
+    "module": "CommonJS",
+    "noImplicitAny": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES2022"
   },
-  "exclude": ["build", "generated", "node_modules"],
-  "include": ["index.ts", "src"]
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "dist",
+    "generated",
+    "node_modules"
+  ],
+  "include": ["src"]
 }
 

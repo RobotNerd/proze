@@ -1,0 +1,15 @@
+{
+    "preset": "ts-jest",
+    "coverageDirectory": "./coverage",
+    "testMatch": [
+        "**/?(*.)+(spec).ts",
+        "**/?(*.)+(test).ts"
+    ],
+    "coveragePathIgnorePatterns" : [
+        "<rootDir>/generated/",
+        "<rootDir>/dist/",
+        "<rootDir>/node_modules/"
+    ],
+    "resetMocks": true,
+    "clearMocks": true
+}

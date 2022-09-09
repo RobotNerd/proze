@@ -8,7 +8,7 @@ endef
 
 clean:
 	$(info $n--- Cleaning)
-	rm -fr ./compiler-typescript/generated/* ./compiler-typescript/build/*
+	rm -fr ./compiler-typescript/generated/* ./compiler-typescript/dist/*
 
 build_all:
 	$(info $n--- Building grammar and typescript)

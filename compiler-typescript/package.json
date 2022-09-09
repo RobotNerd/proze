@@ -2,13 +2,16 @@
   "name": "proze-compiler",
   "version": "0.1.0",
   "description": "Compile proze to target document type.",
-  "main": "build/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "antlr4ts": "antlr4ts -visitor ../grammar/Proze.g4 -o generated && mv ./grammar/* ./generated && rm -fr ./grammar",
-    "build-all": "npm run antlr4ts && npx tsc",
-    "build": "npx tsc",
-    "compile": "node build/index.js",
-    "test": "npm test"
+    "antlr4ts": "antlr4ts -visitor ../grammar/Proze.g4 -o generated -Xexact-output-dir",
+    "build-all": "npm run antlr4ts && npm run build",
+    "build": "npx tsc --project ./tsconfig.json",
+    "compile": "node ./dist/index.js",
+    "test": "jest -c ./jest.unit.json",
+    "test:watch": "npm run test -- --watch",
+    "test:coverage": "jest --coverage -c ./jest.unit.json",
+    "test:coverage:watch": "npm run test:coverage -- --watch"
   },
   "repository": {
     "type": "git",
@@ -22,8 +25,12 @@
   "homepage": "https://github.com/RobotNerd/proze#readme",
   "devDependencies": {
     "@tsconfig/node18": "^1.0.1",
-    "@types/node": "^18.7.14",
+    "@types/jest": "^29.0.0",
+    "@types/node": "^18.7.16",
     "antlr4ts-cli": "^0.5.0-alpha.4",
+    "jest": "^29.0.2",
+    "ts-jest": "^29.0.0",
+    "ts-node": "^10.9.1",
     "typescript": "^4.8.2"
   },
   "dependencies": {

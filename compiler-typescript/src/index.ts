@@ -1,6 +1,6 @@
 import { exit } from 'process';
-import { ArgParser, ShowHelpError } from './src/cli-arguments';
-import { Compiler } from './src/compiler';
+import { ArgParser, ShowHelpError } from './cli-arguments';
+import { Compiler } from './compiler';
 
 
 try {
