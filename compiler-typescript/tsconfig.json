@@ -1,0 +1,11 @@
+{
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "outDir": "build",
+    "sourceMap": true
+  },
+  "include": ["index.ts", "src"],
+  "exclude": ["node_modules"]
+}
+

@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build-all",
+			"path": "compiler-typescript",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": [],
+			"label": "npm: build-all - compiler-typescript",
+			"detail": "npm run antlr4ts && npx tsc"
+		}
+	]
+}
