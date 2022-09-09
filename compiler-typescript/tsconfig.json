@@ -5,7 +5,7 @@
     "outDir": "build",
     "sourceMap": true
   },
-  "include": ["index.ts", "src"],
-  "exclude": ["node_modules"]
+  "exclude": ["build", "generated", "node_modules"],
+  "include": ["index.ts", "src"]
 }
 

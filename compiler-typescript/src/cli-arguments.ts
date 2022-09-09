@@ -1,6 +1,6 @@
 export class ShowHelpError extends Error {}
 
-enum Format {
+export enum Format {
     text = "text",
 }
 
