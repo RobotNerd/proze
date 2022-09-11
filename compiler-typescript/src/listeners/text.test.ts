@@ -23,11 +23,6 @@ describe('text listener', () => {
     test('throws on parse error and provides a list of all errors', () => {
         mockArgs.inputString = 'Title:\n';
         const compiler = new Compiler(mockArgs, mockArgs.inputString);
-        // expect(() => {
-        //     let output = compiler.compile();
-        // }).toThrow();
-        // let errors = compiler.errors();
-        // expect(() => { errors.length }).toBe(1);
         try {
             let output = compiler.compile();
             fail('expected CompileError to be thrown');

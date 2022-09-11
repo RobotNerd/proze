@@ -1,5 +1,5 @@
-import {Title_tagContext} from '../../generated/ProzeParser';
-import {ListenerOutput} from './interface';
+import { Title_tagContext } from '../../generated/ProzeParser';
+import { ListenerOutput } from './interface';
 
 
 export class TextListener implements ListenerOutput {
