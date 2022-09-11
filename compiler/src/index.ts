@@ -4,7 +4,7 @@ import { Compiler, CompileError } from './compiler';
 
 
 try {
-    let args = ArgParser.parse_args();
+    let args = ArgParser.parseArgs(process.argv.slice(2));
     if (args.inputString == null) {
         console.log('no proze input_string provided to parse');
         exit(0);
@@ -20,6 +20,7 @@ catch (e: unknown) {
         }
     }
     else if (e instanceof ShowHelpError) {
+        ArgParser.showHelp();
         exit(0);
     }
     else {

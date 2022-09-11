@@ -9,7 +9,7 @@ export interface ProzeArgs {
     inputString: string|null;
 }
 
-let help_msg = `Usage: proze compiler
+let helpMessage = `Usage: proze compiler
 
     proze [--format FORMAT] [--input-string STRING]
     
@@ -21,18 +21,27 @@ let help_msg = `Usage: proze compiler
 
 export class ArgParser {
 
-    static parse_args(): ProzeArgs {
-        let cliArgs = process.argv.slice(2);
+    static parseArgs(cliArgs: string[]): ProzeArgs {
+        // let cliArgs = process.argv.slice(2);
+        this.parseHelpFlag(cliArgs);
         let args: ProzeArgs = {
             format: Format.text,
             inputString: null,
         };
-        args.format = this.parse_format(cliArgs); 
-        args.inputString = this.parse_inputString(cliArgs);
+        args.format = this.parseFormat(cliArgs); 
+        args.inputString = this.parseInputString(cliArgs);
         return args;
     }
 
-    private static parse_format(cliArgs: string[]): Format {
+    private static parseHelpFlag(cliArgs: string[]) {
+        for (let i=0; i < cliArgs.length; i++) {
+            if (cliArgs[i] == '-h' || cliArgs[i] == '--help') {
+                throw new ShowHelpError();
+            }
+        }
+    }
+
+    private static parseFormat(cliArgs: string[]): Format {
         let format = Format.text;
         for (let i=0; i < cliArgs.length; i++) {
             if (cliArgs[i] == '--format') {
@@ -45,7 +54,7 @@ export class ArgParser {
         return format;
     }
 
-    private static parse_inputString(cliArgs: string[]): string|null {
+    private static parseInputString(cliArgs: string[]): string|null {
         let inputString: string|null = null;
         for (let i=0; i < cliArgs.length; i++) {
             if (cliArgs[i] == '--input-string') {
@@ -57,7 +66,7 @@ export class ArgParser {
         return inputString;
     }
 
-    static show_help() {
-        console.log(help_msg);
+    static showHelp() {
+        console.log(helpMessage);
     }
 }
