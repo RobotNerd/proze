@@ -15,7 +15,8 @@ let help_msg = `Usage: proze compiler
     
     Optional arguments:
         --format: Target format for the generated output file (default: text)
-        --input-string: A proze-formatted string to compile (mainly used for testing).`;
+        --input-string: A proze-formatted string to compile (mainly used for testing).
+`;
 
 
 export class ArgParser {
