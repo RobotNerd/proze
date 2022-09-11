@@ -14,6 +14,7 @@ let helpMessage = `Usage: proze compiler
     proze [--format FORMAT] [--input-string STRING]
     
     Optional arguments:
+        -h, --help: Show this help message.
         --format: Target format for the generated output file (default: text)
         --input-string: A proze-formatted string to compile (mainly used for testing).
 `;
@@ -21,48 +22,44 @@ let helpMessage = `Usage: proze compiler
 
 export class ArgParser {
 
-    static parseArgs(cliArgs: string[]): ProzeArgs {
-        this.parseHelpFlag(cliArgs);
-        let args: ProzeArgs = {
+    args: ProzeArgs;
+
+    constructor() {
+        this.args = {
             format: Format.text,
             inputString: null,
         };
-        args.format = this.parseFormat(cliArgs); 
-        args.inputString = this.parseInputString(cliArgs);
-        return args;
     }
 
-    private static parseHelpFlag(cliArgs: string[]) {
+    parseArgs(cliArgs: string[]): ProzeArgs {
         for (let i=0; i < cliArgs.length; i++) {
-            if (cliArgs[i] == '-h' || cliArgs[i] == '--help') {
-                throw new ShowHelpError();
+            this.parseHelpFlag(cliArgs[i]);
+            this.parseFormat(cliArgs, i);
+            this.parseInputString(cliArgs, i);
+        }
+        return this.args;
+    }
+
+    private parseHelpFlag(flag: string) {
+        if (flag == '-h' || flag == '--help') {
+            throw new ShowHelpError();
+        }
+    }
+
+    private parseFormat(cliArgs: string[], i: number) {
+        if (cliArgs[i] == '--format') {
+            if (i + 1 < cliArgs.length) {
+                this.args.format = cliArgs[i+1].toLowerCase() as Format;
             }
         }
     }
 
-    private static parseFormat(cliArgs: string[]): Format {
-        let format = Format.text;
-        for (let i=0; i < cliArgs.length; i++) {
-            if (cliArgs[i] == '--format') {
-                if (i + 1 < cliArgs.length) {
-                    format = cliArgs[i+1].toLowerCase() as Format;
-                    break;
-                }
+    private parseInputString(cliArgs: string[], i: number) {
+        if (cliArgs[i] == '--input-string') {
+            if (i + 1 <= cliArgs.length) {
+                this.args.inputString = cliArgs[i+1];
             }
         }
-        return format;
-    }
-
-    private static parseInputString(cliArgs: string[]): string|null {
-        let inputString: string|null = null;
-        for (let i=0; i < cliArgs.length; i++) {
-            if (cliArgs[i] == '--input-string') {
-                if (i + 1 <= cliArgs.length) {
-                    inputString = cliArgs[i+1];
-                }
-            }
-        }
-        return inputString;
     }
 
     static showHelp() {

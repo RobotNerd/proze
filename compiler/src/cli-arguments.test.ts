@@ -3,39 +3,42 @@ import { ArgParser, Format, ProzeArgs, ShowHelpError } from './cli-arguments';
 
 describe('CLI arg parser', () => {
     test('throws error if help message should be displayed', () => {
+        const argParser = new ArgParser();
         expect(
-            () => ArgParser.parseArgs(['-h'])
+            () => argParser.parseArgs(['-h'])
         ).toThrow(ShowHelpError);
 
         expect(
-            () => ArgParser.parseArgs(['--help'])
+            () => argParser.parseArgs(['--help'])
         ).toThrow(ShowHelpError);
 
         expect(
-            () => ArgParser.parseArgs(['--format', 'text', '-h'])
+            () => argParser.parseArgs(['--format', 'text', '-h'])
         ).toThrow(ShowHelpError);
     });
 
     test('parses format', () => {
+        const argParser = new ArgParser();
         let result: ProzeArgs = {
             format: Format.text,
             inputString: 'test',
         };
-        expect(ArgParser.parseArgs(['--format', 'text', '--input-string', 'test'])).toEqual(result);
-        expect(ArgParser.parseArgs(['--input-string', 'test', '--format', 'text'])).toEqual(result);
+        expect(argParser.parseArgs(['--format', 'text', '--input-string', 'test'])).toEqual(result);
+        expect(argParser.parseArgs(['--input-string', 'test', '--format', 'text'])).toEqual(result);
     });
 
     test('parses input string', () => {
+        const argParser = new ArgParser();
         let result: ProzeArgs = {
             format: Format.text,
             inputString: 'test',
         };
-        expect(ArgParser.parseArgs(
+        expect(argParser.parseArgs(
             ['--format', 'text', '--input-string', 'test'])
         ).toEqual(result);
 
         result.inputString = 'this is another test';
-        expect(ArgParser.parseArgs(
+        expect(argParser.parseArgs(
             ['--input-string', result.inputString, '--format', 'text'])
         ).toEqual(result);
     });
