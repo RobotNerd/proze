@@ -22,22 +22,22 @@ let help_msg = `Usage: proze compiler
 export class ArgParser {
 
     static parse_args(): ProzeArgs {
-        let cli_args = process.argv.slice(2);
+        let cliArgs = process.argv.slice(2);
         let args: ProzeArgs = {
             format: Format.text,
             inputString: null,
         };
-        args.format = this.parse_format(cli_args); 
-        args.inputString = this.parse_inputString(cli_args);
+        args.format = this.parse_format(cliArgs); 
+        args.inputString = this.parse_inputString(cliArgs);
         return args;
     }
 
-    private static parse_format(cli_args: string[]): Format {
+    private static parse_format(cliArgs: string[]): Format {
         let format = Format.text;
-        for (let i=0; i < cli_args.length; i++) {
-            if (cli_args[i] == '--format') {
-                if (i + 1 < cli_args.length) {
-                    format = cli_args[i+1].toLowerCase() as Format;
+        for (let i=0; i < cliArgs.length; i++) {
+            if (cliArgs[i] == '--format') {
+                if (i + 1 < cliArgs.length) {
+                    format = cliArgs[i+1].toLowerCase() as Format;
                     break;
                 }
             }
@@ -45,12 +45,12 @@ export class ArgParser {
         return format;
     }
 
-    private static parse_inputString(cli_args: string[]): string|null {
+    private static parse_inputString(cliArgs: string[]): string|null {
         let inputString: string|null = null;
-        for (let i=0; i < cli_args.length; i++) {
-            if (cli_args[i] == '--input-string') {
-                if (i + 1 <= cli_args.length) {
-                    inputString = cli_args[i+1];
+        for (let i=0; i < cliArgs.length; i++) {
+            if (cliArgs[i] == '--input-string') {
+                if (i + 1 <= cliArgs.length) {
+                    inputString = cliArgs[i+1];
                 }
             }
         }
