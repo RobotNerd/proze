@@ -27,8 +27,8 @@ export class Compiler {
 
     constructor(args: any, input_string: string) {
         this.errorListener = new ParseErrorListener();
-        this.listener = this.create_listener(args);
-        this.tree = this.create_parse_tree(input_string);
+        this.listener = this.createListener(args);
+        this.tree = this.createParseTree(input_string);
     }
 
     compile() {
@@ -41,17 +41,17 @@ export class Compiler {
                 errors
             );
         }
-        return this.listener.get_output();
+        return this.listener.getOutput();
     }
 
-    private create_listener(args: any): ListenerOutput {
+    private createListener(args: any): ListenerOutput {
         if (args.format == 'text') {
             return new TextListener();
         }
         throw Error('No compiler for format ' + args.format);
     }
 
-    private create_parse_tree(input_string: string) {
+    private createParseTree(input_string: string) {
         let chars = CharStreams.fromString(input_string);
         let lexer = new ProzeLexer(chars);
         lexer.removeErrorListeners();

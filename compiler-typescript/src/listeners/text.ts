@@ -10,7 +10,7 @@ export class TextListener implements ListenerOutput {
         this.output = '';
     }
 
-    get_output(): string {
+    getOutput(): string {
         return this.output;
     }
 

@@ -5,11 +5,11 @@ import { Compiler, CompileError } from './compiler';
 
 try {
     let args = ArgParser.parse_args();
-    if (args.input_string == null) {
+    if (args.inputString == null) {
         console.log('no proze input_string provided to parse');
         exit(0);
     }
-    let compiler = new Compiler(args, args.input_string);
+    let compiler = new Compiler(args, args.inputString);
     console.log(compiler.compile());
 }
 catch (e: unknown) {

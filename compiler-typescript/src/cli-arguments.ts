@@ -6,7 +6,7 @@ export enum Format {
 
 export interface ProzeArgs {
     format: Format;
-    input_string: string|null;
+    inputString: string|null;
 }
 
 let help_msg = `Usage: proze compiler
@@ -25,10 +25,10 @@ export class ArgParser {
         let cli_args = process.argv.slice(2);
         let args: ProzeArgs = {
             format: Format.text,
-            input_string: null,
+            inputString: null,
         };
         args.format = this.parse_format(cli_args); 
-        args.input_string = this.parse_input_string(cli_args);
+        args.inputString = this.parse_inputString(cli_args);
         return args;
     }
 
@@ -45,16 +45,16 @@ export class ArgParser {
         return format;
     }
 
-    private static parse_input_string(cli_args: string[]): string|null {
-        let input_string: string|null = null;
+    private static parse_inputString(cli_args: string[]): string|null {
+        let inputString: string|null = null;
         for (let i=0; i < cli_args.length; i++) {
             if (cli_args[i] == '--input-string') {
                 if (i + 1 <= cli_args.length) {
-                    input_string = cli_args[i+1];
+                    inputString = cli_args[i+1];
                 }
             }
         }
-        return input_string;
+        return inputString;
     }
 
     static show_help() {
