@@ -6,7 +6,7 @@
   "scripts": {
     "antlr4ts": "antlr4ts -visitor ../grammar/Proze.g4 -o generated -Xexact-output-dir",
     "build-all": "npm run antlr4ts && npm run build",
-    "build": "npx tsc --project ./tsconfig.json",
+    "build": "npx tsc --project ./tsconfig.build.json",
     "compile": "node ./dist/src/index.js",
     "test": "jest -c ./jest.unit.json",
     "test:watch": "npm run test -- --watch",

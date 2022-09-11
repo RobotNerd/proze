@@ -4,13 +4,13 @@
 		{
 			"type": "npm",
 			"script": "build-all",
-			"path": "compiler-typescript",
+			"path": "compiler",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
 			"problemMatcher": [],
-			"label": "npm: build-all - compiler-typescript",
+			"label": "npm: build-all - compiler",
 			"detail": "npm run antlr4ts && npx tsc"
 		}
 	]

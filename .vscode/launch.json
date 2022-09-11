@@ -13,10 +13,10 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/compiler-typescript/src/index.ts",
-            "preLaunchTask": "npm: build-all - compiler-typescript",
+            "program": "${workspaceFolder}/compiler/src/index.ts",
+            "preLaunchTask": "npm: build-all - compiler",
             "outFiles": [
-                "${workspaceFolder}/compiler-typescript/dist/**/*.js"
+                "${workspaceFolder}/compiler/dist/**/*.js"
             ],
             "args": ["--format", "text", "--input-string", "Title: My Book\n"]
         }

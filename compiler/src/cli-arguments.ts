@@ -22,7 +22,6 @@ let helpMessage = `Usage: proze compiler
 export class ArgParser {
 
     static parseArgs(cliArgs: string[]): ProzeArgs {
-        // let cliArgs = process.argv.slice(2);
         this.parseHelpFlag(cliArgs);
         let args: ProzeArgs = {
             format: Format.text,
