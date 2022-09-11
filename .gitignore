@@ -1,8 +1,5 @@
 .antlr/
+coverage/
 dist/
 generated/
 node_modules/
-__pycache__
-compiler/generated
-
-coverage/
