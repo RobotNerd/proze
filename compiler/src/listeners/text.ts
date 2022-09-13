@@ -22,7 +22,7 @@ export class TextListener implements ListenerOutput {
 
     enterTitle_tag(ctx: Title_tagContext): void {
         let result: string[] = [];
-        for (let word of ctx.markup_value().WORD()) {
+        for (let word of ctx.metadata().WORD()) {
             if (word.payload.text != undefined) {
                 result.push(word.payload.text);
             }

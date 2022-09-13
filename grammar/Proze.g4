@@ -4,18 +4,18 @@ grammar Proze;
 
 document : title_tag? ;
 
-title_tag : TITLE markup_value ;
+title_tag : TITLE metadata ;
 
-markup_value: ':' (WHITESPACE | WORD)+ NEWLINE+ ;
+metadata: ':' (WHITESPACE | WORD)+ NEWLINE+ ;
 
 
 // document : (title_tag? | author_tag? ) chapter+ ;
 
-// title_tag : TITLE markup_value ;
-// chapter_tag : CHAPTER markup_value ;
-// author_tag : AUTHOR markup_value ;
-// section_tag : SECTION  markup_value | SECTION_SYMBOL WHITESPACE* NEWLINE+ ;
-// markup_value: ':' (WHITESPACE | WORD)+ NEWLINE+;
+// title_tag : TITLE metadata ;
+// chapter_tag : CHAPTER metadata ;
+// author_tag : AUTHOR metadata ;
+// section_tag : SECTION  metadata | SECTION_SYMBOL WHITESPACE* NEWLINE+ ;
+// metadata: ':' (WHITESPACE | WORD)+ NEWLINE+;
 
 // chapter: chapter_tag (paragraph | section_tag)+ ;
 

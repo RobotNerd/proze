@@ -12,7 +12,7 @@ writers while writing.
 - [Paragraphs](#paragraphs)
 - [Dialogue and Emphasis](#dialogue-and-emphasis)
 - [Em Dash](#em-dash)
-- [Structure Tags](#structure-tags)
+- [Metadata Tags](#metadata-tags)
 - [Comments](#comments)
 - [Brackets](#brackets)
 - [Comment tokens](#comment-tokens)
@@ -33,7 +33,7 @@ Proze files are UTF-8 and use the file extension `.proze`.
 
 ## Paragraphs
 
-- Proze documents are structured as a series of paragraphs.
+- Proze documents are written as a series of paragraphs.
 - Paragraphs are separated by at least one blank line.
   - Multiple contiguous blank lines are allowed.
   - Lines containing only whitespace characters are treated as blank lines.
@@ -72,9 +72,9 @@ Proze files are UTF-8 and use the file extension `.proze`.
 - The [Em Dash](https://en.wikipedia.org/wiki/Dash#Em_dash) is represented
   by two contiguous hyphens `--` within a paragraph.
 
-## Structure tags
+## Metadata tags
 
-Tags are used to define document structure.
+Tags are used to define document metadata.
 
 General rules:
 - Tags must be left-justified.
@@ -87,7 +87,7 @@ General rules:
 >      for each story. Be smart enough to treat the title tag the
 >      same as a chapter in this scenario.
 
-Structure tags:
+Metadata tags:
 - Title
   - The tag `Title:` followed by the title of the work.
   - There can be only one title per project.
@@ -373,7 +373,7 @@ compile:
 
 Compilation rules are used when compiling proze to another
 document format. If the document type of the output document does not
-support a feature (e.g. bold, italic text), the proze-specific markup
+support a feature (e.g. bold, italic text), the proze-specific metadata
 characters are removed but no additional changes are made.
 
 - Comments and bracketed text blocks are ignored.
@@ -487,4 +487,4 @@ The following elements should be uniquely highlighted:
 - Dialogue
 - Italicized and bolded text
 - Special names
-- Structure markup tags
+- Metadata tags
