@@ -2,9 +2,10 @@ grammar Proze;
 
 /* Parser rules */
 
-document : title_tag? ;
+document : title_tag? author_tag? ;
 
 title_tag : TITLE metadata ;
+author_tag : AUTHOR metadata ;
 
 metadata: ':' (WHITESPACE | WORD)+ NEWLINE+ ;
 
@@ -13,7 +14,6 @@ metadata: ':' (WHITESPACE | WORD)+ NEWLINE+ ;
 
 // title_tag : TITLE metadata ;
 // chapter_tag : CHAPTER metadata ;
-// author_tag : AUTHOR metadata ;
 // section_tag : SECTION  metadata | SECTION_SYMBOL WHITESPACE* NEWLINE+ ;
 // metadata: ':' (WHITESPACE | WORD)+ NEWLINE+;
 
@@ -39,6 +39,7 @@ fragment LOWERCASE  : [a-z] ;
 fragment UPPERCASE  : [A-Z] ;
 
 TITLE : 'Title' ;
+AUTHOR : 'Author' ;
 
 WORD : (LOWERCASE | UPPERCASE | '-' | '.' | ';' )+ ;
 
@@ -50,10 +51,9 @@ NEWLINE : ('\r'? '\n' | '\r') ;
 // fragment LOWERCASE  : [a-z] ;
 // fragment UPPERCASE  : [A-Z] ;
 
-// // Markup
+// // Metadata
 // TITLE : 'Title' ;
 // CHAPTER : 'Chapter' ;
-// AUTHOR : 'Author' ;
 // SECTION : 'Section' ;
 // SECTION_SYMBOL: '---' ;
 

@@ -20,7 +20,7 @@ describe('text listener', () => {
         expect(output).toBe('My Book\n');
     });
 
-    test('throws on parse error and provides a list of all errors', () => {
+    test('throws on parse error on invalid title', () => {
         mockArgs.inputString = 'Title:\n';
         const compiler = new Compiler(mockArgs, mockArgs.inputString);
         try {
@@ -31,6 +31,20 @@ describe('text listener', () => {
             expect(e).toBeInstanceOf(CompileError);
             expect((e as CompileError).errors.length).toBe(1);
         }
+    });
+
+    test('parses author', () => {
+        mockArgs.inputString = 'Author: Jane Doe\n';
+        const compiler = new Compiler(mockArgs, mockArgs.inputString);
+        let output = compiler.compile();
+        expect(output).toBe('by Jane Doe\n');
+    });
+
+    test('parses title and author', () => {
+        mockArgs.inputString = 'Title: My Book\nAuthor: Jane Doe\n';
+        const compiler = new Compiler(mockArgs, mockArgs.inputString);
+        let output = compiler.compile();
+        expect(output).toBe('My Book\nby Jane Doe\n');
     });
 
 });
