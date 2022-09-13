@@ -1,16 +1,22 @@
 import { Title_tagContext } from '../../generated/ProzeParser';
 import { ListenerOutput } from './interface';
+import { Metadata } from '../metadata';
 
 
 export class TextListener implements ListenerOutput {
 
     private output: string;
+    private metadata: Metadata;
 
-    constructor() {
+    constructor(metadata: Metadata) {
         this.output = '';
+        this.metadata = metadata;
     }
 
     getOutput(): string {
+        if (this.metadata.title) {
+            this.output = this.metadata.title + '\n';
+        }
         return this.output;
     }
 
@@ -21,7 +27,7 @@ export class TextListener implements ListenerOutput {
                 result.push(word.payload.text);
             }
         }
-        this.output += result.join(' ') + '\n';
+        this.metadata.title = result.join(' ');
     }
 
 }

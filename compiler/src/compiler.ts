@@ -5,6 +5,7 @@ import { CharStreams, CommonTokenStream } from 'antlr4ts';
 import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker'
 
 import { ListenerOutput } from '../src/listeners/interface';
+import { Metadata } from './metadata';
 import { ParseErrorListener, ParseError } from './listeners/error-listener';
 import { TextListener } from './listeners/text';
 
@@ -21,12 +22,14 @@ export class CompileError extends Error {
 
 export class Compiler {
 
-    private listener: ListenerOutput;
-    private tree: any;
     private errorListener: ParseErrorListener;
+    private listener: ListenerOutput;
+    private metadata: Metadata;
+    private tree: any;
 
     constructor(args: any, input_string: string) {
         this.errorListener = new ParseErrorListener();
+        this.metadata = new Metadata();
         this.listener = this.createListener(args);
         this.tree = this.createParseTree(input_string);
     }
@@ -46,7 +49,7 @@ export class Compiler {
 
     private createListener(args: any): ListenerOutput {
         if (args.format == 'text') {
-            return new TextListener();
+            return new TextListener(this.metadata);
         }
         throw Error('No compiler for format ' + args.format);
     }
