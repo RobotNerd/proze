@@ -1,5 +1,5 @@
 import { CompileError, Compiler } from '../compiler';
-import { ProzeArgs, Format } from '../cli-arguments';
+import { ProzeArgs, Format } from '../util/cli-arguments';
 
 
 describe('text listener', () => {

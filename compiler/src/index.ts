@@ -1,5 +1,5 @@
 import { exit } from 'process';
-import { ArgParser, ShowHelpError } from './cli-arguments';
+import { ArgParser, ShowHelpError } from './util/cli-arguments';
 import { Compiler, CompileError } from './compiler';
 
 
