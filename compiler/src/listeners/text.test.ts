@@ -2,7 +2,11 @@ import { CompileError, Compiler } from '../compiler';
 import { ProzeArgs, Format } from '../util/cli-arguments';
 
 
-const defaultContent = 'This is a sentence.';
+const defaultContent = [
+    'It was a dark and stormy night.',
+    'Lightning flashed and illuminated the dust-covered furniture of the mansion.',
+    'A trail of wet footprints crossed the wooden planks of the floor.',
+].join(' ');
 
 const data = {
     default: {

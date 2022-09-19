@@ -1,8 +1,8 @@
-import { Author_tagContext, Raw_sentenceContext, Title_tagContext } from '../../generated/ProzeParser';
+import { Author_tagContext, ParagraphContext, Raw_sentenceContext, Title_tagContext } from '../../generated/ProzeParser';
 import { MetadataContext } from '../../generated/ProzeParser';
 import { ListenerOutput } from './interface';
 import { Metadata } from '../metadata';
-import { Sentence } from '../components/sentence';
+import { Paragraph } from '../components/paragraph';
 
 
 
@@ -10,19 +10,21 @@ export class TextListener implements ListenerOutput {
 
     private output: string;
     private metadata: Metadata;
-    private sentences: Sentence[] = [];
+    private paragraphs: Paragraph[] = [];
+
+    private currentParagraph: Paragraph|null;
 
     constructor(metadata: Metadata) {
         this.output = '';
         this.metadata = metadata;
+        this.currentParagraph = null;
     }
 
     getOutput(): string {
         this.output += this.getOutputHeader();
-        for (let sentence of this.sentences) {
-            this.output += sentence.getOutput();
+        for (let paragraph of this.paragraphs) {
+            this.output += paragraph.sentences.join(' ') + '\n';
         }
-        this.output += '\n';
         return this.output;
     }
 
@@ -49,7 +51,16 @@ export class TextListener implements ListenerOutput {
     }
 
     enterRaw_sentence(ctx: Raw_sentenceContext) {
-        this.sentences.push(new Sentence(ctx.text));
+        this.currentParagraph?.sentences.push(ctx.text);
+    }
+
+    enterParagraph(ctx: ParagraphContext) {
+        this.currentParagraph = new Paragraph();
+        this.paragraphs.push(this.currentParagraph);
+    }
+
+    exitParagraph(ctx: ParagraphContext) {
+        this.currentParagraph = null;
     }
 
     private parseMetadata(ctx: MetadataContext): string {

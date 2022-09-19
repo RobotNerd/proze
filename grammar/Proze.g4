@@ -2,7 +2,7 @@ grammar Proze;
 
 /* Parser rules */
 
-document : title_tag? author_tag? sentence EOF ;
+document : title_tag? author_tag? paragraph EOF ;
 // document : (title_tag? | author_tag? ) chapter+ ;
 
 title_tag : TITLE metadata ;
@@ -11,7 +11,9 @@ author_tag : AUTHOR metadata ;
 metadata: ':' (WHITESPACE | WORD)+ NEWLINE+ ;
 
 raw_sentence: ( WORD | WHITESPACE | PUNCTUATION )+ STOP ;
-sentence : raw_sentence ( WHITESPACE+ NEWLINE | NEWLINE ) ;
+spaced_sentence: raw_sentence WHITESPACE+;
+
+paragraph: ( spaced_sentence+ raw_sentence | raw_sentence ) (NEWLINE NEWLINE+ | NEWLINE EOF ) ;
 
 
 // chapter_tag : CHAPTER metadata ;
