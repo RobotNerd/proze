@@ -16,9 +16,6 @@ try {
 catch (e: unknown) {
     if (e instanceof CompileError) {
         console.log(e.message);
-        for (let err of e.errors) {
-            console.log(`${err.line}:${err.charPositionInLine} ${err.msg}`);
-        }
     }
     else if (e instanceof ShowHelpError) {
         ArgParser.showHelp();

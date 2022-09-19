@@ -18,7 +18,7 @@
             "outFiles": [
                 "${workspaceFolder}/compiler/dist/**/*.js"
             ],
-            "args": ["--format", "text", "--input-string", "Title: My Book\nAuthor: Jane Doe\n"]
+            "args": ["--format", "text", "--input-string", "Title: My Book\nAuthor: Jane Doe\n\nThis is a sentence.\n"]
         }
     ]
 }

@@ -2,26 +2,26 @@ grammar Proze;
 
 /* Parser rules */
 
-document : title_tag? author_tag? ;
+document : title_tag? author_tag? sentence EOF ;
+// document : (title_tag? | author_tag? ) chapter+ ;
 
 title_tag : TITLE metadata ;
 author_tag : AUTHOR metadata ;
 
 metadata: ':' (WHITESPACE | WORD)+ NEWLINE+ ;
 
+raw_sentence: ( WORD | WHITESPACE | PUNCTUATION )+ STOP ;
+sentence : raw_sentence ( WHITESPACE+ NEWLINE | NEWLINE ) ;
 
-// document : (title_tag? | author_tag? ) chapter+ ;
 
-// title_tag : TITLE metadata ;
 // chapter_tag : CHAPTER metadata ;
 // section_tag : SECTION  metadata | SECTION_SYMBOL WHITESPACE* NEWLINE+ ;
-// metadata: ':' (WHITESPACE | WORD)+ NEWLINE+;
+
+// empty_lines: NEWLINE NEWLINE+ ;
 
 // chapter: chapter_tag (paragraph | section_tag)+ ;
 
-// paragraph : sentence+ NEWLINE NEWLINE+ ;
-
-// sentence : ( WORD | WHITESPACE | PUNCTUATION )+ STOP ;
+// paragraph : sentence+ empty_lines ;
 
 // bold : BOLD (WORD+ | WHITESPACE)+ (BOLD | NEWLINE) ;
 
@@ -41,7 +41,7 @@ fragment UPPERCASE  : [A-Z] ;
 TITLE : 'Title' ;
 AUTHOR : 'Author' ;
 
-WORD : (LOWERCASE | UPPERCASE | '-' | '.' | ';' )+ ;
+WORD : (LOWERCASE | UPPERCASE | '-' )+ ;
 
 WHITESPACE : (' ' | '\t') ;
 
@@ -64,16 +64,12 @@ NEWLINE : ('\r'? '\n' | '\r') ;
 
 // EM_DASH : '--';
 
-// STOP : ( '.' | '!' | '?' ) ;
+STOP : ( '.' ) ;
+// STOP : ( '.' | '!' | '?' ) '"'? ;
 
 // ITALIC : '*' ;
 
 // BOLD : '__' ;
 
-// PUNCTUATION : ( '"' | '\'' | ';' | ',' | EM_DASH ) ;
-
-// WORD : (LOWERCASE | UPPERCASE | '-' | '.' | ';' )+ ;
-
-// WHITESPACE : (' ' | '\t') ;
-
-// NEWLINE : ('\r'? '\n' | '\r') ;
+PUNCTUATION : ( ',' ) WHITESPACE+ ;
+// PUNCTUATION : ( '"' | '\'' | ';' | ',' | ':' | EM_DASH ) ;

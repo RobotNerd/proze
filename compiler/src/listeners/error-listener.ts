@@ -3,10 +3,20 @@ import { RecognitionException } from "antlr4ts/RecognitionException";
 import { Recognizer } from "antlr4ts/Recognizer";
 
 
-export interface ParseError {
-    line: number;
-    charPositionInLine: number;
-    msg: string;
+export class ParseError {
+    line: number = -1;
+    charPositionInLine: number = -1;
+    msg: string = '';
+
+    constructor(line: number, charPositionInLine: number, msg: string) {
+        this.line = line;
+        this.charPositionInLine = charPositionInLine;
+        this.msg = msg;
+    }
+
+    toString(): string {
+        return `${this.line}:${this.charPositionInLine} ${this.msg}`;
+    }
 }
 
 
@@ -19,11 +29,7 @@ export class ParseErrorListener implements ANTLRErrorListener<any> {
     }
 
     private add(line: number, charPositionInLine: number, msg: string) {
-        this.errorList.push({
-            line,
-            charPositionInLine,
-            msg
-        });
+        this.errorList.push(new ParseError(line, charPositionInLine, msg));
     }
 
     errors(): ParseError[] {

@@ -15,7 +15,19 @@ export class CompileError extends Error {
 
     constructor(message: string, errors: ParseError[]) {
         super(message);
+        this.message += `\n${this.errorsToString(errors)}`;
+
+        // The array of errors is attached here to allow for programmatic access.
         this.errors = errors;
+    }
+
+    /** Automatically append errors to exception message. */
+    private errorsToString(errors: ParseError[]): string {
+        let result = '';
+        for (let error of errors) {
+            result += `${error.toString()}\n`
+        }
+        return result;
     }
 }
 

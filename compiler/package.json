@@ -8,9 +8,9 @@
     "build-all": "npm run antlr4ts && npm run build",
     "build": "npx tsc --project ./tsconfig.build.json",
     "compile": "node ./dist/src/index.js",
-    "test": "jest -c ./jest.unit.json",
+    "test": "npm run build-all && jest -c ./jest.unit.json",
     "test:watch": "npm run test -- --watch",
-    "test:coverage": "jest --coverage -c ./jest.unit.json",
+    "test:coverage": "npm run build-all && jest --coverage -c ./jest.unit.json",
     "test:coverage:watch": "npm run test:coverage -- --watch"
   },
   "repository": {
