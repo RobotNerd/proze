@@ -22,9 +22,11 @@ export class TextListener implements ListenerOutput {
 
     getOutput(): string {
         this.output += this.getOutputHeader();
+        const parsedParagraphs = [];
         for (let paragraph of this.paragraphs) {
-            this.output += paragraph.sentences.join(' ') + '\n';
+            parsedParagraphs.push(paragraph.sentences.join(' '));
         }
+        this.output += parsedParagraphs.join('\n\n') + '\n';
         return this.output;
     }
 
