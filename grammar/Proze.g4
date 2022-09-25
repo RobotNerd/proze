@@ -2,56 +2,72 @@ grammar Proze;
 
 /* Parser rules */
 
-document : (title_tag? | author_tag? ) chapter+ ;
+document : title_tag? author_tag? paragraph+ EOF ;
+// document : (title_tag? | author_tag? ) chapter+ ;
 
-title_tag : TITLE markup_value ;
-chapter_tag : CHAPTER markup_value ;
-author_tag : AUTHOR markup_value ;
-section_tag : SECTION  markup_value | SECTION_SYMBOL WHITESPACE* NEWLINE+;
-markup_value: ':' (WHITESPACE | WORD)+ NEWLINE+;
+title_tag : TITLE metadata ;
+author_tag : AUTHOR metadata ;
+// chapter_tag : CHAPTER metadata ;
 
-chapter: chapter_tag (paragraph | section_tag)+ ;
+metadata: ':' (WHITESPACE | WORD)+ NEWLINE+ ;
 
-paragraph : sentence+ NEWLINE NEWLINE+ ;
+raw_sentence: ( WORD | WHITESPACE | PUNCTUATION )+ STOP ;
+spaced_sentence: raw_sentence WHITESPACE+;
 
-sentence : ( WORD | WHITESPACE | PUNCTUATION )+ STOP ;
+paragraph: ( spaced_sentence+ | spaced_sentence+ raw_sentence | raw_sentence ) ( empty_lines | NEWLINE EOF ) ;
 
-bold : BOLD (WORD+ | WHITESPACE)+ (BOLD | NEWLINE) ;
+// section_tag : SECTION  metadata | SECTION_SYMBOL WHITESPACE* NEWLINE+ ;
 
-italic : ITALIC (WORD+ | WHITESPACE)+ (ITALIC | NEWLINE) ;
+empty_lines: NEWLINE NEWLINE+ ;
 
-block_comment : BLOCK_COMMENT (WORD | COMMENT_CALLOUT | WHITESPACE)+ (BLOCK_COMMENT | EOF) ;
-line_comment : LINE_COMMENT (WORD | COMMENT_CALLOUT | WHITESPACE)+ NEWLINE ;
+// chapter: chapter_tag paragraph+ ( chapter_tag | EOF ) ;
+// chapter: chapter_tag (paragraph | section_tag)+ ;
+
+// bold : BOLD (WORD+ | WHITESPACE)+ (BOLD | NEWLINE) ;
+
+// italic : ITALIC (WORD+ | WHITESPACE)+ (ITALIC | NEWLINE) ;
+
+// block_comment : BLOCK_COMMENT (WORD | COMMENT_TOKEN | WHITESPACE)+ (BLOCK_COMMENT | EOF) ;
+// line_comment : LINE_COMMENT (WORD | COMMENT_TOKEN | WHITESPACE)+ NEWLINE ;
+
+
+
 
 /* Lexer rules */
 
 fragment LOWERCASE  : [a-z] ;
 fragment UPPERCASE  : [A-Z] ;
 
-// Markup
 TITLE : 'Title' ;
-CHAPTER : 'Chapter' ;
 AUTHOR : 'Author' ;
-SECTION : 'Section' ;
-SECTION_SYMBOL: '---' ;
+// CHAPTER : 'Chapter' ;
 
-BLOCK_COMMENT : '###' ;
-LINE_COMMENT : '##' ;
-
-COMMENT_CALLOUT: 'FIXME' | 'IMPORTANT' | 'NOTE' | 'TODO' ;
-
-EM_DASH : '--';
-
-STOP : ( '.' | '!' | '?' ) ;
-
-ITALIC : '*' ;
-
-BOLD : '__' ;
-
-PUNCTUATION : ( '"' | '\'' | ';' | ',' | EM_DASH ) ;
-
-WORD : (LOWERCASE | UPPERCASE | '-' | '.' | ';' )+ ;
+WORD : (LOWERCASE | UPPERCASE | '-' )+ ;
 
 WHITESPACE : (' ' | '\t') ;
 
 NEWLINE : ('\r'? '\n' | '\r') ;
+
+
+// fragment LOWERCASE  : [a-z] ;
+// fragment UPPERCASE  : [A-Z] ;
+
+// SECTION : 'Section' ;
+// SECTION_SYMBOL: '---' ;
+
+// BLOCK_COMMENT : '###' ;
+// LINE_COMMENT : '##' ;
+
+// COMMENT_TOKEN: 'FIXME' | 'IMPORTANT' | 'NOTE' | 'TODO' ;
+
+// EM_DASH : '--';
+
+STOP : ( '.' ) ;
+// STOP : ( '.' | '!' | '?' ) '"'? ;
+
+// ITALIC : '*' ;
+
+// BOLD : '__' ;
+
+PUNCTUATION : ( ',' ) WHITESPACE ;
+// PUNCTUATION : ( '"' | '\'' | ';' | ',' | ':' | EM_DASH ) ;

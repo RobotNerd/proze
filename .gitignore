@@ -1,1 +1,5 @@
 .antlr/
+coverage/
+dist/
+generated/
+node_modules/

@@ -1,4 +1,4 @@
-# Proze
+# Proze grammar
 
 > TODO
 
@@ -15,4 +15,12 @@ To get `grun` working, update the `CLASSPATH` environment variable.
 - Add this to the CLASSPATH env var in .zshrc. For example:
 ```
 export CLASSPATH=/opt/homebrew/Cellar/antlr/4.10.1/antlr-4.10.1-complete.jar:$CLASSPATH
+```
+
+## Building
+
+- Generate python files from the grammar.
+
+```shell
+make generate_grammar
 ```
