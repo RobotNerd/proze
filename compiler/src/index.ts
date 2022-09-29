@@ -6,11 +6,11 @@ import { Compiler, CompileError } from './compiler';
 try {
     const argParser = new ArgParser();
     let args = argParser.parseArgs(process.argv.slice(2));
-    if (args.inputString == null) {
+    if (args.path == null) {
         console.log('no proze input_string provided to parse');
         exit(0);
     }
-    let compiler = new Compiler(args, args.inputString);
+    let compiler = new Compiler(args);
     console.log(compiler.compile());
 }
 catch (e: unknown) {

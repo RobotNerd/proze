@@ -39,7 +39,7 @@ export class TextListener implements ListenerOutput {
             header += `by ${this.metadata.author}\n`;
         }
         if (header != '') {
-            header += '\n';
+            header += '\n\n';
         }
         return header;
     }

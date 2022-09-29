@@ -1,18 +1,11 @@
+import { readFileSync } from 'fs';
 import { CompileError, Compiler } from '../compiler';
 import { ProzeArgs, Format } from '../util/cli-arguments';
 
 
-const defaultContent =
-`It was a dark and stormy night. Lightning flashed and illuminated the dust-covered furniture of the mansion. A trail of wet footprints crossed the wooden planks of the floor.
-
-A dark figure stood by the fireplace, wet and shivering from the rain. A pool or orange light from the fire pressed against the darkness. The small fire provided little heat, but it was better than nothing.`;
-
-const data = {
-    default: {
-        given: `Title: My Book\nAuthor: Jane Doe\n\n\n${defaultContent}\n`,
-        expected: `My Book\nby Jane Doe\n\n${defaultContent}\n`,
-    },
-};
+function loadExpectedOutput(path: string): string {
+    return readFileSync(path, 'utf-8');
+}
 
 
 describe('text listener', () => {
@@ -22,32 +15,34 @@ describe('text listener', () => {
     beforeEach(() => {
         mockArgs = {
             format: Format.text,
-            inputString: null,
+            path: null,
         };
     });
 
     test('parses document', () => {
-        const compiler = new Compiler(mockArgs, data.default.given);
-        expect(compiler.compile()).toBe(data.default.expected);
+        mockArgs.path = 'test-data/default.proze';
+        let expected = 'test-data/default.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
     test('allows no metadata fields to be provided', () => {
-        mockArgs.inputString = `${defaultContent}\n`;
-        const compiler = new Compiler(mockArgs, mockArgs.inputString);
-        let output = compiler.compile();
-        expect(output).toBe(`${defaultContent}\n`);
+        mockArgs.path = 'test-data/no-metadata.proze';
+        let expected = 'test-data/no-metadata.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
     test('allows title to be the only metadata', () => {
-        mockArgs.inputString = `Title: My Book\n\n${defaultContent}\n`;
-        const compiler = new Compiler(mockArgs, mockArgs.inputString);
-        let output = compiler.compile();
-        expect(output).toBe(`My Book\n\n${defaultContent}\n`);
+        mockArgs.path = 'test-data/title-only.proze';
+        let expected = 'test-data/title-only.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
     test('throws on parse error on invalid title', () => {
-        mockArgs.inputString = `Title:\n\n${defaultContent}\n`;
-        const compiler = new Compiler(mockArgs, mockArgs.inputString);
+        mockArgs.path = 'test-data/invalid-title.proze';
+        const compiler = new Compiler(mockArgs);
         try {
             let output = compiler.compile();
             fail('expected CompileError to be thrown');
@@ -59,10 +54,10 @@ describe('text listener', () => {
     });
 
     test('allows author to be the only metadata', () => {
-        mockArgs.inputString = `Author: Jane Doe\n\n${defaultContent}\n`;
-        const compiler = new Compiler(mockArgs, mockArgs.inputString);
-        let output = compiler.compile();
-        expect(output).toBe(`by Jane Doe\n\n${defaultContent}\n`);
+        mockArgs.path = 'test-data/author-only.proze';
+        let expected = 'test-data/author-only.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
 });

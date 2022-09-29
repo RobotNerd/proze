@@ -8,6 +8,7 @@ import { ListenerOutput } from '../src/listeners/interface';
 import { Metadata } from './metadata';
 import { ParseErrorListener, ParseError } from './listeners/error-listener';
 import { TextListener } from './listeners/text';
+import { readFileSync } from 'fs';
 
 
 export class CompileError extends Error {
@@ -39,11 +40,11 @@ export class Compiler {
     private metadata: Metadata;
     private tree: any;
 
-    constructor(args: any, input_string: string) {
+    constructor(args: any) {
         this.errorListener = new ParseErrorListener();
         this.metadata = new Metadata();
         this.listener = this.createListener(args);
-        this.tree = this.createParseTree(input_string);
+        this.tree = this.createParseTree(args.path);
     }
 
     compile() {
@@ -66,8 +67,9 @@ export class Compiler {
         throw Error('No compiler for format ' + args.format);
     }
 
-    private createParseTree(input_string: string) {
-        let chars = CharStreams.fromString(input_string);
+    private createParseTree(path: string) {
+        let content = readFileSync(path, 'utf-8');
+        let chars = CharStreams.fromString(content);
         let lexer = new ProzeLexer(chars);
         lexer.removeErrorListeners();
         lexer.addErrorListener(this.errorListener);

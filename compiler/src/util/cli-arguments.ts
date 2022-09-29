@@ -6,7 +6,7 @@ export enum Format {
 
 export interface ProzeArgs {
     format: Format;
-    inputString: string|null;
+    path: string|null;
 }
 
 let helpMessage = `Usage: proze compiler
@@ -16,7 +16,7 @@ let helpMessage = `Usage: proze compiler
     Optional arguments:
         -h, --help: Show this help message.
         --format: Target format for the generated output file (default: text)
-        --input-string: A proze-formatted string to compile (mainly used for testing).
+        --path: Path to a proze file or a project directory.
 `;
 
 
@@ -27,7 +27,7 @@ export class ArgParser {
     constructor() {
         this.args = {
             format: Format.text,
-            inputString: null,
+            path: null,
         };
     }
 
@@ -35,7 +35,7 @@ export class ArgParser {
         for (let i=0; i < cliArgs.length; i++) {
             this.parseHelpFlag(cliArgs[i]);
             this.parseFormat(cliArgs, i);
-            this.parseInputString(cliArgs, i);
+            this.parsePath(cliArgs, i);
         }
         return this.args;
     }
@@ -54,10 +54,10 @@ export class ArgParser {
         }
     }
 
-    private parseInputString(cliArgs: string[], i: number) {
-        if (cliArgs[i] == '--input-string') {
+    private parsePath(cliArgs: string[], i: number) {
+        if (cliArgs[i] == '--path') {
             if (i + 1 <= cliArgs.length) {
-                this.args.inputString = cliArgs[i+1];
+                this.args.path = cliArgs[i+1];
             }
         }
     }
