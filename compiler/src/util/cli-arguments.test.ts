@@ -21,25 +21,25 @@ describe('CLI arg parser', () => {
         const argParser = new ArgParser();
         let result: ProzeArgs = {
             format: Format.text,
-            inputString: 'test',
+            path: 'test',
         };
-        expect(argParser.parseArgs(['--format', 'text', '--input-string', 'test'])).toEqual(result);
-        expect(argParser.parseArgs(['--input-string', 'test', '--format', 'text'])).toEqual(result);
+        expect(argParser.parseArgs(['--format', 'text', '--path', 'test'])).toEqual(result);
+        expect(argParser.parseArgs(['--path', 'test', '--format', 'text'])).toEqual(result);
     });
 
     test('parses input string', () => {
         const argParser = new ArgParser();
         let result: ProzeArgs = {
             format: Format.text,
-            inputString: 'test',
+            path: 'test',
         };
         expect(argParser.parseArgs(
-            ['--format', 'text', '--input-string', 'test'])
+            ['--format', 'text', '--path', 'test'])
         ).toEqual(result);
 
-        result.inputString = 'this is another test';
+        result.path = 'this is another test';
         expect(argParser.parseArgs(
-            ['--input-string', result.inputString, '--format', 'text'])
+            ['--path', result.path, '--format', 'text'])
         ).toEqual(result);
     });
 });
