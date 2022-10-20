@@ -11,7 +11,7 @@
 			},
 			"problemMatcher": [],
 			"label": "npm: build-all - compiler",
-			"detail": "npm run antlr4ts && npx tsc"
+			"detail": "npx tsc"
 		}
 	]
 }

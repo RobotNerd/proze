@@ -6,7 +6,7 @@ export enum Format {
 
 export interface ProzeArgs {
     format: Format;
-    path: string|null;
+    path: string;
 }
 
 let helpMessage = `Usage: proze compiler
@@ -27,7 +27,7 @@ export class ArgParser {
     constructor() {
         this.args = {
             format: Format.text,
-            path: null,
+            path: '',
         };
     }
 
