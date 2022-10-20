@@ -18,17 +18,11 @@ export class Metadata {
         this.author = null;
     }
 
-    // private resetPatterns() {
-    //     this.patterns.tag.lastIndex = 0;
-    //     this.patterns.content.lastIndex = 0;
-    // }
-
     parse(line: string): boolean {
         let isMetadata = false;
-        // this.resetPatterns();
         const tag = this.startsWithTag(line);
         if (tag) {
-            const match = line.match(this.patterns.content);  //this.patterns.content.exec(line);
+            const match = line.match(this.patterns.content);
             if (match) {
                 switch(tag) {
                     case Tag.Author:
@@ -46,7 +40,6 @@ export class Metadata {
 
     private startsWithTag(line: string): Tag | null {
         let tag: Tag | null = null;
-        // const match = this.patterns.tag.exec(line);
         const match = line.match(this.patterns.tag);
         if (match) {
             tag = match[1] as Tag;  // TODO add exception handling
