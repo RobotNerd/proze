@@ -26,19 +26,19 @@ describe('text listener', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
-    // test('allows no metadata fields to be provided', () => {
-    //     mockArgs.path = 'test-data/no-metadata.proze';
-    //     let expected = 'test-data/no-metadata.expected.txt';
-    //     const compiler = new Compiler(mockArgs);
-    //     expect(compiler.compile()).toBe(loadExpectedOutput(expected));
-    // });
+    test('allows no metadata fields to be provided', () => {
+        mockArgs.path = 'test-data/no-metadata.proze';
+        let expected = 'test-data/no-metadata.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
 
-    // test('allows title to be the only metadata', () => {
-    //     mockArgs.path = 'test-data/title-only.proze';
-    //     let expected = 'test-data/title-only.expected.txt';
-    //     const compiler = new Compiler(mockArgs);
-    //     expect(compiler.compile()).toBe(loadExpectedOutput(expected));
-    // });
+    test('allows title to be the only metadata', () => {
+        mockArgs.path = 'test-data/title-only.proze';
+        let expected = 'test-data/title-only.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
 
     // test('throws on parse error on invalid title', () => {
     //     mockArgs.path = 'test-data/invalid-title.proze';
@@ -53,11 +53,11 @@ describe('text listener', () => {
     //     }
     // });
 
-    // test('allows author to be the only metadata', () => {
-    //     mockArgs.path = 'test-data/author-only.proze';
-    //     let expected = 'test-data/author-only.expected.txt';
-    //     const compiler = new Compiler(mockArgs);
-    //     expect(compiler.compile()).toBe(loadExpectedOutput(expected));
-    // });
+    test('allows author to be the only metadata', () => {
+        mockArgs.path = 'test-data/author-only.proze';
+        let expected = 'test-data/author-only.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
 
 });

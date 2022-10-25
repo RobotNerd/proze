@@ -14,11 +14,11 @@ export class TextFormatter {
     }
 
     getOutput(): string {
-        let output = this.getOutputHeader();
+        let content: string[] = [];
         for (let paragraph of this.paragraphs) {
-            output += paragraph.lines.join(' ') + '\n\n';
+            content.push(paragraph.getOutput());
         }
-        return output;
+        return this.getOutputHeader() + content.join('\n\n') + '\n';
     }
 
     private getOutputHeader(): string {

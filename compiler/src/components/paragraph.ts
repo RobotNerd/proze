@@ -5,4 +5,8 @@ export class Paragraph {
     add(line: string) {
         this.lines.push(line);
     }
+
+    getOutput(): string {
+        return this.lines.join(' ');
+    }
 }
