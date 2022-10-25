@@ -18,8 +18,11 @@ export class Metadata {
         this.author = null;
     }
 
-    parse(line: string): boolean {
-        let isMetadata = false;
+    isMetadata(line: string): boolean {
+        return this.startsWithTag(line) !== null;
+    }
+
+    parse(line: string) {
         const tag = this.startsWithTag(line);
         if (tag) {
             const match = line.match(this.patterns.content);
@@ -33,9 +36,7 @@ export class Metadata {
                         break;
                 }
             }
-            isMetadata = true;
         }
-        return isMetadata;
     }
 
     private startsWithTag(line: string): Tag | null {

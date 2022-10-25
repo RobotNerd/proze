@@ -1,11 +1,8 @@
 export class Paragraph {
-    pattern = /.*?\n\n+/;
-    content: string | null = null;
+    private content: string | null = null;
+    lines: string[] = [];
 
-    parse(line: string) {
-        const match = line.match(this.pattern);
-        if (match) {
-            this.content = line;
-        }
+    add(line: string) {
+        this.lines.push(line);
     }
 }

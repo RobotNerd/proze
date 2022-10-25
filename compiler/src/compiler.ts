@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import { Format, ProzeArgs } from './util/cli-arguments';
 import { Paragraph } from './components/paragraph';
 import { TextFormatter } from './formatters/text';
+import { LineState, LineType } from './components/line-state';
 
 
 export class Compiler {
@@ -10,11 +11,12 @@ export class Compiler {
     private args: ProzeArgs;
     private metadata: Metadata;
     private paragraphs: Paragraph[] = [];
-    private inParagraph: boolean = false;
+    private lineState: LineState;
 
     constructor(args: any) {
         this.args = args;
         this.metadata = new Metadata();
+        this.lineState = new LineState(this.metadata);
     }
 
     compile() {
@@ -31,26 +33,25 @@ export class Compiler {
     }
 
     private parseLines() {
-        let paragraph: Paragraph;
+        let paragraph: Paragraph = new Paragraph();
         const lines = this.loadFile(this.args.path);
         for (let line of lines) {
-            const isMetadata = this.metadata.parse(line);
-            // if (!isMetadata) {
-            //     if (this.isEmptyLine(line)) {
-            //         paragraph = new Paragraph();
-            //     }
-            //     this.inParagraph = true;
-            //     const paragraph = new Paragraph();
-            //     paragraph.parse(line);
-            //     if (paragraph.content != null) {
-            //         this.paragraphs.push(paragraph);
-            //     }
-            // }
+            this.lineState.update(line);
+            switch(this.lineState.lineType) {
+                case LineType.metadata:
+                    this.metadata.parse(line);
+                    break;
+                case LineType.paragraph:
+                    paragraph.add(line);
+                    break;
+                case LineType.emptyLine:
+                    if (paragraph.lines.length > 0) {
+                        this.paragraphs.push(paragraph);
+                        paragraph = new Paragraph();
+                    }
+                    break;
+            }
         }
-    }
-
-    private isEmptyLine(line: string): boolean {
-        return false;
     }
 
     private loadFile(path: string): string[] {
