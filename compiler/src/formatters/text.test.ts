@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
-import { CompileError, Compiler } from '../compiler';
+import { Compiler } from '../compiler';
 import { ProzeArgs, Format } from '../util/cli-arguments';
+import { CompileError } from '../util/compile-error';
 
 
 function loadExpectedOutput(path: string): string {
@@ -15,7 +16,7 @@ describe('text listener', () => {
     beforeEach(() => {
         mockArgs = {
             format: Format.text,
-            path: null,
+            path: '',
         };
     });
 
@@ -40,12 +41,12 @@ describe('text listener', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
-    test('throws on parse error on invalid title', () => {
+    test('throws compile error on invalid title', () => {
         mockArgs.path = 'test-data/invalid-title.proze';
         const compiler = new Compiler(mockArgs);
         try {
             let output = compiler.compile();
-            fail('expected CompileError to be thrown');
+            throw new Error('expected CompileError to be thrown');
         }
         catch(e: unknown) {
             expect(e).toBeInstanceOf(CompileError);

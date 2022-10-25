@@ -1,6 +1,6 @@
 import { exit } from 'process';
 import { ArgParser, ShowHelpError } from './util/cli-arguments';
-import { Compiler, CompileError } from './compiler';
+import { Compiler } from './compiler';
 
 
 try {
@@ -14,10 +14,7 @@ try {
     console.log(compiler.compile());
 }
 catch (e: unknown) {
-    if (e instanceof CompileError) {
-        console.log(e.message);
-    }
-    else if (e instanceof ShowHelpError) {
+    if (e instanceof ShowHelpError) {
         ArgParser.showHelp();
         exit(0);
     }

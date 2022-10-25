@@ -1,84 +1,86 @@
-import { ProzeLexer } from '../generated/ProzeLexer';
-import { ProzeParser } from '../generated/ProzeParser';
-
-import { CharStreams, CommonTokenStream } from 'antlr4ts';
-import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker'
-
-import { ListenerOutput } from '../src/listeners/interface';
-import { Metadata } from './metadata';
-import { ParseErrorListener, ParseError } from './listeners/error-listener';
-import { TextListener } from './listeners/text';
+import { Metadata } from './components/metadata';
 import { readFileSync } from 'fs';
-
-
-export class CompileError extends Error {
-    errors: ParseError[];
-
-    constructor(message: string, errors: ParseError[]) {
-        super(message);
-        this.message += `\n${this.errorsToString(errors)}`;
-
-        // The array of errors is attached here to allow for programmatic access.
-        this.errors = errors;
-    }
-
-    /** Automatically append errors to exception message. */
-    private errorsToString(errors: ParseError[]): string {
-        let result = '';
-        for (let error of errors) {
-            result += `${error.toString()}\n`
-        }
-        return result;
-    }
-}
+import { Format, ProzeArgs } from './util/cli-arguments';
+import { Paragraph } from './components/paragraph';
+import { TextFormatter } from './formatters/text';
+import { LineState, LineType } from './components/line-state';
+import { Line } from './components/line';
+import { ParseError } from './util/parse-error';
+import { CompileError } from './util/compile-error';
 
 
 export class Compiler {
 
-    private errorListener: ParseErrorListener;
-    private listener: ListenerOutput;
+    private args: ProzeArgs;
     private metadata: Metadata;
-    private tree: any;
+    private paragraphs: Paragraph[] = [];
+    private lineState: LineState;
+    private parseErrors: ParseError[] = [];
 
     constructor(args: any) {
-        this.errorListener = new ParseErrorListener();
+        this.args = args;
         this.metadata = new Metadata();
-        this.listener = this.createListener(args);
-        this.tree = this.createParseTree(args.path);
+        this.lineState = new LineState(this.metadata);
     }
 
     compile() {
-        let walker = new ParseTreeWalker();
-        walker.walk(this.listener, this.tree);
-        const errors = this.errorListener.errors();
-        if (errors.length > 0) {
+        this.parseLines();
+        let formatter;
+        switch(this.args.format) {
+            case Format.text:
+                formatter = new TextFormatter(this.metadata, this.paragraphs);
+                break;
+            default:
+                throw new Error(`unrecognized format: ${this.args.format}`);
+        }
+        if (this.parseErrors.length > 0) {
             throw new CompileError(
-                `Unable to compile due to ${errors.length} parse errors.`,
-                errors
+                'Failed to compile due to parse errors.',
+                this.parseErrors
             );
         }
-        return this.listener.getOutput();
+        return formatter.getOutput();
     }
 
-    private createListener(args: any): ListenerOutput {
-        if (args.format == 'text') {
-            return new TextListener(this.metadata);
+    private parseLines() {
+        let paragraph: Paragraph = new Paragraph();
+        const lines = this.loadFile(this.args.path);
+        for(let i=0; i < lines.length; i++) {
+            let line = new Line(lines[i], i);
+            this.lineState.update(line);
+            try {
+                switch(this.lineState.lineType) {
+                    case LineType.metadata:
+                        this.metadata.parse(line);
+                        break;
+                    case LineType.paragraph:
+                        paragraph.add(line);
+                        break;
+                    case LineType.emptyLine:
+                        if (paragraph.lines.length > 0) {
+                            this.paragraphs.push(paragraph);
+                            paragraph = new Paragraph();
+                        }
+                        break;
+                }
+            }
+            catch (err) {
+                if (err instanceof ParseError) {
+                    this.handleParseError(err);
+                }
+                else {
+                    throw err;
+                }
+            }
         }
-        throw Error('No compiler for format ' + args.format);
     }
 
-    private createParseTree(path: string) {
+    private loadFile(path: string): string[] {
         let content = readFileSync(path, 'utf-8');
-        let chars = CharStreams.fromString(content);
-        let lexer = new ProzeLexer(chars);
-        lexer.removeErrorListeners();
-        lexer.addErrorListener(this.errorListener);
-        let tokens = new CommonTokenStream(lexer);
-        let parser = new ProzeParser(tokens);
-        parser.removeErrorListeners();
-        parser.addErrorListener(this.errorListener);
+        return content.split(/\r?\n/);
+    }
 
-        parser.buildParseTree = true;
-        return parser.document();
+    private handleParseError(err: ParseError) {
+        this.parseErrors.push(err);
     }
 }
