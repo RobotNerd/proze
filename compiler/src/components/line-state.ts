@@ -1,4 +1,6 @@
+import { Line } from "./line";
 import { Metadata } from "./metadata";
+
 
 export enum LineType {
     emptyLine,
@@ -16,7 +18,7 @@ export class LineState {
         this.lineType = LineType.emptyLine;
     }
 
-    update(line: string) {
+    update(line: Line) {
         if (!this.inParagraph && this.metadata.isMetadata(line)) {
             this.lineType = LineType.metadata;
         }
@@ -30,7 +32,7 @@ export class LineState {
         }
     }
 
-    private isEmptyLine(line: string): boolean {
-        return line.trim() == '';
+    private isEmptyLine(line: Line): boolean {
+        return line.text.trim() == '';
     }
 }

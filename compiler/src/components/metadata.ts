@@ -1,3 +1,6 @@
+import { ParseError } from "../util/parse-error";
+import { Line } from "./line";
+
 enum Tag {
     Author = 'Author',
     Title = 'Title',
@@ -9,7 +12,7 @@ export class Metadata {
     title: string|null;
 
     private patterns = {
-        tag: /^(Title|Author):\s+/,
+        tag: /^(Title|Author):/,
         content: /^.*?:\s+(.+)\s*$/,
     }
 
@@ -18,15 +21,21 @@ export class Metadata {
         this.author = null;
     }
 
-    isMetadata(line: string): boolean {
+    isMetadata(line: Line): boolean {
         return this.startsWithTag(line) !== null;
     }
 
-    parse(line: string) {
+    parse(line: Line) {
         const tag = this.startsWithTag(line);
         if (tag) {
-            const match = line.match(this.patterns.content);
-            if (match) {
+            const match = line.text.match(this.patterns.content);
+            if (!match) {
+                throw new ParseError(
+                    `Invalid ${tag} metadata`,
+                    line.lineNumber
+                );
+            }
+            else {
                 switch(tag) {
                     case Tag.Author:
                         this.author = match[1];
@@ -34,14 +43,19 @@ export class Metadata {
                     case Tag.Title:
                         this.title = match[1];
                         break;
+                    default:
+                        throw new ParseError(
+                            `Unrecognized metadata tag ${tag}`,
+                            line.lineNumber
+                        );
                 }
             }
         }
     }
 
-    private startsWithTag(line: string): Tag | null {
+    private startsWithTag(line: Line): Tag | null {
         let tag: Tag | null = null;
-        const match = line.match(this.patterns.tag);
+        const match = line.text.match(this.patterns.tag);
         if (match) {
             tag = match[1] as Tag;  // TODO add exception handling
         }

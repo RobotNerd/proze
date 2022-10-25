@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { Compiler } from '../compiler';
 import { ProzeArgs, Format } from '../util/cli-arguments';
+import { CompileError } from '../util/compile-error';
 
 
 function loadExpectedOutput(path: string): string {
@@ -40,18 +41,18 @@ describe('text listener', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
-    // test('throws on parse error on invalid title', () => {
-    //     mockArgs.path = 'test-data/invalid-title.proze';
-    //     const compiler = new Compiler(mockArgs);
-    //     try {
-    //         let output = compiler.compile();
-    //         fail('expected CompileError to be thrown');
-    //     }
-    //     catch(e: unknown) {
-    //         expect(e).toBeInstanceOf(CompileError);
-    //         expect((e as CompileError).errors.length).toBe(1);
-    //     }
-    // });
+    test('throws compile error on invalid title', () => {
+        mockArgs.path = 'test-data/invalid-title.proze';
+        const compiler = new Compiler(mockArgs);
+        try {
+            let output = compiler.compile();
+            throw new Error('expected CompileError to be thrown');
+        }
+        catch(e: unknown) {
+            expect(e).toBeInstanceOf(CompileError);
+            expect((e as CompileError).errors.length).toBe(1);
+        }
+    });
 
     test('allows author to be the only metadata', () => {
         mockArgs.path = 'test-data/author-only.proze';
