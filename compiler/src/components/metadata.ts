@@ -1,34 +1,46 @@
 import { ParseError } from "../util/parse-error";
+import { Author } from "./author";
+import { Chapter } from "./chapter";
 import { Line } from "./line";
+import { Title } from "./title";
 
 enum Tag {
     Author = 'Author',
+    Chapter = 'Chapter',
     Title = 'Title',
+}
+
+export interface MetadataInterface {
+    name: string;
 }
 
 export class Metadata {
 
-    author: string|null;
-    title: string|null;
+    private static instance: Metadata;
 
-    private patterns = {
-        tag: /^(Title|Author):/,
+    private static patterns = {
+        tag: /^(Title|Author|Chapter):/,
         content: /^.*?:\s+(.+)\s*$/,
     }
 
-    constructor() {
-        this.title = null;
-        this.author = null;
+    private constructor() {}
+
+    static getInstance(): Metadata {
+        if (!Metadata.instance) {
+            Metadata.instance = new Metadata();
+        }
+        return Metadata.instance;
     }
 
     isMetadata(line: Line): boolean {
-        return this.startsWithTag(line) !== null;
+        return Metadata.startsWithTag(line) !== null;
     }
 
-    parse(line: Line) {
-        const tag = this.startsWithTag(line);
+    parse(line: Line): MetadataInterface {
+        const tag = Metadata.startsWithTag(line);
+        let component: MetadataInterface = { name: '' };
         if (tag) {
-            const match = line.text.match(this.patterns.content);
+            const match = line.text.match(Metadata.patterns.content);
             if (!match) {
                 throw new ParseError(
                     `Invalid ${tag} metadata`,
@@ -38,10 +50,13 @@ export class Metadata {
             else {
                 switch(tag) {
                     case Tag.Author:
-                        this.author = match[1];
+                        component = new Author(match[1]);
+                        break;
+                    case Tag.Chapter:
+                        component = new Chapter(match[1]);
                         break;
                     case Tag.Title:
-                        this.title = match[1];
+                        component = new Title(match[1]);
                         break;
                     default:
                         throw new ParseError(
@@ -51,11 +66,12 @@ export class Metadata {
                 }
             }
         }
+        return component;
     }
 
-    private startsWithTag(line: Line): Tag | null {
+    private static startsWithTag(line: Line): Tag | null {
         let tag: Tag | null = null;
-        const match = line.text.match(this.patterns.tag);
+        const match = line.text.match(Metadata.patterns.tag);
         if (match) {
             tag = match[1] as Tag;  // TODO add exception handling
         }

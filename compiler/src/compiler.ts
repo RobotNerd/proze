@@ -1,4 +1,4 @@
-import { Metadata } from './components/metadata';
+import { Metadata, MetadataInterface } from './components/metadata';
 import { readFileSync } from 'fs';
 import { Format, ProzeArgs } from './util/cli-arguments';
 import { Paragraph } from './components/paragraph';
@@ -7,20 +7,22 @@ import { LineState, LineType } from './components/line-state';
 import { Line } from './components/line';
 import { ParseError } from './util/parse-error';
 import { CompileError } from './util/compile-error';
+import { Author } from './components/author';
+import { Title } from './components/title';
 
 
 export class Compiler {
 
     private args: ProzeArgs;
-    private metadata: Metadata;
+    private author: Author | null = null;
     private paragraphs: Paragraph[] = [];
     private lineState: LineState;
     private parseErrors: ParseError[] = [];
+    private title: Title | null = null;
 
     constructor(args: any) {
         this.args = args;
-        this.metadata = new Metadata();
-        this.lineState = new LineState(this.metadata);
+        this.lineState = new LineState();
     }
 
     compile() {
@@ -28,7 +30,7 @@ export class Compiler {
         let formatter;
         switch(this.args.format) {
             case Format.text:
-                formatter = new TextFormatter(this.metadata, this.paragraphs);
+                formatter = new TextFormatter(this.author, this.paragraphs, this.title);
                 break;
             default:
                 throw new Error(`unrecognized format: ${this.args.format}`);
@@ -51,7 +53,8 @@ export class Compiler {
             try {
                 switch(this.lineState.lineType) {
                     case LineType.metadata:
-                        this.metadata.parse(line);
+                        const metadata = Metadata.getInstance().parse(line);
+                        this.assignMetadata(metadata);
                         break;
                     case LineType.paragraph:
                         paragraph.add(line);
@@ -72,6 +75,17 @@ export class Compiler {
                     throw err;
                 }
             }
+        }
+    }
+
+    private assignMetadata(metadata: MetadataInterface) {
+        switch(true) {
+            case metadata instanceof Author:
+                this.author = metadata as Author;
+                break;
+            case metadata instanceof Title:
+                this.title = metadata as Title;
+                break;
         }
     }
 

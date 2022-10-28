@@ -10,16 +10,14 @@ export enum LineType {
 
 export class LineState {
     inParagraph: boolean = false;
-    metadata: Metadata;
     lineType: LineType;
 
-    constructor(metadata: Metadata) {
-        this.metadata = metadata;
+    constructor() {
         this.lineType = LineType.emptyLine;
     }
 
     update(line: Line) {
-        if (!this.inParagraph && this.metadata.isMetadata(line)) {
+        if (!this.inParagraph && Metadata.getInstance().isMetadata(line)) {
             this.lineType = LineType.metadata;
         }
         else if (this.isEmptyLine(line)) {
