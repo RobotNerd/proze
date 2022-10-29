@@ -1,7 +1,6 @@
 import { Metadata, MetadataInterface } from './components/metadata';
 import { readFileSync } from 'fs';
 import { Format, ProzeArgs } from './util/cli-arguments';
-import { Paragraph } from './components/paragraph';
 import { TextFormatter } from './formatters/text';
 import { LineState, LineType } from './components/line-state';
 import { Line } from './components/line';
@@ -9,13 +8,14 @@ import { ParseError } from './util/parse-error';
 import { CompileError } from './util/compile-error';
 import { Author } from './components/author';
 import { Title } from './components/title';
+import { Chapter } from './components/chapter';
 
 
 export class Compiler {
 
     private args: ProzeArgs;
     private author: Author | null = null;
-    private paragraphs: Paragraph[] = [];
+    private chapters: Chapter[] = [];
     private lineState: LineState;
     private parseErrors: ParseError[] = [];
     private title: Title | null = null;
@@ -30,7 +30,7 @@ export class Compiler {
         let formatter;
         switch(this.args.format) {
             case Format.text:
-                formatter = new TextFormatter(this.author, this.paragraphs, this.title);
+                formatter = new TextFormatter(this.author, this.chapters, this.title);
                 break;
             default:
                 throw new Error(`unrecognized format: ${this.args.format}`);
@@ -45,7 +45,6 @@ export class Compiler {
     }
 
     private parseLines() {
-        let paragraph: Paragraph = new Paragraph();
         const lines = this.loadFile(this.args.path);
         for(let i=0; i < lines.length; i++) {
             let line = new Line(lines[i], i);
@@ -57,13 +56,14 @@ export class Compiler {
                         this.assignMetadata(metadata);
                         break;
                     case LineType.paragraph:
-                        paragraph.add(line);
+                        let chapter = this.currentChapter();
+                        if (!chapter) {
+                            chapter = this.createDefaultChapter();
+                        }
+                        chapter.addLine(line);
                         break;
                     case LineType.emptyLine:
-                        if (paragraph.lines.length > 0) {
-                            this.paragraphs.push(paragraph);
-                            paragraph = new Paragraph();
-                        }
+                        this.currentChapter()?.endParagraph();
                         break;
                 }
             }
@@ -78,15 +78,40 @@ export class Compiler {
         }
     }
 
+    private addChapter(chapter: Chapter) {
+        this.chapters.push(chapter);
+    }
+
     private assignMetadata(metadata: MetadataInterface) {
         switch(true) {
             case metadata instanceof Author:
                 this.author = metadata as Author;
                 break;
+            case metadata instanceof Chapter:
+                this.addChapter(metadata as Chapter);
+                break;
             case metadata instanceof Title:
                 this.title = metadata as Title;
                 break;
+            default:
+                throw new Error(`Invalid metadata type ${metadata.constructor.name}`);
         }
+    }
+
+    private createDefaultChapter(): Chapter {
+        // Create a default chapter to store paragraph content.
+        // This occurs when there is no chapter metadata tag.
+        const defaultChapter = new Chapter('');
+        this.chapters.push(defaultChapter);
+        return defaultChapter;
+    }
+
+    private currentChapter(): Chapter | null {
+        if (this.chapters.length == 0) {
+            return null;
+        }
+        let index: number = this.chapters.length - 1;
+        return this.chapters[index];
     }
 
     private loadFile(path: string): string[] {

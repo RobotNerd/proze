@@ -1,23 +1,21 @@
 import { Author } from '../components/author';
-import { Paragraph } from '../components/paragraph';
+import { Chapter } from '../components/chapter';
 import { Title } from '../components/title';
-
-
 
 export class TextFormatter {
 
     constructor(
         private author: Author | null,
-        private paragraphs: Paragraph[],
+        private chapters: Chapter[],
         private title: Title | null
     ) {}
 
     getOutput(): string {
         let content: string[] = [];
-        for (let paragraph of this.paragraphs) {
-            content.push(paragraph.getOutput());
+        for (let chapter of this.chapters) {
+            content.push(chapter.getOutput());
         }
-        return this.getOutputHeader() + content.join('\n\n') + '\n';
+        return this.getOutputHeader() + content.join('\n\n');
     }
 
     private getOutputHeader(): string {

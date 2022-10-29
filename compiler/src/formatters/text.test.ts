@@ -27,6 +27,13 @@ describe('text listener', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    test('parses document that does not contain chapters', () => {
+        mockArgs.path = 'test-data/no-chapters.proze';
+        let expected = 'test-data/no-chapters.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
     test('allows no metadata fields to be provided', () => {
         mockArgs.path = 'test-data/no-metadata.proze';
         let expected = 'test-data/no-metadata.expected.txt';
