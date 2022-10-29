@@ -1,33 +1,30 @@
-import { Metadata } from '../components/metadata';
-import { Paragraph } from '../components/paragraph';
-
-
+import { Author } from '../components/author';
+import { Chapter } from '../components/chapter';
+import { Title } from '../components/title';
 
 export class TextFormatter {
 
-    private metadata: Metadata;
-    private paragraphs: Paragraph[];
-
-    constructor(metadata: Metadata, paragraphs: Paragraph[]) {
-        this.metadata = metadata;
-        this.paragraphs = paragraphs;
-    }
+    constructor(
+        private author: Author | null,
+        private chapters: Chapter[],
+        private title: Title | null
+    ) {}
 
     getOutput(): string {
         let content: string[] = [];
-        for (let paragraph of this.paragraphs) {
-            content.push(paragraph.getOutput());
+        for (let chapter of this.chapters) {
+            content.push(chapter.getOutput());
         }
-        return this.getOutputHeader() + content.join('\n\n') + '\n';
+        return this.getOutputHeader() + content.join('\n\n');
     }
 
     private getOutputHeader(): string {
         let header = '';
-        if (this.metadata.title) {
-            header += this.metadata.title + '\n';
+        if (this.title) {
+            header += this.title.name + '\n';
         }
-        if (this.metadata.author) {
-            header += `by ${this.metadata.author}\n`;
+        if (this.author) {
+            header += `by ${this.author.name}\n`;
         }
         if (header != '') {
             header += '\n\n';
