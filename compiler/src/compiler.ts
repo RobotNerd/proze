@@ -58,7 +58,8 @@ export class Compiler {
                     case LineType.paragraph:
                         let chapter = this.currentChapter();
                         if (!chapter) {
-                            chapter = this.createDefaultChapter();
+                            chapter = Metadata.getInstance().createEmptyChapter();
+                            this.chapters.push(chapter);
                         }
                         chapter.addLine(line);
                         break;
@@ -96,14 +97,6 @@ export class Compiler {
             default:
                 throw new Error(`Invalid metadata type ${metadata.constructor.name}`);
         }
-    }
-
-    private createDefaultChapter(): Chapter {
-        // Create a default chapter to store paragraph content.
-        // This occurs when there is no chapter metadata tag.
-        const defaultChapter = new Chapter('');
-        this.chapters.push(defaultChapter);
-        return defaultChapter;
     }
 
     private currentChapter(): Chapter | null {

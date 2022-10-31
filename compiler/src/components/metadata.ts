@@ -17,6 +17,12 @@ export interface MetadataInterface {
 export class Metadata {
 
     private static instance: Metadata;
+    private chapterNumber: number = 0;
+
+    // Set to true if any chapter tag is parsed that has a name.
+    // Example of a named chapter: "Chapter: My Chapter"
+    // Example of a non-named chapter: "Chapter:"
+    public hasChapterNames: boolean = false;
 
     private static patterns = {
         tag: /^(Title|Author|Chapter):/,
@@ -32,6 +38,21 @@ export class Metadata {
         return Metadata.instance;
     }
 
+    /**
+     * Create an placeholder chapter.
+     * Use when paragraph content is detected before chapter metadata.
+     * @returns A chapter instance.
+     */
+    createEmptyChapter(): Chapter {
+        const defaultChapter = new Chapter('', this.getNextChapterNumber());
+        return defaultChapter;
+    }
+
+    private getNextChapterNumber(): number {
+        this.chapterNumber++;
+        return this.chapterNumber;
+    }
+
     isMetadata(line: Line): boolean {
         return Metadata.startsWithTag(line) !== null;
     }
@@ -39,33 +60,60 @@ export class Metadata {
     parse(line: Line): MetadataInterface {
         const tag = Metadata.startsWithTag(line);
         let component: MetadataInterface = { name: '' };
-        if (tag) {
-            const match = line.text.match(Metadata.patterns.content);
-            if (!match) {
+        switch(tag) {
+            case Tag.Author:
+                component = this.parseAuthor(line);
+                break;
+            case Tag.Chapter:
+                component = this.parseChapter(line);
+                break;
+            case Tag.Title:
+                component = this.parseTitle(line);
+                break;
+            default:
                 throw new ParseError(
-                    `Invalid ${tag} metadata`,
+                    `Unrecognized metadata tag ${tag}`,
                     line.lineNumber
                 );
-            }
-            else {
-                switch(tag) {
-                    case Tag.Author:
-                        component = new Author(match[1]);
-                        break;
-                    case Tag.Chapter:
-                        component = new Chapter(match[1]);
-                        break;
-                    case Tag.Title:
-                        component = new Title(match[1]);
-                        break;
-                    default:
-                        throw new ParseError(
-                            `Unrecognized metadata tag ${tag}`,
-                            line.lineNumber
-                        );
-                }
-            }
         }
+        return component;
+    }
+
+    private parseAuthor(line: Line): MetadataInterface {
+        let component: MetadataInterface = { name: '' };
+        const match = line.text.match(Metadata.patterns.content);
+        if (!match) {
+            throw new ParseError(
+                `Invalid Author tag: no author name provided`,
+                line.lineNumber
+            );
+        }
+        component = new Author(match[1]);
+        return component;
+    }
+
+    private parseChapter(line: Line): MetadataInterface {
+        let name = '';
+        let component: MetadataInterface = { name: name };
+        const match = line.text.match(Metadata.patterns.content);
+        if (match) {
+            name = match[1];
+            Metadata.getInstance().hasChapterNames = true;
+        }
+        component = new Chapter(name, this.getNextChapterNumber());
+        return component;
+    }
+
+    private parseTitle(line: Line): MetadataInterface {
+        let component: MetadataInterface = { name: '' };
+        const match = line.text.match(Metadata.patterns.content);
+        if (!match) {
+            throw new ParseError(
+                `Invalid Title tag: no title provided`,
+                line.lineNumber
+            );
+        }
+        component = new Title(match[1]);
         return component;
     }
 
@@ -76,5 +124,14 @@ export class Metadata {
             tag = match[1] as Tag;  // TODO add exception handling
         }
         return tag;
+    }
+
+    /**
+     * Reset to initial starting state.
+     * Use for testing or if batch compiling multiple projects.
+     */
+    reset() {
+        this.chapterNumber = 0;
+        this.hasChapterNames = false;
     }
 }

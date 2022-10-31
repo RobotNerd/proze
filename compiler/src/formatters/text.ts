@@ -12,8 +12,8 @@ export class TextFormatter {
 
     getOutput(): string {
         let content: string[] = [];
-        for (let chapter of this.chapters) {
-            content.push(chapter.getOutput());
+        for (let i=0; i < this.chapters.length; i++) {
+            content.push(this.chapters[i].getOutput());
         }
         return this.getOutputHeader() + content.join('\n\n');
     }

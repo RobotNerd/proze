@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import { Compiler } from '../compiler';
+import { Metadata } from '../components/metadata';
 import { ProzeArgs, Format } from '../util/cli-arguments';
 import { CompileError } from '../util/compile-error';
 
@@ -14,6 +15,7 @@ describe('text listener', () => {
     let mockArgs: ProzeArgs;
 
     beforeEach(() => {
+        Metadata.getInstance().reset();
         mockArgs = {
             format: Format.text,
             path: '',
@@ -23,13 +25,6 @@ describe('text listener', () => {
     test('parses document', () => {
         mockArgs.path = 'test-data/default.proze';
         let expected = 'test-data/default.expected.txt';
-        const compiler = new Compiler(mockArgs);
-        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
-    });
-
-    test('parses document that does not contain chapters', () => {
-        mockArgs.path = 'test-data/no-chapters.proze';
-        let expected = 'test-data/no-chapters.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
@@ -64,6 +59,23 @@ describe('text listener', () => {
     test('allows author to be the only metadata', () => {
         mockArgs.path = 'test-data/author-only.proze';
         let expected = 'test-data/author-only.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
+
+    // Chapters
+
+    test('parses document that does not contain chapters', () => {
+        mockArgs.path = 'test-data/no-chapters.proze';
+        let expected = 'test-data/no-chapters.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
+    test('parses document where only some chapter names have titles', () => {
+        mockArgs.path = 'test-data/single-file/chapters/partial-chapter-names.proze';
+        let expected = 'test-data/single-file/chapters/partial-chapter-names.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
