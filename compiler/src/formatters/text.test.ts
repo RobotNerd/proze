@@ -23,28 +23,28 @@ describe('text listener', () => {
     });
 
     test('parses document', () => {
-        mockArgs.path = 'test-data/default.proze';
-        let expected = 'test-data/default.expected.txt';
+        mockArgs.path = 'test-data/single-file/default.proze';
+        let expected = 'test-data/single-file/default.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
     test('allows no metadata fields to be provided', () => {
-        mockArgs.path = 'test-data/no-metadata.proze';
-        let expected = 'test-data/no-metadata.expected.txt';
+        mockArgs.path = 'test-data/single-file/no-metadata.proze';
+        let expected = 'test-data/single-file/no-metadata.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
     test('allows title to be the only metadata', () => {
-        mockArgs.path = 'test-data/title-only.proze';
-        let expected = 'test-data/title-only.expected.txt';
+        mockArgs.path = 'test-data/single-file/titles/title-only.proze';
+        let expected = 'test-data/single-file/titles/title-only.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
     test('throws compile error on invalid title', () => {
-        mockArgs.path = 'test-data/invalid-title.proze';
+        mockArgs.path = 'test-data/single-file/titles/invalid-title.proze';
         const compiler = new Compiler(mockArgs);
         try {
             let output = compiler.compile();
@@ -57,8 +57,8 @@ describe('text listener', () => {
     });
 
     test('allows author to be the only metadata', () => {
-        mockArgs.path = 'test-data/author-only.proze';
-        let expected = 'test-data/author-only.expected.txt';
+        mockArgs.path = 'test-data/single-file/author/author-only.proze';
+        let expected = 'test-data/single-file/author/author-only.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
@@ -67,8 +67,8 @@ describe('text listener', () => {
     // Chapters
 
     test('parses document that does not contain chapters', () => {
-        mockArgs.path = 'test-data/no-chapters.proze';
-        let expected = 'test-data/no-chapters.expected.txt';
+        mockArgs.path = 'test-data/single-file/chapters/no-chapters.proze';
+        let expected = 'test-data/single-file/chapters/no-chapters.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });

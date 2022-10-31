@@ -18,7 +18,7 @@
             "outFiles": [
                 "${workspaceFolder}/compiler/dist/**/*.js"
             ],
-            "args": ["--format", "text", "--path", "./compiler/test-data/default.proze"]
+            "args": ["--format", "text", "--path", "./compiler/test-data/single-file/default.proze"]
         }
     ]
 }
