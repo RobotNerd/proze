@@ -1,7 +1,6 @@
-import { exit } from 'process';
 import { ArgParser, ShowHelpError } from './util/cli-arguments';
 import { Compiler } from './compiler';
-
+import { exit } from 'process';
 
 try {
     const argParser = new ArgParser();
@@ -22,4 +21,3 @@ catch (e: unknown) {
         throw e;
     }
 }
-

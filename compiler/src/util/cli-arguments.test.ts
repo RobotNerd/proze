@@ -1,6 +1,5 @@
 import { ArgParser, Format, ProzeArgs, ShowHelpError } from './cli-arguments';
 
-
 describe('CLI arg parser', () => {
     test('throws error if help message should be displayed', () => {
         const argParser = new ArgParser();

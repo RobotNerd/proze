@@ -1,7 +1,6 @@
 import { Line } from "./line";
 import { Metadata } from "./metadata";
 
-
 export enum LineType {
     emptyLine,
     metadata,

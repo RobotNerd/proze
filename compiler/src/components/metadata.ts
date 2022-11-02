@@ -1,7 +1,7 @@
-import { ParseError } from "../util/parse-error";
 import { Author } from "./author";
 import { Chapter } from "./chapter";
 import { Line } from "./line";
+import { ParseError } from "../util/parse-error";
 import { Section } from "./section";
 import { Title } from "./title";
 

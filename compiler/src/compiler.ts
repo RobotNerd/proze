@@ -1,18 +1,18 @@
-import { Metadata, MetadataInterface } from './components/metadata';
-import { readFileSync } from 'fs';
-import { Format, ProzeArgs } from './util/cli-arguments';
-import { TextFormatter } from './formatters/text';
-import { LineState, LineType } from './components/line-state';
-import { Line } from './components/line';
-import { ParseError } from './util/parse-error';
-import { CompileError } from './util/compile-error';
 import { Author } from './components/author';
-import { Title } from './components/title';
 import { Chapter } from './components/chapter';
-import { Token } from './components/token';
+import { CompileError } from './util/compile-error';
 import { Component, EmptyComponent } from './components/component';
-import { Text } from './components/text';
+import { Format, ProzeArgs } from './util/cli-arguments';
+import { Line } from './components/line';
+import { LineState, LineType } from './components/line-state';
+import { Metadata, MetadataInterface } from './components/metadata';
+import { ParseError } from './util/parse-error';
 import { Section } from './components/section';
+import { Text } from './components/text';
+import { TextFormatter } from './formatters/text';
+import { Title } from './components/title';
+import { Token } from './components/token';
+import { readFileSync } from 'fs';
 
 export class Compiler {
 
