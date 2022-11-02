@@ -9,16 +9,18 @@ import { CompileError } from './util/compile-error';
 import { Author } from './components/author';
 import { Title } from './components/title';
 import { Chapter } from './components/chapter';
-
+import { Token } from './components/token';
+import { Component, EmptyComponent } from './components/component';
+import { Text } from './components/text';
 
 export class Compiler {
 
     private args: ProzeArgs;
     private author: Author | null = null;
-    private chapters: Chapter[] = [];
     private lineState: LineState;
     private parseErrors: ParseError[] = [];
     private title: Title | null = null;
+    private components: Component[] = [];
 
     constructor(args: any) {
         this.args = args;
@@ -30,7 +32,7 @@ export class Compiler {
         let formatter;
         switch(this.args.format) {
             case Format.text:
-                formatter = new TextFormatter(this.author, this.chapters, this.title);
+                formatter = new TextFormatter(this.author, this.title, this.components);
                 break;
             default:
                 throw new Error(`unrecognized format: ${this.args.format}`);
@@ -56,15 +58,10 @@ export class Compiler {
                         this.assignMetadata(metadata);
                         break;
                     case LineType.paragraph:
-                        let chapter = this.currentChapter();
-                        if (!chapter) {
-                            chapter = Metadata.getInstance().createEmptyChapter();
-                            this.chapters.push(chapter);
-                        }
-                        chapter.addLine(line);
+                        this.components.push(new Text(line.text));
                         break;
                     case LineType.emptyLine:
-                        this.currentChapter()?.endParagraph();
+                        this.parseEmptyLine();
                         break;
                 }
             }
@@ -79,8 +76,18 @@ export class Compiler {
         }
     }
 
-    private addChapter(chapter: Chapter) {
-        this.chapters.push(chapter);
+    private parseEmptyLine() {
+        let lastElement: Component | null = null;
+        if (this.components.length > 0) {
+            lastElement = this.components[this.components.length - 1];
+        }
+        if (
+            lastElement !== null &&
+            lastElement.token != Token.end_paragraph &&
+            lastElement.token != Token.chapter
+        ) {
+            this.components.push(new EmptyComponent(Token.end_paragraph));
+        }
     }
 
     private assignMetadata(metadata: MetadataInterface) {
@@ -89,7 +96,10 @@ export class Compiler {
                 this.author = metadata as Author;
                 break;
             case metadata instanceof Chapter:
-                this.addChapter(metadata as Chapter);
+                if (!this.isFirstComponent()) {
+                    this.components.push(new EmptyComponent(Token.end_chapter));
+                }
+                this.components.push(metadata as Chapter);
                 break;
             case metadata instanceof Title:
                 this.title = metadata as Title;
@@ -99,12 +109,8 @@ export class Compiler {
         }
     }
 
-    private currentChapter(): Chapter | null {
-        if (this.chapters.length == 0) {
-            return null;
-        }
-        let index: number = this.chapters.length - 1;
-        return this.chapters[index];
+    private isFirstComponent() {
+        return this.components.length == 0;
     }
 
     private loadFile(path: string): string[] {

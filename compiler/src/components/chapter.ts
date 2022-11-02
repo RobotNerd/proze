@@ -1,28 +1,15 @@
-import { Line } from "./line";
+import { Component } from "./component";
 import { Metadata } from "./metadata";
-import { Paragraph } from "./paragraph";
+import { Token } from "./token";
 
-export class Chapter {
+export class Chapter implements Component {
 
-    private currentParagraph: Paragraph | null = null;
-    private paragraphs: Paragraph[] = [];
+    public token: Token = Token.chapter;
 
     constructor(
         public name: string = '',
         public chapterNumber: number = -1
     ) {}
-
-    addLine(line: Line) {
-        if (!this.currentParagraph) {
-            this.addParagraph();
-        }
-        this.currentParagraph?.add(line);
-    }
-
-    private addParagraph() {
-        this.currentParagraph = new Paragraph();
-        this.paragraphs.push(this.currentParagraph);
-    }
 
     private getChapterTitle(): string | null {
         let chapterTitle: string | null = null;
@@ -36,19 +23,7 @@ export class Chapter {
         return chapterTitle;
     }
 
-    endParagraph() {
-        this.currentParagraph = null;
-    }
-
     getOutput(): string {
-        let content: string[] = [];
-        const chapterTitle = this.getChapterTitle();
-        if (chapterTitle) {
-            content.push(chapterTitle);
-        }
-        for (let paragraph of this.paragraphs) {
-            content.push(paragraph.getOutput());
-        }
-        return content.join('\n\n') + '\n';
+        return this.getChapterTitle() || '';
     }
 }
