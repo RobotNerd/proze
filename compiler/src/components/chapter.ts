@@ -11,19 +11,19 @@ export class Chapter implements Component {
         public chapterNumber: number = -1
     ) {}
 
-    private getChapterTitle(): string | null {
-        let chapterTitle: string | null = null;
+    private chapterTitle(): string | null {
+        let title: string | null = null;
         if (Metadata.getInstance().hasChapterNames && this.name === '') {
             // TODO add warning about mix of chapter names and no names
-            chapterTitle = `Chapter ${this.chapterNumber}`
+            title = `Chapter ${this.chapterNumber}`
         }
         else {
-            chapterTitle = this.name;
+            title = this.name;
         }
-        return chapterTitle;
+        return title;
     }
 
     getOutput(): string {
-        return this.getChapterTitle() || '';
+        return this.chapterTitle() || '';
     }
 }

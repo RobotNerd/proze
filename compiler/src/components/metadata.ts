@@ -1,7 +1,7 @@
-import { ParseError } from "../util/parse-error";
 import { Author } from "./author";
 import { Chapter } from "./chapter";
 import { Line } from "./line";
+import { ParseError } from "../util/parse-error";
 import { Section } from "./section";
 import { Title } from "./title";
 
@@ -126,6 +126,15 @@ export class Metadata {
         return component;
     }
 
+    /**
+     * Reset to initial starting state.
+     * Use for testing or if batch compiling multiple projects.
+     */
+    reset() {
+        this.chapterNumber = 0;
+        this.hasChapterNames = false;
+    }
+
     private static startsWithTag(line: Line): Tag | null {
         let tag: Tag | null = null;
         let match = line.text.match(Metadata.patterns.tag);
@@ -139,14 +148,5 @@ export class Metadata {
             }
         }
         return tag;
-    }
-
-    /**
-     * Reset to initial starting state.
-     * Use for testing or if batch compiling multiple projects.
-     */
-    reset() {
-        this.chapterNumber = 0;
-        this.hasChapterNames = false;
     }
 }

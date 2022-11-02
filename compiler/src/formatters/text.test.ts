@@ -1,14 +1,12 @@
-import { readFileSync } from 'fs';
+import { CompileError } from '../util/compile-error';
 import { Compiler } from '../compiler';
 import { Metadata } from '../components/metadata';
 import { ProzeArgs, Format } from '../util/cli-arguments';
-import { CompileError } from '../util/compile-error';
-
+import { readFileSync } from 'fs';
 
 function loadExpectedOutput(path: string): string {
     return readFileSync(path, 'utf-8');
 }
-
 
 describe('text formatter', () => {
 

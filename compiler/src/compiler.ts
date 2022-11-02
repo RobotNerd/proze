@@ -1,18 +1,18 @@
-import { Metadata, MetadataInterface } from './components/metadata';
-import { readFileSync } from 'fs';
-import { Format, ProzeArgs } from './util/cli-arguments';
-import { TextFormatter } from './formatters/text';
-import { LineState, LineType } from './components/line-state';
-import { Line } from './components/line';
-import { ParseError } from './util/parse-error';
-import { CompileError } from './util/compile-error';
 import { Author } from './components/author';
-import { Title } from './components/title';
 import { Chapter } from './components/chapter';
-import { Token } from './components/token';
+import { CompileError } from './util/compile-error';
 import { Component, EmptyComponent } from './components/component';
-import { Text } from './components/text';
+import { Format, ProzeArgs } from './util/cli-arguments';
+import { Line } from './components/line';
+import { LineState, LineType } from './components/line-state';
+import { Metadata, MetadataInterface } from './components/metadata';
+import { ParseError } from './util/parse-error';
 import { Section } from './components/section';
+import { Text } from './components/text';
+import { TextFormatter } from './formatters/text';
+import { Title } from './components/title';
+import { Token } from './components/token';
+import { readFileSync } from 'fs';
 
 export class Compiler {
 
@@ -26,6 +26,28 @@ export class Compiler {
     constructor(args: any) {
         this.args = args;
         this.lineState = new LineState();
+    }
+
+    private assignMetadata(metadata: MetadataInterface) {
+        switch(true) {
+            case metadata instanceof Author:
+                this.author = metadata as Author;
+                break;
+            case metadata instanceof Chapter:
+                if (!this.isFirstComponent()) {
+                    this.components.push(new EmptyComponent(Token.end_chapter));
+                }
+                this.components.push(metadata as Chapter);
+                break;
+            case metadata instanceof Section:
+                this.components.push(metadata as Section);
+                break;
+            case metadata instanceof Title:
+                this.title = metadata as Title;
+                break;
+            default:
+                throw new Error(`Invalid metadata type ${metadata.constructor.name}`);
+        }
     }
 
     compile() {
@@ -45,6 +67,33 @@ export class Compiler {
             );
         }
         return formatter.getOutput();
+    }
+
+    private handleParseError(err: ParseError) {
+        this.parseErrors.push(err);
+    }
+
+    private isFirstComponent() {
+        return this.components.length == 0;
+    }
+
+    private loadFile(path: string): string[] {
+        let content = readFileSync(path, 'utf-8');
+        return content.split(/\r?\n/);
+    }
+
+    private parseEmptyLine() {
+        let lastElement: Component | null = null;
+        if (this.components.length > 0) {
+            lastElement = this.components[this.components.length - 1];
+        }
+        if (
+            lastElement !== null &&
+            lastElement.token != Token.end_paragraph &&
+            lastElement.token != Token.chapter
+        ) {
+            this.components.push(new EmptyComponent(Token.end_paragraph));
+        }
     }
 
     private parseLines() {
@@ -75,54 +124,5 @@ export class Compiler {
                 }
             }
         }
-    }
-
-    private parseEmptyLine() {
-        let lastElement: Component | null = null;
-        if (this.components.length > 0) {
-            lastElement = this.components[this.components.length - 1];
-        }
-        if (
-            lastElement !== null &&
-            lastElement.token != Token.end_paragraph &&
-            lastElement.token != Token.chapter
-        ) {
-            this.components.push(new EmptyComponent(Token.end_paragraph));
-        }
-    }
-
-    private assignMetadata(metadata: MetadataInterface) {
-        switch(true) {
-            case metadata instanceof Author:
-                this.author = metadata as Author;
-                break;
-            case metadata instanceof Chapter:
-                if (!this.isFirstComponent()) {
-                    this.components.push(new EmptyComponent(Token.end_chapter));
-                }
-                this.components.push(metadata as Chapter);
-                break;
-            case metadata instanceof Section:
-                this.components.push(metadata as Section);
-                break;
-            case metadata instanceof Title:
-                this.title = metadata as Title;
-                break;
-            default:
-                throw new Error(`Invalid metadata type ${metadata.constructor.name}`);
-        }
-    }
-
-    private isFirstComponent() {
-        return this.components.length == 0;
-    }
-
-    private loadFile(path: string): string[] {
-        let content = readFileSync(path, 'utf-8');
-        return content.split(/\r?\n/);
-    }
-
-    private handleParseError(err: ParseError) {
-        this.parseErrors.push(err);
     }
 }

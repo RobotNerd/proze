@@ -19,7 +19,6 @@ let helpMessage = `Usage: proze compiler
         --path: Path to a proze file or a project directory.
 `;
 
-
 export class ArgParser {
 
     args: ProzeArgs;
