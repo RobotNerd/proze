@@ -38,16 +38,6 @@ export class Metadata {
         return Metadata.instance;
     }
 
-    /**
-     * Create an placeholder chapter.
-     * Use when paragraph content is detected before chapter metadata.
-     * @returns A chapter instance.
-     */
-    createEmptyChapter(): Chapter {
-        const defaultChapter = new Chapter('', this.getNextChapterNumber());
-        return defaultChapter;
-    }
-
     private getNextChapterNumber(): number {
         this.chapterNumber++;
         return this.chapterNumber;

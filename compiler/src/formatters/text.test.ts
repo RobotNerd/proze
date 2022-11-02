@@ -10,7 +10,7 @@ function loadExpectedOutput(path: string): string {
 }
 
 
-describe('text listener', () => {
+describe('text formatter', () => {
 
     let mockArgs: ProzeArgs;
 
