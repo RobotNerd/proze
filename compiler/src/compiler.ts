@@ -28,6 +28,28 @@ export class Compiler {
         this.lineState = new LineState();
     }
 
+    private assignMetadata(metadata: MetadataInterface) {
+        switch(true) {
+            case metadata instanceof Author:
+                this.author = metadata as Author;
+                break;
+            case metadata instanceof Chapter:
+                if (!this.isFirstComponent()) {
+                    this.components.push(new EmptyComponent(Token.end_chapter));
+                }
+                this.components.push(metadata as Chapter);
+                break;
+            case metadata instanceof Section:
+                this.components.push(metadata as Section);
+                break;
+            case metadata instanceof Title:
+                this.title = metadata as Title;
+                break;
+            default:
+                throw new Error(`Invalid metadata type ${metadata.constructor.name}`);
+        }
+    }
+
     compile() {
         this.parseLines();
         let formatter;
@@ -45,6 +67,33 @@ export class Compiler {
             );
         }
         return formatter.getOutput();
+    }
+
+    private handleParseError(err: ParseError) {
+        this.parseErrors.push(err);
+    }
+
+    private isFirstComponent() {
+        return this.components.length == 0;
+    }
+
+    private loadFile(path: string): string[] {
+        let content = readFileSync(path, 'utf-8');
+        return content.split(/\r?\n/);
+    }
+
+    private parseEmptyLine() {
+        let lastElement: Component | null = null;
+        if (this.components.length > 0) {
+            lastElement = this.components[this.components.length - 1];
+        }
+        if (
+            lastElement !== null &&
+            lastElement.token != Token.end_paragraph &&
+            lastElement.token != Token.chapter
+        ) {
+            this.components.push(new EmptyComponent(Token.end_paragraph));
+        }
     }
 
     private parseLines() {
@@ -75,54 +124,5 @@ export class Compiler {
                 }
             }
         }
-    }
-
-    private parseEmptyLine() {
-        let lastElement: Component | null = null;
-        if (this.components.length > 0) {
-            lastElement = this.components[this.components.length - 1];
-        }
-        if (
-            lastElement !== null &&
-            lastElement.token != Token.end_paragraph &&
-            lastElement.token != Token.chapter
-        ) {
-            this.components.push(new EmptyComponent(Token.end_paragraph));
-        }
-    }
-
-    private assignMetadata(metadata: MetadataInterface) {
-        switch(true) {
-            case metadata instanceof Author:
-                this.author = metadata as Author;
-                break;
-            case metadata instanceof Chapter:
-                if (!this.isFirstComponent()) {
-                    this.components.push(new EmptyComponent(Token.end_chapter));
-                }
-                this.components.push(metadata as Chapter);
-                break;
-            case metadata instanceof Section:
-                this.components.push(metadata as Section);
-                break;
-            case metadata instanceof Title:
-                this.title = metadata as Title;
-                break;
-            default:
-                throw new Error(`Invalid metadata type ${metadata.constructor.name}`);
-        }
-    }
-
-    private isFirstComponent() {
-        return this.components.length == 0;
-    }
-
-    private loadFile(path: string): string[] {
-        let content = readFileSync(path, 'utf-8');
-        return content.split(/\r?\n/);
-    }
-
-    private handleParseError(err: ParseError) {
-        this.parseErrors.push(err);
     }
 }
