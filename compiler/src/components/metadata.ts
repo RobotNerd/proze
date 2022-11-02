@@ -2,11 +2,14 @@ import { ParseError } from "../util/parse-error";
 import { Author } from "./author";
 import { Chapter } from "./chapter";
 import { Line } from "./line";
+import { Section } from "./section";
 import { Title } from "./title";
 
 enum Tag {
     Author = 'Author',
     Chapter = 'Chapter',
+    Section = 'Section',
+    SectionSymbol = '---',
     Title = 'Title',
 }
 
@@ -25,7 +28,8 @@ export class Metadata {
     public hasChapterNames: boolean = false;
 
     private static patterns = {
-        tag: /^(Title|Author|Chapter):/,
+        tag: /^(Title|Author|Chapter|Section):/,
+        sectionSymbol: /^\s*---\s*\n/,
         content: /^.*?:\s+(.+)\s*$/,
     }
 
@@ -56,6 +60,10 @@ export class Metadata {
                 break;
             case Tag.Chapter:
                 component = this.parseChapter(line);
+                break;
+            case Tag.Section:
+            case Tag.SectionSymbol:
+                component = this.parseSection(line);
                 break;
             case Tag.Title:
                 component = this.parseTitle(line);
@@ -94,6 +102,17 @@ export class Metadata {
         return component;
     }
 
+    private parseSection(line: Line): MetadataInterface {
+        let name = '';
+        let component: MetadataInterface = { name: name };
+        const match = line.text.match(Metadata.patterns.content);
+        if (match) {
+            name = match[1];
+        }
+        component = new Section(name);
+        return component;
+    }
+
     private parseTitle(line: Line): MetadataInterface {
         let component: MetadataInterface = { name: '' };
         const match = line.text.match(Metadata.patterns.content);
@@ -109,9 +128,15 @@ export class Metadata {
 
     private static startsWithTag(line: Line): Tag | null {
         let tag: Tag | null = null;
-        const match = line.text.match(Metadata.patterns.tag);
+        let match = line.text.match(Metadata.patterns.tag);
         if (match) {
             tag = match[1] as Tag;  // TODO add exception handling
+        }
+        else {
+            match = line.text.match(Metadata.patterns.sectionSymbol);
+            if (match) {
+                tag = Tag.SectionSymbol;
+            }
         }
         return tag;
     }

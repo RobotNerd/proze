@@ -3,6 +3,7 @@ export enum Token {
     chapter,
     end_chapter,
     end_paragraph,
+    section,
     text,
     title,
 }

@@ -80,4 +80,27 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    // Sections
+
+    test('parses document with sections but no chapters', () => {
+        mockArgs.path = 'test-data/single-file/sections/no-chapters.proze';
+        let expected = 'test-data/single-file/sections/no-chapters.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
+    test('parses named sections', () => {
+        mockArgs.path = 'test-data/single-file/sections/with-names.proze';
+        let expected = 'test-data/single-file/sections/with-names.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
+    test('parses named sections', () => {
+        mockArgs.path = 'test-data/single-file/sections/symbol-only.proze';
+        let expected = 'test-data/single-file/sections/symbol-only.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
 });
