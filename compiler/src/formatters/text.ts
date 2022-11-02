@@ -1,6 +1,7 @@
 import { Author } from '../components/author';
 import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
+import { Section } from '../components/section';
 import { Text } from '../components/text';
 import { Title } from '../components/title';
 import { Token } from '../components/token';
@@ -14,6 +15,10 @@ export class TextFormatter {
         private title: Title | null,
         private components: Component[]
     ) {}
+
+    private addSection(section: Section) {
+        this.content.push(section.getOutput());
+    }
 
     private addText(text: Text) {
         this.content.push(text.text);
@@ -44,6 +49,9 @@ export class TextFormatter {
                     break;
                 case Token.end_paragraph:
                     this.endParagraph(i);
+                    break;
+                case Token.section:
+                    this.addSection(component as Section);
                     break;
                 case Token.text:
                     this.addText(component as Text);
