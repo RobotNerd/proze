@@ -74,14 +74,14 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
-    test('parses document where only some chapters are namesd', () => {
+    test('parses document where only some chapters are named', () => {
         mockArgs.path = 'test-data/single-file/chapters/partial-chapter-names.proze';
         let expected = 'test-data/single-file/chapters/partial-chapter-names.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+        expect(CompilerMessages.getInstance().hasWarnings()).toBe(true);
+        expect(CompilerMessages.getInstance().warnings.length).toBe(1);
     });
-
-    // TODO test for warning of mix/match chapter names and missing names
 
     // Sections
 
