@@ -4,6 +4,7 @@ import { Line } from "./line";
 import { ParseError } from "../util/parse-error";
 import { Section } from "./section";
 import { Title } from "./title";
+import { CompilerMessages } from "../util/compiler-messages";
 
 enum Tag {
     Author = 'Author',
@@ -69,9 +70,8 @@ export class Metadata {
                 component = this.parseTitle(line);
                 break;
             default:
-                throw new ParseError(
-                    `Unrecognized metadata tag ${tag}`,
-                    line.lineNumber
+                CompilerMessages.getInstance().add(
+                    new ParseError(`Unrecognized metadata tag ${tag}`, line.lineNumber)
                 );
         }
         return component;
@@ -80,13 +80,17 @@ export class Metadata {
     private parseAuthor(line: Line): MetadataInterface {
         let component: MetadataInterface = { name: '' };
         const match = line.text.match(Metadata.patterns.content);
-        if (!match) {
-            throw new ParseError(
-                `Invalid Author tag: no author name provided`,
-                line.lineNumber
+        if (match) {
+            component = new Author(match[1]);
+        }
+        else {
+            CompilerMessages.getInstance().add(
+                new ParseError(
+                    `Invalid Author tag: no author name provided`,
+                    line.lineNumber
+                )
             );
         }
-        component = new Author(match[1]);
         return component;
     }
 
@@ -98,7 +102,7 @@ export class Metadata {
             name = match[1];
             Metadata.getInstance().hasChapterNames = true;
         }
-        component = new Chapter(name, this.getNextChapterNumber());
+        component = new Chapter(line, name, this.getNextChapterNumber());
         return component;
     }
 
@@ -116,13 +120,17 @@ export class Metadata {
     private parseTitle(line: Line): MetadataInterface {
         let component: MetadataInterface = { name: '' };
         const match = line.text.match(Metadata.patterns.content);
-        if (!match) {
-            throw new ParseError(
-                `Invalid Title tag: no title provided`,
-                line.lineNumber
+        if (match) {
+            component = new Title(match[1]);
+        }
+        else {
+            CompilerMessages.getInstance().add(
+                new ParseError(
+                    `Invalid Title tag: no title provided`,
+                    line.lineNumber
+                )
             );
         }
-        component = new Title(match[1]);
         return component;
     }
 

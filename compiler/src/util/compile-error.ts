@@ -1,16 +1,10 @@
-import { ParseError } from "./parse-error";
+import { CompilerMessages } from "./compiler-messages";
 
 export class CompileError extends Error {
 
     constructor(
-        public message: string,
-        public errors: ParseError[]
+        public message: string
     ) {
         super(message);
-        let lineErrors: string[] = [];
-        for (let err of errors) {
-            lineErrors.push(`    ${err.lineNumber}: ${err.message}`);
-        }
-        this.message += `\n${lineErrors.join('\n')}`;
     }
 }

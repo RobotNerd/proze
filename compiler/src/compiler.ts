@@ -6,20 +6,19 @@ import { Format, ProzeArgs } from './util/cli-arguments';
 import { Line } from './components/line';
 import { LineState, LineType } from './components/line-state';
 import { Metadata, MetadataInterface } from './components/metadata';
-import { ParseError } from './util/parse-error';
 import { Section } from './components/section';
 import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
 import { Title } from './components/title';
 import { Token } from './components/token';
 import { readFileSync } from 'fs';
+import { CompilerMessages } from './util/compiler-messages';
 
 export class Compiler {
 
     private args: ProzeArgs;
     private author: Author | null = null;
     private lineState: LineState;
-    private parseErrors: ParseError[] = [];
     private title: Title | null = null;
     private components: Component[] = [];
 
@@ -45,8 +44,6 @@ export class Compiler {
             case metadata instanceof Title:
                 this.title = metadata as Title;
                 break;
-            default:
-                throw new Error(`Invalid metadata type ${metadata.constructor.name}`);
         }
     }
 
@@ -60,17 +57,10 @@ export class Compiler {
             default:
                 throw new Error(`unrecognized format: ${this.args.format}`);
         }
-        if (this.parseErrors.length > 0) {
-            throw new CompileError(
-                'Failed to compile due to parse errors.',
-                this.parseErrors
-            );
+        if (CompilerMessages.getInstance().hasErrors()) {
+            throw new CompileError('Failed to compile due to parse errors.');
         }
         return formatter.getOutput();
-    }
-
-    private handleParseError(err: ParseError) {
-        this.parseErrors.push(err);
     }
 
     private isFirstComponent() {
@@ -101,27 +91,17 @@ export class Compiler {
         for(let i=0; i < lines.length; i++) {
             let line = new Line(lines[i], i);
             this.lineState.update(line);
-            try {
-                switch(this.lineState.lineType) {
-                    case LineType.metadata:
-                        const metadata = Metadata.getInstance().parse(line);
-                        this.assignMetadata(metadata);
-                        break;
-                    case LineType.paragraph:
-                        this.components.push(new Text(line.text));
-                        break;
-                    case LineType.emptyLine:
-                        this.parseEmptyLine();
-                        break;
-                }
-            }
-            catch (err) {
-                if (err instanceof ParseError) {
-                    this.handleParseError(err);
-                }
-                else {
-                    throw err;
-                }
+            switch(this.lineState.lineType) {
+                case LineType.metadata:
+                    const metadata = Metadata.getInstance().parse(line);
+                    this.assignMetadata(metadata);
+                    break;
+                case LineType.paragraph:
+                    this.components.push(new Text(line.text));
+                    break;
+                case LineType.emptyLine:
+                    this.parseEmptyLine();
+                    break;
             }
         }
     }
