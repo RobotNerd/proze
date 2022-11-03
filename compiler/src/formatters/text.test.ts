@@ -3,6 +3,7 @@ import { Compiler } from '../compiler';
 import { Metadata } from '../components/metadata';
 import { ProzeArgs, Format } from '../util/cli-arguments';
 import { readFileSync } from 'fs';
+import { CompilerMessages } from '../util/compiler-messages';
 
 function loadExpectedOutput(path: string): string {
     return readFileSync(path, 'utf-8');
@@ -13,6 +14,7 @@ describe('text formatter', () => {
     let mockArgs: ProzeArgs;
 
     beforeEach(() => {
+        CompilerMessages.getInstance().reset();
         Metadata.getInstance().reset();
         mockArgs = {
             format: Format.text,
@@ -50,7 +52,8 @@ describe('text formatter', () => {
         }
         catch(e: unknown) {
             expect(e).toBeInstanceOf(CompileError);
-            expect((e as CompileError).errors.length).toBe(1);
+            expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
+            expect(CompilerMessages.getInstance().errors.length).toBe(1);
         }
     });
 
@@ -71,11 +74,13 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
-    test('parses document where only some chapter names have titles', () => {
+    test('parses document where only some chapters are named', () => {
         mockArgs.path = 'test-data/single-file/chapters/partial-chapter-names.proze';
         let expected = 'test-data/single-file/chapters/partial-chapter-names.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+        expect(CompilerMessages.getInstance().hasWarnings()).toBe(true);
+        expect(CompilerMessages.getInstance().warnings.length).toBe(1);
     });
 
     // Sections
