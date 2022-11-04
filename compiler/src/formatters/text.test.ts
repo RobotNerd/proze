@@ -29,6 +29,8 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    // Metadata
+
     test('allows no metadata fields to be provided', () => {
         mockArgs.path = 'test-data/single-file/no-metadata.proze';
         let expected = 'test-data/single-file/no-metadata.expected.txt';
@@ -63,6 +65,15 @@ describe('text formatter', () => {
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
+
+    test('does not parse line as metadata when it is part of a paragraph', () => {
+        mockArgs.path = 'test-data/single-file/metadata-in-paragraph.proze';
+        let expected = 'test-data/single-file/metadata-in-paragraph.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
+    // Paragraphs
 
     test('supports multi-line paragraphs', () => {
         mockArgs.path = 'test-data/single-file/multi-line-paragraphs.proze';
