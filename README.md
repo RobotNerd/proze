@@ -1,7 +1,6 @@
 # What is proze?
 
-> TL;DR proze is a set of tools that makes writing prose a little more
-> like writing code.
+> TL;DR `proze` is a set of tools that lets you write literature like you write code.
 
 Have you ever written a short story, a novel, or an essay and thought to yourself,
 "I wish this had syntax highlighting like when I write code."
