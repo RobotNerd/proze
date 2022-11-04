@@ -9,6 +9,7 @@ import { Token } from '../components/token';
 export class TextFormatter {
 
     private content: string[] = [];
+    private currentTextBlock: string[] = [];
 
     constructor(
         private author: Author | null,
@@ -21,7 +22,7 @@ export class TextFormatter {
     }
 
     private addText(text: Text) {
-        this.content.push(text.text);
+        this.currentTextBlock.push(text.text);
     }
 
     private endChapter() {
@@ -29,6 +30,10 @@ export class TextFormatter {
     }
 
     private endParagraph(i: number) {
+        if (this.currentTextBlock.length > 0) {
+            this.content.push(this.currentTextBlock.join(' '));
+            this.currentTextBlock = [];
+        }
         if (this.isLastComponent(i)) {
             this.content.push('\n');
         }
