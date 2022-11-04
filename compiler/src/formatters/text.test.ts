@@ -64,6 +64,13 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    test('supports multi-line paragraphs', () => {
+        mockArgs.path = 'test-data/single-file/multi-line-paragraphs.proze';
+        let expected = 'test-data/single-file/multi-line-paragraphs.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
 
     // Chapters
 
