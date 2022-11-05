@@ -8,8 +8,13 @@ export enum LineType {
 }
 
 export class LineState {
+    // inBlockComment: boolean = false;
     inParagraph: boolean = false;
     lineType: LineType;
+
+    private patterns = {
+        lineComment: /(.*?)##.*/,
+    }
 
     constructor() {
         this.lineType = LineType.emptyLine;
@@ -19,17 +24,39 @@ export class LineState {
         return line.text.trim() == '';
     }
 
-    update(line: Line) {
-        if (!this.inParagraph && Metadata.getInstance().isMetadata(line)) {
-            this.lineType = LineType.metadata;
+    private stripLineComment(line: Line): Line | null {
+        let parsedLine: Line | null = line;
+        const match = line.text.match(this.patterns.lineComment);
+        if (match) {
+            parsedLine = null;
+            const text = match[1].trim();
+            if (text !== '') {
+                parsedLine = new Line(text, line.lineNumber);
+            }
         }
-        else if (this.isEmptyLine(line)) {
-            this.inParagraph = false;
-            this.lineType = LineType.emptyLine;
+        return parsedLine;
+    }
+
+    update(line: Line): Line | null {
+        let updatedLine = this.stripLineComment(line);
+        if (updatedLine !== null) {
+            if (!this.inParagraph && Metadata.getInstance().isMetadata(updatedLine)) {
+                this.lineType = LineType.metadata;
+            }
+            else if (this.isEmptyLine(updatedLine)) {
+                this.inParagraph = false;
+                this.lineType = LineType.emptyLine;
+            }
+            else {
+                this.inParagraph = true;
+                this.lineType = LineType.paragraph;
+            }
         }
-        else {
-            this.inParagraph = true;
-            this.lineType = LineType.paragraph;
-        }
+        return updatedLine;
+    }
+
+    reset() {
+        // this.inBlockComment = false;
+        this.inParagraph = false;
     }
 }

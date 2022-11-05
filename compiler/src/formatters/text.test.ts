@@ -124,4 +124,13 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    // Comments
+
+    test('ignores line comments', () => {
+        mockArgs.path = 'test-data/single-file/comments/line-comment.proze';
+        let expected = 'test-data/single-file/comments/line-comment.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
 });
