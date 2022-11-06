@@ -133,4 +133,11 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    test('ignores block comments', () => {
+        mockArgs.path = 'test-data/single-file/comments/block-comment.proze';
+        let expected = 'test-data/single-file/comments/block-comment.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
 });

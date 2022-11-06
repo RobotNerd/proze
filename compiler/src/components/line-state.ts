@@ -8,12 +8,14 @@ export enum LineType {
 }
 
 export class LineState {
-    // inBlockComment: boolean = false;
+    private inBlockComment: boolean = false;
+
     inParagraph: boolean = false;
     lineType: LineType;
 
     private patterns = {
-        lineComment: /(.*?)##.*/,
+        blockComment: '###',
+        lineComment: /(.*)##.*/,
     }
 
     constructor() {
@@ -36,9 +38,36 @@ export class LineState {
         }
         return parsedLine;
     }
+    
+    private stripBlockComment(line: Line): Line | null {
+        let updatedLine: Line | null = null;
+        let substrings: string[] = [];
+        let text = line.text;
+        let index: number;
+        do {
+            index = text.indexOf(this.patterns.blockComment);
+            if (index >= 0) {
+                if (!this.inBlockComment) {
+                    substrings.push(text.substring(0, index).trim());
+                }
+                this.inBlockComment = !this.inBlockComment;
+                text = text.substring(index + 3).trim();
+            }
+            else if (!this.inBlockComment) {
+                substrings.push(text);
+            }
+        } while (index != -1);
+        if (substrings.length > 0) {
+            updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
+        }
+        return updatedLine;
+    }
 
     update(line: Line): Line | null {
-        let updatedLine = this.stripLineComment(line);
+        let updatedLine = this.stripBlockComment(line);
+        if (updatedLine !== null) {
+            updatedLine = this.stripLineComment(updatedLine);
+        }
         if (updatedLine !== null) {
             if (!this.inParagraph && Metadata.getInstance().isMetadata(updatedLine)) {
                 this.lineType = LineType.metadata;
@@ -56,7 +85,7 @@ export class LineState {
     }
 
     reset() {
-        // this.inBlockComment = false;
+        this.inBlockComment = false;
         this.inParagraph = false;
     }
 }
