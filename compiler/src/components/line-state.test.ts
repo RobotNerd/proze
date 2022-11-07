@@ -48,6 +48,15 @@ describe('LineState', () => {
         expect(newLine?.text).toBe(text);
     });
 
+    test('requires whitespace before block comment if not at beginning of the line', () => {
+        let text = 'this sentence will contain this and### this';
+        const line = new Line(text, 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
     test('strips a comment block from the end of a line', () => {
         let text = 'this sentence will contain this';
         const line = new Line('this sentence will contain this   ### but will not contain this text ###  ', 0);
@@ -84,15 +93,37 @@ describe('LineState', () => {
         expect(newLine3?.text).toBe('def');
     });
 
-    test('ignores an escaped block comment', () => {
-        let text = 'this sentence ### will contain this';
-        // const line = new Line('this sentence ### will not contain this text but ### \\### will contain this', 0);
-        const line = new Line('this sentence \\### will contain this', 0);
+    // Line comment and block comment interaction
+
+    test('line comment hides block comments', () => {
+        let text = 'only the beginning is included';
+        const line = new Line('only the beginning is included ## but nothing else will ### including this ### or this', 0);
         const lineState = new LineState();
         const newLine = lineState.update(line);
         expect(newLine).not.toBeNull();
         expect(newLine?.text).toBe(text);
     });
+
+    test('block comment hides line comment', () => {
+        let text = 'only the beginning is included';
+        const line = new Line('only the beginning is included ### but nothing else ## like this', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    // Escaped block comments
+
+    // test('ignores an escaped block comment', () => {
+    //     let text = 'this sentence ### will contain this';
+    //     // const line = new Line('this sentence ### will not contain this text but ### \\### will contain this', 0);
+    //     const line = new Line('this sentence \\### will contain this', 0);
+    //     const lineState = new LineState();
+    //     const newLine = lineState.update(line);
+    //     expect(newLine).not.toBeNull();
+    //     expect(newLine?.text).toBe(text);
+    // });
 
     // test('ignores an escaped block inside another block comment', () => {
     //     let text = 'this sentence will contain this';

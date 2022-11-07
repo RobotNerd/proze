@@ -17,10 +17,30 @@ export class LineState {
     private patterns = {
         blockComment: '###',
         lineComment: /(.*)##.*/,
+        // lineComment: '##',
     }
 
     constructor() {
         this.lineType = LineType.emptyLine;
+    }
+
+    private findNextCommentToken(text: string, pattern: string): number {
+        let index: number;
+        let found: boolean;
+        let position = 0;
+        do {
+            index = text.indexOf(pattern, position);
+            // index = text.indexOf(this.patterns.blockComment, position);
+            found = true;
+            if (index > 0) {
+                if (this.isEscaped(text, index) || !this.isPrefixedByWhitespace(text, index)) {
+                    found = false;
+                    position = index + pattern.length;
+                    // position = index + 3;
+                }
+            }
+        } while (!found);
+        return index;
     }
 
     private isEmptyLine(line: Line): boolean {
@@ -29,9 +49,14 @@ export class LineState {
 
     private isEscaped(text: string, index: number): boolean {
         if (index > 0) {
-            if (text[index - 1] === this.escapeChar) {
-                return true;
-            }
+            return text[index - 1] === this.escapeChar;
+        }
+        return false;
+    }
+
+    private isPrefixedByWhitespace(text: string, index: number): boolean {
+        if (index > 0) {
+            return text[index - 1].match(/\s/) !== null;
         }
         return false;
     }
@@ -47,6 +72,8 @@ export class LineState {
             }
         }
         return parsedLine;
+        // let updatedLine: Line | null = null;
+        // let index = this.findNextCommentToken(text, this.patterns.lineComment);
     }
     
     private stripBlockComment(line: Line): Line | null {
@@ -54,20 +81,14 @@ export class LineState {
         let substrings: string[] = [];
         let text = line.text;
         let index: number;
-        let startingPositon: number = 0;
         do {
-            index = text.indexOf(this.patterns.blockComment, startingPositon);
+            index = this.findNextCommentToken(text, this.patterns.blockComment);
             if (index >= 0) {
-                if (this.isEscaped(text, index)) {
-                    startingPositon = index + 3;
+                if (!this.inBlockComment) {
+                    substrings.push(text.substring(0, index).trim());
                 }
-                else {
-                    if (!this.inBlockComment) {
-                        substrings.push(text.substring(0, index).trim());
-                    }
-                    this.inBlockComment = !this.inBlockComment;
-                    text = text.substring(index + 3).trim();
-                }
+                this.inBlockComment = !this.inBlockComment;
+                text = text.substring(index + 3).trim();
             }
             else if (!this.inBlockComment) {
                 substrings.push(text);

@@ -107,5 +107,6 @@ export class Compiler {
                     break;
             }
         }
+        this.components.push(new EmptyComponent(Token.eof));
     }
 }
