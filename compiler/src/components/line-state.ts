@@ -13,6 +13,7 @@ export class LineState {
     inParagraph: boolean = false;
     lineType: LineType;
 
+    private escapeChar = '\\';
     private patterns = {
         blockComment: '###',
         lineComment: /(.*)##.*/,
@@ -24,6 +25,15 @@ export class LineState {
 
     private isEmptyLine(line: Line): boolean {
         return line.text.trim() == '';
+    }
+
+    private isEscaped(text: string, index: number): boolean {
+        if (index > 0) {
+            if (text[index - 1] === this.escapeChar) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private stripLineComment(line: Line): Line | null {
@@ -44,14 +54,20 @@ export class LineState {
         let substrings: string[] = [];
         let text = line.text;
         let index: number;
+        let startingPositon: number = 0;
         do {
-            index = text.indexOf(this.patterns.blockComment);
+            index = text.indexOf(this.patterns.blockComment, startingPositon);
             if (index >= 0) {
-                if (!this.inBlockComment) {
-                    substrings.push(text.substring(0, index).trim());
+                if (this.isEscaped(text, index)) {
+                    startingPositon = index + 3;
                 }
-                this.inBlockComment = !this.inBlockComment;
-                text = text.substring(index + 3).trim();
+                else {
+                    if (!this.inBlockComment) {
+                        substrings.push(text.substring(0, index).trim());
+                    }
+                    this.inBlockComment = !this.inBlockComment;
+                    text = text.substring(index + 3).trim();
+                }
             }
             else if (!this.inBlockComment) {
                 substrings.push(text);

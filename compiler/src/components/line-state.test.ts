@@ -83,4 +83,23 @@ describe('LineState', () => {
         expect(newLine3).not.toBeNull();
         expect(newLine3?.text).toBe('def');
     });
+
+    test('ignores an escaped block comment', () => {
+        let text = 'this sentence ### will contain this';
+        // const line = new Line('this sentence ### will not contain this text but ### \\### will contain this', 0);
+        const line = new Line('this sentence \\### will contain this', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    // test('ignores an escaped block inside another block comment', () => {
+    //     let text = 'this sentence will contain this';
+    //     const line = new Line('this sentence ### will not contain this text but \\### ### will contain this', 0);
+    //     const lineState = new LineState();
+    //     const newLine = lineState.update(line);
+    //     expect(newLine).not.toBeNull();
+    //     expect(newLine?.text).toBe(text);
+    // });
 });
