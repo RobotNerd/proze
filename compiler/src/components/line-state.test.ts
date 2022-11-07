@@ -28,7 +28,7 @@ describe('LineState', () => {
         expect(newLine).toBeNull();
     });
 
-    // Comment block
+    // // Comment block
 
     test('strips a comment block from middle of a line', () => {
         let text = 'this sentence will contain this';
@@ -115,22 +115,22 @@ describe('LineState', () => {
 
     // Escaped block comments
 
-    // test('ignores an escaped block comment', () => {
-    //     let text = 'this sentence ### will contain this';
-    //     // const line = new Line('this sentence ### will not contain this text but ### \\### will contain this', 0);
-    //     const line = new Line('this sentence \\### will contain this', 0);
-    //     const lineState = new LineState();
-    //     const newLine = lineState.update(line);
-    //     expect(newLine).not.toBeNull();
-    //     expect(newLine?.text).toBe(text);
-    // });
+    test('ignores an escaped block comment', () => {
+        let text = 'this sentence ### will contain this';
+        // const line = new Line('this sentence ### will not contain this text but ### \\### will contain this', 0);
+        const line = new Line('this sentence \\### will contain this', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
 
-    // test('ignores an escaped block inside another block comment', () => {
-    //     let text = 'this sentence will contain this';
-    //     const line = new Line('this sentence ### will not contain this text but \\### ### will contain this', 0);
-    //     const lineState = new LineState();
-    //     const newLine = lineState.update(line);
-    //     expect(newLine).not.toBeNull();
-    //     expect(newLine?.text).toBe(text);
-    // });
+    test('ignores an escaped block inside another block comment', () => {
+        let text = 'this sentence will contain this';
+        const line = new Line('this sentence ### will not contain this text but \\### ### will contain this', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
 });
