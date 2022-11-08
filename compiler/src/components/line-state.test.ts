@@ -117,7 +117,6 @@ describe('LineState', () => {
 
     test('ignores an escaped block comment', () => {
         let text = 'this sentence ### will contain this';
-        // const line = new Line('this sentence ### will not contain this text but ### \\### will contain this', 0);
         const line = new Line('this sentence \\### will contain this', 0);
         const lineState = new LineState();
         const newLine = lineState.update(line);

@@ -17,6 +17,8 @@ export class LineState {
     private patterns = {
         blockComment: '###',
         lineComment: '##',
+        escaped: '\\#',
+        escapedReplacement: '#',
     }
 
     constructor() {
@@ -124,7 +126,14 @@ export class LineState {
                 this.lineType = LineType.paragraph;
             }
         }
+        if (updatedLine) {
+            this.removeEscapeCharacter(updatedLine);
+        }
         return updatedLine;
+    }
+
+    private removeEscapeCharacter(line: Line) {
+        line.text = line.text.replaceAll(this.patterns.escaped, this.patterns.escapedReplacement);
     }
 
     reset() {
