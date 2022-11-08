@@ -13,6 +13,34 @@ export class Strip {
         escapedComment: '\\#',
         escapedCommentReplacer: '#',
     }
+    
+    blockComment(line: Line): Line | null {
+        let updatedLine: Line | null = null;
+        let substrings: string[] = [];
+        let text = line.text;
+        let index: number;
+        do {
+            index = this.findNextCommentToken(text, this.patterns.blockComment);
+            if (index >= 0) {
+                if (!this.inBlockComment) {
+                    substrings.push(text.substring(0, index).trim());
+                }
+                this.inBlockComment = !this.inBlockComment;
+                text = text.substring(index + this.patterns.blockComment.length).trim();
+            }
+            else if (!this.inBlockComment) {
+                substrings.push(text);
+            }
+        } while (index != -1);
+        if (substrings.length > 0) {
+            updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
+        }
+        return updatedLine;
+    }
+
+    escapeCharacter(line: Line) {
+        line.text = line.text.replaceAll(this.patterns.escapedComment, this.patterns.escapedCommentReplacer);
+    }
 
     private findNextCommentToken(text: string, pattern: string): number {
         let index: number;
@@ -67,34 +95,6 @@ export class Strip {
             updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
         }
         return updatedLine;
-    }
-    
-    blockComment(line: Line): Line | null {
-        let updatedLine: Line | null = null;
-        let substrings: string[] = [];
-        let text = line.text;
-        let index: number;
-        do {
-            index = this.findNextCommentToken(text, this.patterns.blockComment);
-            if (index >= 0) {
-                if (!this.inBlockComment) {
-                    substrings.push(text.substring(0, index).trim());
-                }
-                this.inBlockComment = !this.inBlockComment;
-                text = text.substring(index + this.patterns.blockComment.length).trim();
-            }
-            else if (!this.inBlockComment) {
-                substrings.push(text);
-            }
-        } while (index != -1);
-        if (substrings.length > 0) {
-            updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
-        }
-        return updatedLine;
-    }
-
-    escapeCharacter(line: Line) {
-        line.text = line.text.replaceAll(this.patterns.escapedComment, this.patterns.escapedCommentReplacer);
     }
 
     reset() {
