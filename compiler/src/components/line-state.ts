@@ -8,28 +8,136 @@ export enum LineType {
 }
 
 export class LineState {
+    private inBlockComment: boolean = false;
+
     inParagraph: boolean = false;
     lineType: LineType;
 
+    private escapeChar = '\\';
+    private patterns = {
+        blockComment: '###',
+        lineComment: '##',
+        escaped: '\\#',
+        escapedReplacement: '#',
+    }
+
     constructor() {
         this.lineType = LineType.emptyLine;
+    }
+
+    private findNextCommentToken(text: string, pattern: string): number {
+        let index: number;
+        let found: boolean;
+        let position = 0;
+        do {
+            index = text.indexOf(pattern, position);
+            found = true;
+            if (index > 0) {
+                if (this.isEscaped(text, index) || !this.isPrefixedByWhitespace(text, index)) {
+                    found = false;
+                    position = index + pattern.length;
+                }
+            }
+        } while (!found);
+        return index;
     }
 
     private isEmptyLine(line: Line): boolean {
         return line.text.trim() == '';
     }
 
-    update(line: Line) {
-        if (!this.inParagraph && Metadata.getInstance().isMetadata(line)) {
-            this.lineType = LineType.metadata;
+    private isEscaped(text: string, index: number): boolean {
+        if (index > 0) {
+            return text[index - 1] === this.escapeChar;
         }
-        else if (this.isEmptyLine(line)) {
-            this.inParagraph = false;
-            this.lineType = LineType.emptyLine;
+        return false;
+    }
+
+    private isPrefixedByWhitespace(text: string, index: number): boolean {
+        if (index > 0) {
+            return text[index - 1].match(/\s/) !== null;
         }
-        else {
-            this.inParagraph = true;
-            this.lineType = LineType.paragraph;
+        return false;
+    }
+
+    private stripLineComment(line: Line): Line | null {
+        let updatedLine: Line | null = null;
+        let substrings: string[] = [];
+        let text = line.text;
+        let index: number;
+        do {
+            index = this.findNextCommentToken(text, this.patterns.lineComment);
+            if (index >= 0) {
+                let parsedText = text.substring(0, index).trim(); 
+                if (parsedText !== '') {
+                    substrings.push(text.substring(0, index).trim());
+                }
+                index = -1;
+            }
+            else {
+                substrings.push(text);
+            }
+        } while (index != -1);
+        if (substrings.length > 0) {
+            updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
         }
+        return updatedLine;
+    }
+    
+    private stripBlockComment(line: Line): Line | null {
+        let updatedLine: Line | null = null;
+        let substrings: string[] = [];
+        let text = line.text;
+        let index: number;
+        do {
+            index = this.findNextCommentToken(text, this.patterns.blockComment);
+            if (index >= 0) {
+                if (!this.inBlockComment) {
+                    substrings.push(text.substring(0, index).trim());
+                }
+                this.inBlockComment = !this.inBlockComment;
+                text = text.substring(index + this.patterns.blockComment.length).trim();
+            }
+            else if (!this.inBlockComment) {
+                substrings.push(text);
+            }
+        } while (index != -1);
+        if (substrings.length > 0) {
+            updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
+        }
+        return updatedLine;
+    }
+
+    update(line: Line): Line | null {
+        let updatedLine = this.stripBlockComment(line);
+        if (updatedLine !== null) {
+            updatedLine = this.stripLineComment(updatedLine);
+        }
+        if (updatedLine !== null) {
+            if (!this.inParagraph && Metadata.getInstance().isMetadata(updatedLine)) {
+                this.lineType = LineType.metadata;
+            }
+            else if (this.isEmptyLine(updatedLine)) {
+                this.inParagraph = false;
+                this.lineType = LineType.emptyLine;
+            }
+            else {
+                this.inParagraph = true;
+                this.lineType = LineType.paragraph;
+            }
+        }
+        if (updatedLine) {
+            this.removeEscapeCharacter(updatedLine);
+        }
+        return updatedLine;
+    }
+
+    private removeEscapeCharacter(line: Line) {
+        line.text = line.text.replaceAll(this.patterns.escaped, this.patterns.escapedReplacement);
+    }
+
+    reset() {
+        this.inBlockComment = false;
+        this.inParagraph = false;
     }
 }

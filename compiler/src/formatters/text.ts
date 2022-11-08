@@ -29,6 +29,15 @@ export class TextFormatter {
         this.content.push('\n');
     }
 
+    private endOfFile(i: number) {
+        if (this.currentTextBlock.length > 0) {
+            // A hanging paragraph can occur when a block comment is started in
+            // the middle of a paragraph but there's no closing block comment
+            // token before EOF.
+            this.endParagraph(i);
+        }
+    }
+
     private endParagraph(i: number) {
         if (this.currentTextBlock.length > 0) {
             this.content.push(this.currentTextBlock.join(' '));
@@ -54,6 +63,9 @@ export class TextFormatter {
                     break;
                 case Token.end_paragraph:
                     this.endParagraph(i);
+                    break;
+                case Token.eof:
+                    this.endOfFile(i);
                     break;
                 case Token.section:
                     this.addSection(component as Section);
@@ -81,7 +93,7 @@ export class TextFormatter {
     }
 
     private isLastComponent(i: number) {
-        return i == this.components.length - 1;
+        return (i == this.components.length - 1) || this.components[i+1].token == Token.eof;
     }
 
     private startChapter(chapter: Chapter) {

@@ -89,8 +89,11 @@ export class Compiler {
     private parseLines() {
         const lines = this.loadFile(this.args.path);
         for(let i=0; i < lines.length; i++) {
-            let line = new Line(lines[i], i);
-            this.lineState.update(line);
+            let line: Line | null = new Line(lines[i], i);
+            line = this.lineState.update(line);
+            if (line === null) {
+                continue;
+            }
             switch(this.lineState.lineType) {
                 case LineType.metadata:
                     const metadata = Metadata.getInstance().parse(line);
@@ -104,5 +107,6 @@ export class Compiler {
                     break;
             }
         }
+        this.components.push(new EmptyComponent(Token.eof));
     }
 }
