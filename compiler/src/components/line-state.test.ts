@@ -113,7 +113,7 @@ describe('LineState', () => {
         expect(newLine?.text).toBe(text);
     });
 
-    // Escaped block comments
+    // Escaped comments
 
     test('ignores an escaped block comment', () => {
         let text = 'this sentence ### will contain this';
@@ -127,6 +127,33 @@ describe('LineState', () => {
     test('ignores an escaped block inside another block comment', () => {
         let text = 'this sentence will contain this';
         const line = new Line('this sentence ### will not contain this text but \\### ### will contain this', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    test('ignores an escaped line comment', () => {
+        let text = 'this sentence ## will contain this';
+        const line = new Line('this sentence \\## will contain this', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    test('ignores an escaped line comment hidden by another line comment', () => {
+        let text = 'this sentence';
+        const line = new Line('this sentence ## will not contain this \\## or this', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    test('ignores an escaped block hidden by a line comment', () => {
+        let text = 'this sentence';
+        const line = new Line('this sentence ## will not ### contain ### this text or \\### this', 0);
         const lineState = new LineState();
         const newLine = lineState.update(line);
         expect(newLine).not.toBeNull();
