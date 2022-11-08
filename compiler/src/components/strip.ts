@@ -1,16 +1,17 @@
 import { Line } from "./line";
 
-/** Remove comments. */
-export class Ignore {
+/** Remove comments and bracketed blocks. */
+export class Strip {
 
     private inBlockComment: boolean = false;
+    private inBracketBlock: boolean = false;
 
     private escapeChar = '\\';
     private patterns = {
         blockComment: '###',
         lineComment: '##',
-        escaped: '\\#',
-        escapedReplacement: '#',
+        escapedComment: '\\#',
+        escapedCommentReplacer: '#',
     }
 
     private findNextCommentToken(text: string, pattern: string): number {
@@ -93,10 +94,11 @@ export class Ignore {
     }
 
     escapeCharacter(line: Line) {
-        line.text = line.text.replaceAll(this.patterns.escaped, this.patterns.escapedReplacement);
+        line.text = line.text.replaceAll(this.patterns.escapedComment, this.patterns.escapedCommentReplacer);
     }
 
     reset() {
         this.inBlockComment = false;
+        this.inBracketBlock = false;
     }
 }

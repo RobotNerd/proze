@@ -1,6 +1,6 @@
-import { Ignore } from "./ignore";
 import { Line } from "./line";
 import { Metadata } from "./metadata";
+import { Strip } from "./strip";
 
 export enum LineType {
     emptyLine,
@@ -13,11 +13,11 @@ export class LineState {
     inParagraph: boolean = false;
     lineType: LineType;
     
-    private ignore: Ignore;
+    private strip: Strip;
 
     constructor() {
         this.lineType = LineType.emptyLine;
-        this.ignore = new Ignore();
+        this.strip = new Strip();
     }
 
     private isEmptyLine(line: Line): boolean {
@@ -25,9 +25,9 @@ export class LineState {
     }
 
     update(line: Line): Line | null {
-        let updatedLine = this.ignore.blockComment(line);
+        let updatedLine = this.strip.blockComment(line);
         if (updatedLine !== null) {
-            updatedLine = this.ignore.lineComment(updatedLine);
+            updatedLine = this.strip.lineComment(updatedLine);
         }
         if (updatedLine !== null) {
             if (!this.inParagraph && Metadata.getInstance().isMetadata(updatedLine)) {
@@ -43,13 +43,13 @@ export class LineState {
             }
         }
         if (updatedLine) {
-            this.ignore.escapeCharacter(updatedLine);
+            this.strip.escapeCharacter(updatedLine);
         }
         return updatedLine;
     }
 
     reset() {
         this.inParagraph = false;
-        this.ignore.reset();
+        this.strip.reset();
     }
 }
