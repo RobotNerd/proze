@@ -1,3 +1,4 @@
+import { Ignore } from "./ignore";
 import { Line } from "./line";
 import { Metadata } from "./metadata";
 
@@ -8,110 +9,25 @@ export enum LineType {
 }
 
 export class LineState {
-    private inBlockComment: boolean = false;
 
     inParagraph: boolean = false;
     lineType: LineType;
-
-    private escapeChar = '\\';
-    private patterns = {
-        blockComment: '###',
-        lineComment: '##',
-        escaped: '\\#',
-        escapedReplacement: '#',
-    }
+    
+    private ignore: Ignore;
 
     constructor() {
         this.lineType = LineType.emptyLine;
-    }
-
-    private findNextCommentToken(text: string, pattern: string): number {
-        let index: number;
-        let found: boolean;
-        let position = 0;
-        do {
-            index = text.indexOf(pattern, position);
-            found = true;
-            if (index > 0) {
-                if (this.isEscaped(text, index) || !this.isPrefixedByWhitespace(text, index)) {
-                    found = false;
-                    position = index + pattern.length;
-                }
-            }
-        } while (!found);
-        return index;
+        this.ignore = new Ignore();
     }
 
     private isEmptyLine(line: Line): boolean {
         return line.text.trim() == '';
     }
 
-    private isEscaped(text: string, index: number): boolean {
-        if (index > 0) {
-            return text[index - 1] === this.escapeChar;
-        }
-        return false;
-    }
-
-    private isPrefixedByWhitespace(text: string, index: number): boolean {
-        if (index > 0) {
-            return text[index - 1].match(/\s/) !== null;
-        }
-        return false;
-    }
-
-    private stripLineComment(line: Line): Line | null {
-        let updatedLine: Line | null = null;
-        let substrings: string[] = [];
-        let text = line.text;
-        let index: number;
-        do {
-            index = this.findNextCommentToken(text, this.patterns.lineComment);
-            if (index >= 0) {
-                let parsedText = text.substring(0, index).trim(); 
-                if (parsedText !== '') {
-                    substrings.push(text.substring(0, index).trim());
-                }
-                index = -1;
-            }
-            else {
-                substrings.push(text);
-            }
-        } while (index != -1);
-        if (substrings.length > 0) {
-            updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
-        }
-        return updatedLine;
-    }
-    
-    private stripBlockComment(line: Line): Line | null {
-        let updatedLine: Line | null = null;
-        let substrings: string[] = [];
-        let text = line.text;
-        let index: number;
-        do {
-            index = this.findNextCommentToken(text, this.patterns.blockComment);
-            if (index >= 0) {
-                if (!this.inBlockComment) {
-                    substrings.push(text.substring(0, index).trim());
-                }
-                this.inBlockComment = !this.inBlockComment;
-                text = text.substring(index + this.patterns.blockComment.length).trim();
-            }
-            else if (!this.inBlockComment) {
-                substrings.push(text);
-            }
-        } while (index != -1);
-        if (substrings.length > 0) {
-            updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
-        }
-        return updatedLine;
-    }
-
     update(line: Line): Line | null {
-        let updatedLine = this.stripBlockComment(line);
+        let updatedLine = this.ignore.blockComment(line);
         if (updatedLine !== null) {
-            updatedLine = this.stripLineComment(updatedLine);
+            updatedLine = this.ignore.lineComment(updatedLine);
         }
         if (updatedLine !== null) {
             if (!this.inParagraph && Metadata.getInstance().isMetadata(updatedLine)) {
@@ -127,17 +43,13 @@ export class LineState {
             }
         }
         if (updatedLine) {
-            this.removeEscapeCharacter(updatedLine);
+            this.ignore.escapeCharacter(updatedLine);
         }
         return updatedLine;
     }
 
-    private removeEscapeCharacter(line: Line) {
-        line.text = line.text.replaceAll(this.patterns.escaped, this.patterns.escapedReplacement);
-    }
-
     reset() {
-        this.inBlockComment = false;
         this.inParagraph = false;
+        this.ignore.reset();
     }
 }
