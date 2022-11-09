@@ -75,10 +75,6 @@ export class Strip {
         return updatedLine;
     }
 
-    /**
-     * Check for a hanging closing bracket character that is not escaped.
-     * @param line Line where bracket blocks and comments have already been removed.
-     */
     private checkHangingCloseBacket(line: Line | null) {
         if (line !== null && line.text.indexOf(this.patterns.closeBracket) >= 0) {
             let message = [
