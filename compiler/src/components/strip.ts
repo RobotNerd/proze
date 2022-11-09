@@ -1,3 +1,5 @@
+import { CompilerMessages } from "../util/compiler-messages";
+import { ParseError } from "../util/parse-error";
 import { Line } from "./line";
 
 /** Remove comments and bracketed blocks. */
@@ -69,7 +71,24 @@ export class Strip {
         if (substrings.length > 0) {
             updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
         }
+        this.checkHangingCloseBacket(updatedLine);
         return updatedLine;
+    }
+
+    /**
+     * Check for a hanging closing bracket character that is not escaped.
+     * @param line Line where bracket blocks and comments have already been removed.
+     */
+    private checkHangingCloseBacket(line: Line | null) {
+        if (line !== null && line.text.indexOf(this.patterns.closeBracket) >= 0) {
+            let message = [
+                'Closing bracket "]" found without prior matching opening bracket.',
+                'If you want this to be in the output, esacpe it with a "\\" character.'
+            ];
+            CompilerMessages.getInstance().add(
+                new ParseError(message.join(' '), line.lineNumber)
+            );
+        }
     }
 
     escapeCharacter(line: Line) {

@@ -5,6 +5,10 @@ import { LineState } from "./line-state";
 
 describe('LineState', () => {
 
+    beforeEach(() => {
+        CompilerMessages.getInstance().reset();
+    });
+
     // Line comment
 
     test('strips line comments from the end of a line', () => {
@@ -322,5 +326,13 @@ describe('LineState', () => {
         const newLine = lineState.update(line);
         expect(newLine).not.toBeNull();
         expect(newLine?.text).toBe(text);
+    });
+
+    test('throws compile error on unescaped closing bracket without matching opening bracket', () => {
+        const line = new Line('this will fail with ] an error', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
+        expect(CompilerMessages.getInstance().errors.length).toBe(1);
     });
 });
