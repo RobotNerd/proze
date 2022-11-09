@@ -28,7 +28,7 @@ describe('LineState', () => {
         expect(newLine).toBeNull();
     });
 
-    // // Comment block
+    // Comment block
 
     test('strips a comment block from middle of a line', () => {
         let text = 'this sentence will contain this';
@@ -77,20 +77,22 @@ describe('LineState', () => {
 
     test('parsed block comments over multiple lines', () => {
         const lineState = new LineState();
+        let line: Line;
+        let newLine: Line | null;
 
-        const line1 = new Line('abc ### XXX', 0);
-        const newLine1 = lineState.update(line1);
-        expect(newLine1).not.toBeNull();
-        expect(newLine1?.text).toBe('abc');
+        line = new Line('abc ### XXX', 0);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('abc');
 
-        const line2 = new Line ('NOT INCLUDED', 1);
-        const newLine2 = lineState.update(line2);
-        expect(newLine2).toBeNull();
+        line = new Line ('NOT INCLUDED', 1);
+        newLine = lineState.update(line);
+        expect(newLine).toBeNull();
 
-        const line3 = new Line('XXX ### def', 2);
-        const newLine3 = lineState.update(line3);
-        expect(newLine3).not.toBeNull();
-        expect(newLine3?.text).toBe('def');
+        line = new Line('XXX ### def', 2);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('def');
     });
 
     // Line comment and block comment interaction
@@ -159,4 +161,150 @@ describe('LineState', () => {
         expect(newLine).not.toBeNull();
         expect(newLine?.text).toBe(text);
     });
+
+    // Bracket blocks
+
+    test('strips text in a bracket block from the middle of a line', () => {
+        const text = 'keep this text';
+        const line = new Line('keep this [but not this] text', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    test('strips text in a bracket block taking up the entire line', () => {
+        const line = new Line('[keep nothing]', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('');
+    });
+
+    test('strips text in a bracket block from the middle of a line', () => {
+        const text = 'keep this text';
+        const line = new Line('[not this text] keep this text', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    test('strips text in a bracket block over multiple lines', () => {
+        const lineState = new LineState();
+        let line: Line;
+        let newLine: Line | null;
+
+        line = new Line('abc [XXX', 0);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('abc');
+
+        line = new Line ('NOT INCLUDED', 1);
+        newLine = lineState.update(line);
+        expect(newLine).toBeNull();
+
+        line = new Line('XXX ] def', 2);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('def');
+    });
+
+    test('ignores a bracket block hidden by a line comment', () => {
+        const text = 'keep this text';
+        const line = new Line('keep this text ## and everything [else on this line] is ignored', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    test('ignores a bracket block hidden by a block comment on a single line', () => {
+        const text = 'keep this text and this';
+        const line = new Line('keep this text ### and [this text] is ignored ### and this', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    test('ignores a bracket block hidden by a block comment over multiple lines', () => {
+        const lineState = new LineState();
+        let line: Line;
+        let newLine: Line | null;
+
+        line = new Line('abc ### XXX [', 0);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('abc');
+
+        line = new Line ('NOT INCLUDED', 1);
+        newLine = lineState.update(line);
+        expect(newLine).toBeNull();
+
+        line = new Line(']XXX ### def', 2);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('def');
+    });
+
+    test('ignores line and block comments contained within a bracket block', () => {
+        const lineState = new LineState();
+        let line: Line;
+        let newLine: Line | null;
+
+        line = new Line('abc [XXX', 0);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('abc');
+
+        line = new Line ('NOT INCLUDED ## and neither is this', 1);
+        newLine = lineState.update(line);
+        expect(newLine).toBeNull();
+
+        line = new Line ('### starting a block comment has no effect', 2);
+        newLine = lineState.update(line);
+        expect(newLine).toBeNull();
+
+        line = new Line('] def', 3);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('def');
+    });
+
+    test('ignores beginning bracket block hidden by a line comment', () => {
+        const lineState = new LineState();
+        let line: Line;
+        let newLine: Line | null;
+
+        line = new Line('abc ## start a bracket block [', 0);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('abc');
+
+        line = new Line('def', 1);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('def');
+    });
+
+    test('ignores beginning bracket block hidden by a block comment', () => {
+        const lineState = new LineState();
+        let line: Line;
+        let newLine: Line | null;
+
+        line = new Line('abc ### start a bracket block [ ### def', 0);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('abc def');
+
+        line = new Line('ghi', 1);
+        newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe('ghi');
+    });
+
+    // TODO no closing bracket block - close at EOF
+    // TODO ending bracket block hidden by comment - close at EOF
+    // TODO error on unescaped closing bracket without opening bracket
 });

@@ -26,9 +26,8 @@ export class LineState {
 
     update(line: Line): Line | null {
         let updatedLine = this.strip.blockComment(line);
-        if (updatedLine !== null) {
-            updatedLine = this.strip.lineComment(updatedLine);
-        }
+        updatedLine = this.strip.lineComment(updatedLine);
+        updatedLine = this.strip.bracketBlock(updatedLine);
         if (updatedLine !== null) {
             if (!this.inParagraph && Metadata.getInstance().isMetadata(updatedLine)) {
                 this.lineType = LineType.metadata;
