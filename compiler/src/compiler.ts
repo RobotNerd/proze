@@ -3,8 +3,8 @@ import { Chapter } from './components/chapter';
 import { CompileError } from './util/compile-error';
 import { Component, EmptyComponent } from './components/component';
 import { Format, ProzeArgs } from './util/cli-arguments';
-import { Line } from './components/line';
-import { LineState, LineType } from './components/line-state';
+import { Line, LineType } from './components/line';
+import { LineState } from './components/line-state';
 import { Metadata, MetadataInterface } from './components/metadata';
 import { Section } from './components/section';
 import { Text } from './components/text';
@@ -13,6 +13,7 @@ import { Title } from './components/title';
 import { Token } from './components/token';
 import { readFileSync } from 'fs';
 import { CompilerMessages } from './util/compiler-messages';
+import { ParseError } from './util/parse-error';
 
 export class Compiler {
 
@@ -89,22 +90,29 @@ export class Compiler {
     private parseLines() {
         const lines = this.loadFile(this.args.path);
         for(let i=0; i < lines.length; i++) {
-            let line: Line | null = new Line(lines[i], i);
-            line = this.lineState.update(line);
-            if (line === null) {
+            const splitLines: Line[] = this.lineState.update(new Line(lines[i], i));
+            if (splitLines.length == 0) {
                 continue;
             }
-            switch(this.lineState.lineType) {
-                case LineType.metadata:
-                    const metadata = Metadata.getInstance().parse(line);
-                    this.assignMetadata(metadata);
-                    break;
-                case LineType.paragraph:
-                    this.components.push(new Text(line.text));
-                    break;
-                case LineType.emptyLine:
-                    this.parseEmptyLine();
-                    break;
+            for (let line of splitLines) {
+                switch(line.lineType) {
+                    case LineType.metadata:
+                        const metadata = Metadata.getInstance().parse(line);
+                        this.assignMetadata(metadata);
+                        break;
+                    case LineType.paragraph:
+                        // TODO add components for bold/italic if present
+                        this.components.push(new Text(line.text));
+                        break;
+                    case LineType.emptyLine:
+                        this.parseEmptyLine();
+                        break;
+                    case LineType.unknown:
+                        CompilerMessages.getInstance().add(
+                            new ParseError('Unparseable line', line.lineNumber)
+                        );
+                        break;
+                }
             }
         }
         this.components.push(new EmptyComponent(Token.eof));
