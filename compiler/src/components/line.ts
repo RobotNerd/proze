@@ -1,11 +1,18 @@
 export enum LineType {
-    emptyLine,
-    metadata,
-    paragraph,
-    unknown
+    emptyLine = 'emptyLine',
+    metadata = 'metadata',
+    paragraph = 'paragraph',
+    unknown = 'unknown',
+}
+
+export enum Emphasis {
+    bold = 'bold',
+    italic = 'italic',
 }
 
 export class Line {
+
+    emphasis: Emphasis[] = [];
 
     constructor(
         public text: string,

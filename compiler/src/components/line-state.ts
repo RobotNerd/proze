@@ -16,7 +16,7 @@ export class LineState {
         return line.text.trim() == '';
     }
 
-    update(line: Line): Line | null {
+    update(line: Line): Line[] {
         let updatedLine = this.strip.blockComment(line);
         updatedLine = this.strip.lineComment(updatedLine);
         updatedLine = this.strip.bracketBlock(updatedLine);
@@ -36,7 +36,10 @@ export class LineState {
         if (updatedLine) {
             this.strip.escapeCharacter(updatedLine);
         }
-        return updatedLine;
+        if (updatedLine === null) {
+            return [];
+        }
+        return [updatedLine];
     }
 
     reset() {

@@ -90,27 +90,29 @@ export class Compiler {
     private parseLines() {
         const lines = this.loadFile(this.args.path);
         for(let i=0; i < lines.length; i++) {
-            let line: Line | null = new Line(lines[i], i);
-            line = this.lineState.update(line);
-            if (line === null) {
+            const splitLines: Line[] = this.lineState.update(new Line(lines[i], i));
+            if (splitLines.length == 0) {
                 continue;
             }
-            switch(line.lineType) {
-                case LineType.metadata:
-                    const metadata = Metadata.getInstance().parse(line);
-                    this.assignMetadata(metadata);
-                    break;
-                case LineType.paragraph:
-                    this.components.push(new Text(line.text));
-                    break;
-                case LineType.emptyLine:
-                    this.parseEmptyLine();
-                    break;
-                case LineType.unknown:
-                    CompilerMessages.getInstance().add(
-                        new ParseError('Unparseable line', line.lineNumber)
-                    );
-                    break;
+            for (let line of splitLines) {
+                switch(line.lineType) {
+                    case LineType.metadata:
+                        const metadata = Metadata.getInstance().parse(line);
+                        this.assignMetadata(metadata);
+                        break;
+                    case LineType.paragraph:
+                        // TODO add components for bold/italic if present
+                        this.components.push(new Text(line.text));
+                        break;
+                    case LineType.emptyLine:
+                        this.parseEmptyLine();
+                        break;
+                    case LineType.unknown:
+                        CompilerMessages.getInstance().add(
+                            new ParseError('Unparseable line', line.lineNumber)
+                        );
+                        break;
+                }
             }
         }
         this.components.push(new EmptyComponent(Token.eof));
