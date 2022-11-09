@@ -1,3 +1,5 @@
+import { CompileError } from "../util/compile-error";
+import { CompilerMessages } from "../util/compiler-messages";
 import { Line } from "./line";
 import { LineState } from "./line-state";
 
@@ -304,7 +306,21 @@ describe('LineState', () => {
         expect(newLine?.text).toBe('ghi');
     });
 
-    // TODO no closing bracket block - close at EOF
-    // TODO ending bracket block hidden by comment - close at EOF
-    // TODO error on unescaped closing bracket without opening bracket
+    test('ignores escaped brackets', () => {
+        const text = 'keep all [ of this ] text';
+        const line = new Line('keep all \\[ of this \\] text', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
+
+    test('ignores escaped brackets within a bracket block', () => {
+        const text = 'keep this';
+        const line = new Line('keep this [ but none \\[ of this \\] text ]', 0);
+        const lineState = new LineState();
+        const newLine = lineState.update(line);
+        expect(newLine).not.toBeNull();
+        expect(newLine?.text).toBe(text);
+    });
 });

@@ -1,0 +1,7 @@
+My Book
+by John Doe
+
+
+Test
+
+This text is in the output. And so is this. This is included.

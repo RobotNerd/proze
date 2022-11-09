@@ -1,0 +1,17 @@
+Title: My Book
+Author: John Doe
+
+
+[This is not included]
+
+Chapter: Test [ XXX ]
+
+[
+    None of this text
+    is included
+
+    in the output.
+]
+
+This text is in the output. And so is this.
+This is [but not this] included.

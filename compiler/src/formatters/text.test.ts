@@ -140,4 +140,20 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    // Brackets
+
+    test('ignores text in square brackets', () => {
+        mockArgs.path = 'test-data/single-file/brackets/brackets.proze';
+        let expected = 'test-data/single-file/brackets/brackets.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
+    test('extends a bracket block to EOF if no closing bracket is found', () => {
+        mockArgs.path = 'test-data/single-file/brackets/no-closing-bracket.proze';
+        let expected = 'test-data/single-file/brackets/no-closing-bracket.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
 });
