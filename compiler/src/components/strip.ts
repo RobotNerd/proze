@@ -1,3 +1,5 @@
+import { CompilerMessages } from "../util/compiler-messages";
+import { ParseError } from "../util/parse-error";
 import { Line } from "./line";
 
 /** Remove comments and bracketed blocks. */
@@ -10,17 +12,21 @@ export class Strip {
     private patterns = {
         blockComment: '###',
         lineComment: '##',
-        escapedComment: '\\#',
-        escapedCommentReplacer: '#',
+        openBracket: '[',
+        closeBracket: ']',
     }
     
-    blockComment(line: Line): Line | null {
+    blockComment(line: Line | null): Line | null {
+        if (line === null || this.inBracketBlock) {
+            return line;
+        }
+
         let updatedLine: Line | null = null;
         let substrings: string[] = [];
         let text = line.text;
         let index: number;
         do {
-            index = this.findNextCommentToken(text, this.patterns.blockComment);
+            index = this.findNextToken(text, this.patterns.blockComment);
             if (index >= 0) {
                 if (!this.inBlockComment) {
                     substrings.push(text.substring(0, index).trim());
@@ -38,11 +44,57 @@ export class Strip {
         return updatedLine;
     }
 
-    escapeCharacter(line: Line) {
-        line.text = line.text.replaceAll(this.patterns.escapedComment, this.patterns.escapedCommentReplacer);
+    bracketBlock(line: Line | null): Line | null {
+        if (line === null || this.inBlockComment) {
+            return line;
+        }
+
+        let updatedLine: Line | null = null;
+        let substrings: string[] = [];
+        let text = line.text;
+        let index: number;
+        do {
+            index = -1;
+            let token = this.inBracketBlock ? this.patterns.closeBracket : this.patterns.openBracket;
+            index = this.findNextToken(text, token, false);
+            if (index >= 0) {
+                if (!this.inBracketBlock) {
+                    substrings.push(text.substring(0, index).trim());
+                }
+                this.inBracketBlock = !this.inBracketBlock;
+                text = text.substring(index + token.length).trim();
+            }
+            else if (!this.inBracketBlock) {
+                substrings.push(text);
+            }
+        } while (index != -1);
+        if (substrings.length > 0) {
+            updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
+        }
+        this.checkHangingCloseBacket(updatedLine);
+        return updatedLine;
     }
 
-    private findNextCommentToken(text: string, pattern: string): number {
+    private checkHangingCloseBacket(line: Line | null) {
+        if (line !== null && line.text.indexOf(this.patterns.closeBracket) >= 0) {
+            let message = [
+                'Closing bracket "]" found without prior matching opening bracket.',
+                'If you want this to be in the output, esacpe it with a "\\" character.'
+            ];
+            CompilerMessages.getInstance().add(
+                new ParseError(message.join(' '), line.lineNumber)
+            );
+        }
+    }
+
+    escapeCharacter(line: Line) {
+        let commentChar = this.patterns.blockComment[0];
+        line.text = line.text.replaceAll(`${this.escapeChar}${commentChar}`, commentChar);
+        line.text = line.text.replaceAll(`${this.escapeChar}${this.patterns.openBracket}`, this.patterns.openBracket);
+        line.text = line.text.replaceAll(`${this.escapeChar}${this.patterns.closeBracket}`, this.patterns.closeBracket);
+    }
+
+    private findNextToken(text: string, pattern: string, requirePreceedingWhitespace = true): number {
         let index: number;
         let found: boolean;
         let position = 0;
@@ -50,7 +102,9 @@ export class Strip {
             index = text.indexOf(pattern, position);
             found = true;
             if (index > 0) {
-                if (this.isEscaped(text, index) || !this.isPrefixedByWhitespace(text, index)) {
+                if (this.isEscaped(text, index) ||
+                    (requirePreceedingWhitespace && !this.isPrefixedByWhitespace(text, index))
+                ) {
                     found = false;
                     position = index + pattern.length;
                 }
@@ -73,13 +127,17 @@ export class Strip {
         return false;
     }
 
-    lineComment(line: Line): Line | null {
+    lineComment(line: Line | null): Line | null {
+        if (line === null) {
+            return null;
+        }
+
         let updatedLine: Line | null = null;
         let substrings: string[] = [];
         let text = line.text;
         let index: number;
         do {
-            index = this.findNextCommentToken(text, this.patterns.lineComment);
+            index = this.findNextToken(text, this.patterns.lineComment);
             if (index >= 0) {
                 let parsedText = text.substring(0, index).trim(); 
                 if (parsedText !== '') {
