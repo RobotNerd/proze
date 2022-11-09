@@ -4,7 +4,8 @@ import { CompileError } from './util/compile-error';
 import { Component, EmptyComponent } from './components/component';
 import { Format, ProzeArgs } from './util/cli-arguments';
 import { Line } from './components/line';
-import { LineState, LineType } from './components/line-state';
+import { LineState } from './components/line-state';
+import { LineType } from './components/line-type';
 import { Metadata, MetadataInterface } from './components/metadata';
 import { Section } from './components/section';
 import { Text } from './components/text';
@@ -13,6 +14,7 @@ import { Title } from './components/title';
 import { Token } from './components/token';
 import { readFileSync } from 'fs';
 import { CompilerMessages } from './util/compiler-messages';
+import { ParseError } from './util/parse-error';
 
 export class Compiler {
 
@@ -94,7 +96,7 @@ export class Compiler {
             if (line === null) {
                 continue;
             }
-            switch(this.lineState.lineType) {
+            switch(line.lineType) {
                 case LineType.metadata:
                     const metadata = Metadata.getInstance().parse(line);
                     this.assignMetadata(metadata);
@@ -104,6 +106,11 @@ export class Compiler {
                     break;
                 case LineType.emptyLine:
                     this.parseEmptyLine();
+                    break;
+                case LineType.unknown:
+                    CompilerMessages.getInstance().add(
+                        new ParseError('Unparseable line', line.lineNumber)
+                    );
                     break;
             }
         }

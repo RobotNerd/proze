@@ -1,22 +1,15 @@
 import { Line } from "./line";
+import { LineType } from "./line-type";
 import { Metadata } from "./metadata";
 import { Strip } from "./strip";
-
-export enum LineType {
-    emptyLine,
-    metadata,
-    paragraph,
-}
 
 export class LineState {
 
     inParagraph: boolean = false;
-    lineType: LineType;
     
     private strip: Strip;
 
     constructor() {
-        this.lineType = LineType.emptyLine;
         this.strip = new Strip();
     }
 
@@ -30,15 +23,15 @@ export class LineState {
         updatedLine = this.strip.bracketBlock(updatedLine);
         if (updatedLine !== null) {
             if (!this.inParagraph && Metadata.getInstance().isMetadata(updatedLine)) {
-                this.lineType = LineType.metadata;
+                updatedLine.lineType = LineType.metadata;
             }
             else if (this.isEmptyLine(updatedLine)) {
                 this.inParagraph = false;
-                this.lineType = LineType.emptyLine;
+                updatedLine.lineType = LineType.emptyLine;
             }
             else {
                 this.inParagraph = true;
-                this.lineType = LineType.paragraph;
+                updatedLine.lineType = LineType.paragraph;
             }
         }
         if (updatedLine) {
