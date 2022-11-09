@@ -1,5 +1,4 @@
-import { Line } from "./line";
-import { LineType } from "./line-type";
+import { Line, LineType } from "./line";
 import { Metadata } from "./metadata";
 import { Strip } from "./strip";
 

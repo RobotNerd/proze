@@ -1,4 +1,9 @@
-import { LineType } from "./line-type";
+export enum LineType {
+    emptyLine,
+    metadata,
+    paragraph,
+    unknown
+}
 
 export class Line {
 
