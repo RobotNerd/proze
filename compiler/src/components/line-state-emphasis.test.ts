@@ -90,12 +90,104 @@ describe('LineState', () => {
         );
     });
 
-    // TODO bold block without closing token - extends to EOF
-    // TODO bold block with closing token commented out - extends to EOF
-    // TODO bold block with closing token in bracket block - extends to EOF
-    // TODO bold start/end tokens commented out on single line - no bold applied
-    // TODO bold block starting token commented out - bold not applied
-    // TODO bold block starting token in bracket block - bold not applied
+    test('extends bold emphasis to EOF if closing bold token not found', () => {
+        const results: Line[] = [
+            new Line('a', 0),
+            new Line('b', 0),
+            new Line('c', 1),
+            new Line('d e', 2),
+        ];
+        results[0].emphasis = [];
+        results[1].emphasis = [EmphasisType.bold];
+        results[2].emphasis = [EmphasisType.bold];
+        results[3].emphasis = [EmphasisType.bold];
+        testMultiLine(
+            [
+                'a *b',
+                'c',
+                'd e'
+            ],
+            results
+        );
+    });
+
+    test('extends bold emphasis to EOF if closing bold token is commented out by line comment', () => {
+        const results: Line[] = [
+            new Line('a', 0),
+            new Line('b', 0),
+            new Line('c', 1),
+            new Line('d e', 2),
+        ];
+        results[0].emphasis = [];
+        results[1].emphasis = [EmphasisType.bold];
+        results[2].emphasis = [EmphasisType.bold];
+        results[3].emphasis = [EmphasisType.bold];
+        testMultiLine(
+            [
+                'a *b',
+                'c ## *',
+                'd e'
+            ],
+            results
+        );
+    });
+
+    test('extends bold emphasis to EOF if closing bold token is commented out by block comment', () => {
+        const results: Line[] = [
+            new Line('a', 0),
+            new Line('b', 0),
+            new Line('c', 1),
+            new Line('d e', 2),
+        ];
+        results[0].emphasis = [];
+        results[1].emphasis = [EmphasisType.bold];
+        results[2].emphasis = [EmphasisType.bold];
+        results[3].emphasis = [EmphasisType.bold];
+        testMultiLine(
+            [
+                'a *b',
+                'c ### *',
+                '### d e'
+            ],
+            results
+        );
+    });
+
+
+
+    test('extends bold emphasis to EOF if closing bold token is in bracket block', () => {
+        const results: Line[] = [
+            new Line('a', 0),
+            new Line('b', 0),
+            new Line('c', 1),
+            new Line('d e', 2),
+        ];
+        results[0].emphasis = [];
+        results[1].emphasis = [EmphasisType.bold];
+        results[2].emphasis = [EmphasisType.bold];
+        results[3].emphasis = [EmphasisType.bold];
+        testMultiLine(
+            [
+                'a *b',
+                'c [*]',
+                'd e'
+            ],
+            results
+        );
+    });
+
+    test('does not apply bold if start/end bold tokens are commented out on a single line', () => {
+        const results: Line[] = [
+            new Line('a b', 0),
+        ];
+        results[0].emphasis = [];
+        testSingleLine(
+            'a ### * ### b ### * ###',
+            results
+        );
+    });
+
     // TODO bold start/end surrounding a line comment - bold applied
     // TODO bold start/end surrounding a block comment - bold applied
+    // TODO escape bold markup
 });
