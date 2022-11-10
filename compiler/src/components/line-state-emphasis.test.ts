@@ -1,6 +1,6 @@
 import { CompilerMessages } from "../util/compiler-messages";
 import { EmphasisType, Line } from "./line";
-import { LineState } from "./line-state";
+import { testSingleLine } from './line-state-test-helper';
 
 describe('LineState', () => {
 
@@ -9,72 +9,62 @@ describe('LineState', () => {
     });
 
     test('parses a bold block that takes up the entire line', () => {
-        const line = new Line('*abcd*', 0);
-        const lineState = new LineState();
-        const newLines = lineState.update(line);
-        expect(newLines.length).toBe(1);
-        expect(newLines[0].text).toBe('abcd');
-        expect(newLines[0].emphasis.length).toBe(1);
-        expect(newLines[0].emphasis).toContain(EmphasisType.bold);
+        const results: Line[] = [new Line('abcd', 0)];
+        results[0].emphasis = [EmphasisType.bold];
+        testSingleLine(
+            '*abcd*',
+            results
+        );
     });
 
     test('parses a bold block that takes up the entire line with leading whitespace', () => {
-        const line = new Line('   *abcd*', 0);
-        const lineState = new LineState();
-        const newLines = lineState.update(line);
-        expect(newLines.length).toBe(1);
-        expect(newLines[0].text).toBe('abcd');
-        expect(newLines[0].emphasis.length).toBe(1);
-        expect(newLines[0].emphasis).toContain(EmphasisType.bold);
+        const results: Line[] = [new Line('abcd', 0)];
+        results[0].emphasis = [EmphasisType.bold];
+        testSingleLine(
+            '   *abcd*',
+            results
+        );
     });
 
     test('parses a bold block at the beginning of a line', () => {
-        const line = new Line('*a* b', 0);
-        const lineState = new LineState();
-        const newLines = lineState.update(line);
-        expect(newLines.length).toBe(2);
-        
-        expect(newLines[0].text).toBe('a');
-        expect(newLines[0].emphasis.length).toBe(1);
-        expect(newLines[0].emphasis).toContain(EmphasisType.bold)
-
-        expect(newLines[1].text).toBe('b');
-        expect(newLines[1].emphasis.length).toBe(0);
-        expect(newLines[1].emphasis.length).toBe(0);
+        const results: Line[] = [
+            new Line('a', 0),
+            new Line('b', 1),
+        ];
+        results[0].emphasis = [EmphasisType.bold];
+        results[1].emphasis = [];
+        testSingleLine(
+            '*a* b',
+            results
+        );
     });
 
     test('parses a bold block in the middle of a line', () => {
-        const line = new Line('a *b* c', 0);
-        const lineState = new LineState();
-        const newLines = lineState.update(line);
-        expect(newLines.length).toBe(3);
-        
-        expect(newLines[0].text).toBe('a');
-        expect(newLines[0].emphasis.length).toBe(0);
-        expect(newLines[0].emphasis.length).toBe(0);
-
-        expect(newLines[1].text).toBe('b');
-        expect(newLines[1].emphasis.length).toBe(1);
-        expect(newLines[1].emphasis).toContain(EmphasisType.bold)
-
-        expect(newLines[2].text).toBe('c');
-        expect(newLines[2].emphasis.length).toBe(0);
-        expect(newLines[0].emphasis.length).toBe(0);
+        const results: Line[] = [
+            new Line('a', 0),
+            new Line('b', 1),
+            new Line('c', 2),
+        ];
+        results[0].emphasis = [];
+        results[1].emphasis = [EmphasisType.bold];
+        results[2].emphasis = [];
+        testSingleLine(
+            'a *b* c',
+            results
+        );
     });
 
     test('parses a bold block at the end of a line', () => {
-        const line = new Line('a *b*', 0);
-        const lineState = new LineState();
-        const newLines = lineState.update(line);
-        expect(newLines.length).toBe(2);
-        
-        expect(newLines[0].text).toBe('a');
-        expect(newLines[0].emphasis.length).toBe(0);
-        expect(newLines[0].emphasis.length).toBe(0);
-
-        expect(newLines[1].text).toBe('b');
-        expect(newLines[1].emphasis.length).toBe(1);
-        expect(newLines[1].emphasis).toContain(EmphasisType.bold)
+        const results: Line[] = [
+            new Line('a', 0),
+            new Line('b', 1),
+        ];
+        results[0].emphasis = [];
+        results[1].emphasis = [EmphasisType.bold];
+        testSingleLine(
+            'a *b*',
+            results
+        );
     });
 
     // TODO bold block covering multiple lines
