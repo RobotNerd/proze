@@ -7,28 +7,29 @@ export interface LineTestData {
     count: number
 }
 
-export function testSingleLine(given: string, result: string, count: number = 1) {
-    const line = new Line(given, 0);
-    const lineState = new LineState();
-    const newLines = lineState.update(line);
-    expect(newLines.length).toBe(count);
-    if (count === 1) {
-        expect(newLines[0].text).toBe(result);
+export function testSingleLine(given: string, results: Line[] | Line | string) {
+    switch(true) {
+        case results instanceof Array:
+            testMultiLine([given], results as Line[]);
+            break;
+        case results instanceof Line:
+            testMultiLine([given], [results as Line]);
+            break;
+        case typeof(results) == "string":
+            testMultiLine([given], [new Line(results as string, 0)]);
+            break;
     }
 }
 
-export function testMultiLine(lineData: LineTestData[]) {
+export function testMultiLine(given: string[], results: Line[]) {
     const lineState = new LineState();
-    let line: Line;
-    let newLines: Line[];
-
-    for (let i=0; i < lineData.length; i++) {
-        let data = lineData[i];
-        line = new Line(data.given, i);
-        newLines = lineState.update(line);
-        expect(newLines.length).toBe(data.count);
-        if (data.count === 1) {
-            expect(newLines[0].text).toBe(data.result);
-        }
+    let newLines: Line[] = [];
+    for (let i=0; i < given.length; i++) {
+        const line = new Line(given[i], i);
+        newLines = newLines.concat(lineState.update(line));
+    }
+    expect(newLines.length).toBe(results.length);
+    for (let i=0; i < results.length; i++) {
+        expect(newLines[i].text).toStrictEqual(results[i].text);
     }
 }
