@@ -13,6 +13,10 @@ export class Emphasis {
             return [];
         }
 
+        if (line.text === '') {
+            return [line]
+        }
+
         let updatedLines: Line[] = [];
         let text = line.text;
         let index: number;
@@ -20,7 +24,7 @@ export class Emphasis {
         do {
             index = Markup.findNextToken(text, this.patterns.bold, requireWhitespaceBefore);
             if (index >= 0) {
-                let parsedText = text.substring(0, index).trim()
+                let parsedText = text.substring(0, index).trim();
                 if (parsedText != '') {
                     let newLine = new Line(parsedText, line.lineNumber);
                     if (this.inBoldBlock) {
@@ -31,12 +35,12 @@ export class Emphasis {
                 this.inBoldBlock = !this.inBoldBlock;
                 text = text.substring(index + this.patterns.bold.length).trim();
             }
-            else if (!this.inBoldBlock) {
-                if (text !== '' || updatedLines.length === 0) {
-                    updatedLines.push(
-                        new Line(text, line.lineNumber, LineType.unknown)
-                    );
+            else if (text !== '' || updatedLines.length === 0) {
+                let newLine = new Line(text, line.lineNumber);
+                if (this.inBoldBlock) {
+                    newLine.emphasis.push(EmphasisType.bold);
                 }
+                updatedLines.push(newLine);
             }
         } while (index != -1);
         return updatedLines;

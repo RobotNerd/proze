@@ -31,6 +31,6 @@ export function testMultiLine(given: string[], results: Line[]) {
     expect(newLines.length).toBe(results.length);
     for (let i=0; i < results.length; i++) {
         expect(newLines[i].text).toBe(results[i].text);
-        expect(newLines[i].emphasis).toStrictEqual(results[i].emphasis);
+        expect(newLines[i].emphasis).toEqual(results[i].emphasis);
     }
 }
