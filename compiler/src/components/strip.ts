@@ -1,4 +1,5 @@
 import { CompilerMessages } from "../util/compiler-messages";
+import { Markup } from "../util/markup";
 import { ParseError } from "../util/parse-error";
 import { Line } from "./line";
 
@@ -8,7 +9,6 @@ export class Strip {
     private inBlockComment: boolean = false;
     private inBracketBlock: boolean = false;
 
-    private escapeChar = '\\';
     private patterns = {
         blockComment: '###',
         lineComment: '##',
@@ -26,7 +26,7 @@ export class Strip {
         let text = line.text;
         let index: number;
         do {
-            index = this.findNextToken(text, this.patterns.blockComment);
+            index = Markup.findNextToken(text, this.patterns.blockComment);
             if (index >= 0) {
                 if (!this.inBlockComment) {
                     substrings.push(text.substring(0, index).trim());
@@ -53,10 +53,11 @@ export class Strip {
         let substrings: string[] = [];
         let text = line.text;
         let index: number;
+        const requireWhitespaceBefore = false;
         do {
             index = -1;
             let token = this.inBracketBlock ? this.patterns.closeBracket : this.patterns.openBracket;
-            index = this.findNextToken(text, token, false);
+            index = Markup.findNextToken(text, token, requireWhitespaceBefore);
             if (index >= 0) {
                 if (!this.inBracketBlock) {
                     substrings.push(text.substring(0, index).trim());
@@ -88,43 +89,9 @@ export class Strip {
     }
 
     escapeCharacter(line: Line) {
-        let commentChar = this.patterns.blockComment[0];
-        line.text = line.text.replaceAll(`${this.escapeChar}${commentChar}`, commentChar);
-        line.text = line.text.replaceAll(`${this.escapeChar}${this.patterns.openBracket}`, this.patterns.openBracket);
-        line.text = line.text.replaceAll(`${this.escapeChar}${this.patterns.closeBracket}`, this.patterns.closeBracket);
-    }
-
-    private findNextToken(text: string, pattern: string, requirePreceedingWhitespace = true): number {
-        let index: number;
-        let found: boolean;
-        let position = 0;
-        do {
-            index = text.indexOf(pattern, position);
-            found = true;
-            if (index > 0) {
-                if (this.isEscaped(text, index) ||
-                    (requirePreceedingWhitespace && !this.isPrefixedByWhitespace(text, index))
-                ) {
-                    found = false;
-                    position = index + pattern.length;
-                }
-            }
-        } while (!found);
-        return index;
-    }
-
-    private isEscaped(text: string, index: number): boolean {
-        if (index > 0) {
-            return text[index - 1] === this.escapeChar;
-        }
-        return false;
-    }
-
-    private isPrefixedByWhitespace(text: string, index: number): boolean {
-        if (index > 0) {
-            return text[index - 1].match(/\s/) !== null;
-        }
-        return false;
+        Markup.removeEsacpe(line, this.patterns.blockComment[0]);
+        Markup.removeEsacpe(line, this.patterns.openBracket);
+        Markup.removeEsacpe(line, this.patterns.closeBracket);
     }
 
     lineComment(line: Line | null): Line | null {
@@ -137,7 +104,7 @@ export class Strip {
         let text = line.text;
         let index: number;
         do {
-            index = this.findNextToken(text, this.patterns.lineComment);
+            index = Markup.findNextToken(text, this.patterns.lineComment);
             if (index >= 0) {
                 let parsedText = text.substring(0, index).trim(); 
                 if (parsedText !== '') {

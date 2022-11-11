@@ -1,38 +1,7 @@
 import { CompilerMessages } from "../util/compiler-messages";
 import { Line } from "./line";
 import { LineState } from "./line-state";
-
-interface LineTestData {
-    given: string,
-    result: string,
-    count: number
-}
-
-function testSingleLine(given: string, result: string, count: number = 1) {
-    const line = new Line(given, 0);
-    const lineState = new LineState();
-    const newLines = lineState.update(line);
-    expect(newLines.length).toBe(count);
-    if (count === 1) {
-        expect(newLines[0].text).toBe(result);
-    }
-}
-
-function testMultiLine(lineData: LineTestData[]) {
-    const lineState = new LineState();
-    let line: Line;
-    let newLines: Line[];
-
-    for (let i=0; i < lineData.length; i++) {
-        let data = lineData[i];
-        line = new Line(data.given, i);
-        newLines = lineState.update(line);
-        expect(newLines.length).toBe(data.count);
-        if (data.count === 1) {
-            expect(newLines[0].text).toBe(data.result);
-        }
-    }
-}
+import { testSingleLine, testMultiLine } from './line-state-test-helper';
 
 describe('LineState', () => {
 
@@ -49,12 +18,12 @@ describe('LineState', () => {
         );
     });
 
-    test('returns null if entire line is commented out', () => {
-        testSingleLine('## XXX', '', 0);
+    test('returns nothing if entire line is commented out', () => {
+        testSingleLine('## XXX', []);
     });
 
-    test('returns null if entire line is leading whitespace followed by a comment', () => {
-        testSingleLine('     ## XXX', '', 0);
+    test('returns nothing if entire line is leading whitespace followed by a comment', () => {
+        testSingleLine('     ## XXX', []);
     });
 
     // Comment block
@@ -95,23 +64,17 @@ describe('LineState', () => {
     });
 
     test('parsed block comments over multiple lines', () => {
-        testMultiLine([
-            {
-                given: 'abc ### XXX',
-                result: 'abc',
-                count: 1,
-            },
-            {
-                given: 'ZZZ',
-                result: '',
-                count: 0,
-            },
-            {
-                given: 'XXX ### def',
-                result: 'def',
-                count: 1
-            }
-        ]);
+        testMultiLine(
+            [
+                'abc ### XXX',
+                'ZZZ',
+                'XXX ### def',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 2),
+            ]
+        );
     });
 
     // Line comment and block comment interaction
@@ -185,23 +148,17 @@ describe('LineState', () => {
     });
 
     test('strips text in a bracket block over multiple lines', () => {
-        testMultiLine([
-            {
-                given: 'abc [XXX',
-                result: 'abc',
-                count: 1,
-            },
-            {
-                given: 'ZZZ',
-                result: '',
-                count: 0,
-            },
-            {
-                given: 'XXX ] def',
-                result: 'def',
-                count: 1
-            }
-        ]);
+        testMultiLine(
+            [
+                'abc [XXX',
+                'ZZZ',
+                'XXX ] def',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 2),
+            ]
+        );
     });
 
     test('ignores a bracket block hidden by a line comment', () => {
@@ -219,78 +176,58 @@ describe('LineState', () => {
     });
 
     test('ignores a bracket block hidden by a block comment over multiple lines', () => {
-        testMultiLine([
-            {
-                given: 'abc ### XXX [',
-                result: 'abc',
-                count: 1,
-            },
-            {
-                given: 'ZZZ',
-                result: '',
-                count: 0,
-            },
-            {
-                given: ']XXX ### def',
-                result: 'def',
-                count: 1
-            }
-        ]);
+        testMultiLine(
+            [
+                'abc ### XXX [',
+                'ZZZ',
+                ']XXX ### def',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 2),
+            ]
+        );
     });
 
     test('ignores line and block comments contained within a bracket block', () => {
-        testMultiLine([
-            {
-                given: 'abc [XXX',
-                result: 'abc',
-                count: 1,
-            },
-            {
-                given: 'ZZZ ### ZZZ',
-                result: '',
-                count: 0,
-            },
-            {
-                given: '### YYY',
-                result: '',
-                count: 0,
-            },
-            {
-                given: '] def',
-                result: 'def',
-                count: 1
-            }
-        ]);
+        testMultiLine(
+            [
+                'abc [XXX',
+                'ZZZ ### ZZZ',
+                '### YYY',
+                '] def',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 3),
+            ]
+        );
     });
 
     test('ignores beginning bracket block hidden by a line comment', () => {
-        testMultiLine([
-            {
-                given: 'abc ## XXX [',
-                result: 'abc',
-                count: 1,
-            },
-            {
-                given: 'def',
-                result: 'def',
-                count: 1
-            }
-        ]);
+        testMultiLine(
+            [
+                'abc ## XXX [',
+                'def',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 1),
+            ]
+        );
     });
 
     test('ignores beginning bracket block hidden by a block comment', () => {
-        testMultiLine([
-            {
-                given: 'abc ### XXX [ ### def',
-                result: 'abc def',
-                count: 1,
-            },
-            {
-                given: 'ghi',
-                result: 'ghi',
-                count: 1
-            }
-        ]);
+        testMultiLine(
+            [
+                'abc ### XXX [ ### def',
+                'ghi',
+            ],
+            [
+                new Line('abc def', 0),
+                new Line('ghi', 1),
+            ]
+        );
     });
 
     test('ignores escaped brackets', () => {

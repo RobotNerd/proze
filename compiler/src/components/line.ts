@@ -5,14 +5,14 @@ export enum LineType {
     unknown = 'unknown',
 }
 
-export enum Emphasis {
+export enum EmphasisType {
     bold = 'bold',
     italic = 'italic',
 }
 
 export class Line {
 
-    emphasis: Emphasis[] = [];
+    emphasis: EmphasisType[] = [];
 
     constructor(
         public text: string,
