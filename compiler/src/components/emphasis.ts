@@ -45,4 +45,8 @@ export class Emphasis {
         } while (index != -1);
         return updatedLines;
     }
+
+    removeEscapeCharacter(line: Line) {
+        Markup.removeEsacpe(line, this.patterns.bold);
+    }
 }

@@ -46,6 +46,7 @@ export class LineState {
                 updatedLine.lineType = LineType.paragraph;
             }
             this.strip.escapeCharacter(updatedLine);
+            this.emphasis.removeEscapeCharacter(updatedLine);
         }
         return updatedLines;
     }
