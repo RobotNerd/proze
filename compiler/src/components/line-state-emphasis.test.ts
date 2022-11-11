@@ -188,4 +188,42 @@ describe('LineState', () => {
         results[3].emphasis = emphasis;
         testMultiLine(given, results);
     }
+
+    // Nesting emphasis markup
+
+    test('handles a token block fully nested in another', ()=> {
+        nested(
+            'a__b*c*d__e',
+            [
+                [],
+                [EmphasisType.bold],
+                [EmphasisType.bold, EmphasisType.italic],
+                [EmphasisType.bold],
+                []
+            ]
+        );
+        nested(
+            'a__b*c__d*e',
+            [
+                [],
+                [EmphasisType.bold],
+                [EmphasisType.bold, EmphasisType.italic],
+                [EmphasisType.italic],
+                []
+            ]
+        );
+    });
+    function nested(given: string, emphasis: EmphasisType[][]) {
+        const results: Line[] = [
+            new Line('a', 0),
+            new Line('b', 0),
+            new Line('c', 0),
+            new Line('d', 0),
+            new Line('e', 0),
+        ];
+        for (let i=0; i < results.length; i++) {
+            results[i].emphasis = emphasis[i];
+        }
+        testSingleLine(given, results);
+    }
 });
