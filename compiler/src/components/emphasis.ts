@@ -5,7 +5,7 @@ export class Emphasis {
     private inBoldBlock: boolean = false;
 
     private patterns = {
-        bold: '*',
+        bold: '__',
     }
 
     bold(line: Line | null): Line[] {
@@ -47,6 +47,6 @@ export class Emphasis {
     }
 
     removeEscapeCharacter(line: Line) {
-        Markup.removeEsacpe(line, this.patterns.bold);
+        Markup.removeEsacpe(line, this.patterns.bold[0]);
     }
 }

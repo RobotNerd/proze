@@ -12,7 +12,7 @@ describe('LineState', () => {
         const results: Line[] = [new Line('abcd', 0)];
         results[0].emphasis = [EmphasisType.bold];
         testSingleLine(
-            '*abcd*',
+            '__abcd__',
             results
         );
     });
@@ -21,7 +21,7 @@ describe('LineState', () => {
         const results: Line[] = [new Line('abcd', 0)];
         results[0].emphasis = [EmphasisType.bold];
         testSingleLine(
-            '   *abcd*',
+            '   __abcd__',
             results
         );
     });
@@ -36,7 +36,7 @@ describe('LineState', () => {
         results[1].emphasis = [EmphasisType.bold];
         results[2].emphasis = [];
         testSingleLine(
-            'a*b*cd',
+            'a__b__cd',
             results
         );
     });
@@ -49,7 +49,7 @@ describe('LineState', () => {
         results[0].emphasis = [EmphasisType.bold];
         results[1].emphasis = [];
         testSingleLine(
-            '*a* b',
+            '__a__ b',
             results
         );
     });
@@ -64,7 +64,7 @@ describe('LineState', () => {
         results[1].emphasis = [EmphasisType.bold];
         results[2].emphasis = [];
         testSingleLine(
-            'a *b* c',
+            'a __b__ c',
             results
         );
     });
@@ -77,7 +77,7 @@ describe('LineState', () => {
         results[0].emphasis = [];
         results[1].emphasis = [EmphasisType.bold];
         testSingleLine(
-            'a *b*',
+            'a __b__',
             results
         );
     });
@@ -97,9 +97,9 @@ describe('LineState', () => {
         results[4].emphasis = [];
         testMultiLine(
             [
-                'a *b',
+                'a __b',
                 'c',
-                'd* e'
+                'd__ e'
             ],
             results
         );
@@ -118,7 +118,7 @@ describe('LineState', () => {
         results[3].emphasis = [EmphasisType.bold];
         testMultiLine(
             [
-                'a *b',
+                'a __b',
                 'c',
                 'd e'
             ],
@@ -139,8 +139,8 @@ describe('LineState', () => {
         results[3].emphasis = [EmphasisType.bold];
         testMultiLine(
             [
-                'a *b',
-                'c ## *',
+                'a __b',
+                'c ## __',
                 'd e'
             ],
             results
@@ -160,8 +160,8 @@ describe('LineState', () => {
         results[3].emphasis = [EmphasisType.bold];
         testMultiLine(
             [
-                'a *b',
-                'c ### *',
+                'a __b',
+                'c ### __',
                 '### d e'
             ],
             results
@@ -181,8 +181,8 @@ describe('LineState', () => {
         results[3].emphasis = [EmphasisType.bold];
         testMultiLine(
             [
-                'a *b',
-                'c [*]',
+                'a __b',
+                'c [__]',
                 'd e'
             ],
             results
@@ -195,38 +195,38 @@ describe('LineState', () => {
         ];
         results[0].emphasis = [];
         testSingleLine(
-            'a ### * ### b ### * ###',
+            'a ### __ ### b ### __ ###',
             results
         );
     });
 
     test('escaping a bold markup token does not start a bold emphasis block', () => {
         const results: Line[] = [
-            new Line('a * b', 0),
+            new Line('a __ b', 0),
         ];
         results[0].emphasis = [];
         testSingleLine(
-            'a \\* b',
+            'a \\__ b',
             results
         );
     });
 
     test('escaped bold markup works when there is no preceeding whitespace', () => {
         const results: Line[] = [
-            new Line('a*b', 0),
+            new Line('a__b', 0),
         ];
         results[0].emphasis = [];
         testSingleLine(
-            'a\\*b',
+            'a\\__b',
             results
         );
     });
 
-    test('extends bold emphasis to EOF if closing bold token is escaoed', () => {
+    test('extends bold emphasis to EOF if closing bold token is escaped', () => {
         const results: Line[] = [
             new Line('a', 0),
             new Line('b', 0),
-            new Line('c *', 1),
+            new Line('c __', 1),
             new Line('d e', 2),
         ];
         results[0].emphasis = [];
@@ -235,8 +235,8 @@ describe('LineState', () => {
         results[3].emphasis = [EmphasisType.bold];
         testMultiLine(
             [
-                'a *b',
-                'c \\*',
+                'a __b',
+                'c \\__',
                 'd e'
             ],
             results
