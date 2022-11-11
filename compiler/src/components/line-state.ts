@@ -20,8 +20,20 @@ export class LineState {
             return [];
         }
 
-        let updatedLines: Line[];
-        updatedLines = this.emphasis.bold(line);
+        const callbacks = [
+            (line: Line) => this.emphasis.bold(line),
+            (line: Line) => this.emphasis.italic(line),
+        ];
+
+        let updatedLines: Line[] = [line];
+        for (let callback of callbacks) {
+            let tmpLines: Line[] = [];
+            for (let line of updatedLines) {
+                tmpLines = tmpLines.concat(callback(line));
+            }
+            updatedLines = tmpLines;
+            tmpLines = [];
+        }
         return updatedLines;
     }
 
