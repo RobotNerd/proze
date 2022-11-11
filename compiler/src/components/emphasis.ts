@@ -1,14 +1,43 @@
 import { Line, EmphasisType, LineType } from "./line";
 import { Markup } from "../util/markup";
 
+interface BooleanReference {
+    value: boolean;
+}
+
 export class Emphasis {
-    private inBoldBlock: boolean = false;
+    private inBoldBlock: BooleanReference = { value: false };
+    private inItalicBlock: BooleanReference = { value: false };
 
     private patterns = {
-        bold: '*',
+        bold: '__',
+        italic: '*',
     }
 
     bold(line: Line | null): Line[] {
+        return this.parseEmphasisMarkup(
+            this.patterns.bold,
+            EmphasisType.bold,
+            this.inBoldBlock,
+            line
+        );
+    }
+
+    italic(line: Line | null): Line[] {
+        return this.parseEmphasisMarkup(
+            this.patterns.italic,
+            EmphasisType.italic,
+            this.inItalicBlock,
+            line
+        );
+    }
+
+    private parseEmphasisMarkup(
+        pattern: string,
+        emphasisType: EmphasisType,
+        blockFlag: BooleanReference,
+        line: Line | null
+    ): Line[] {
         if (line == null) {
             return [];
         }
@@ -22,23 +51,25 @@ export class Emphasis {
         let index: number;
         const requireWhitespaceBefore = false;
         do {
-            index = Markup.findNextToken(text, this.patterns.bold, requireWhitespaceBefore);
+            index = Markup.findNextToken(text, pattern, requireWhitespaceBefore);
             if (index >= 0) {
                 let parsedText = text.substring(0, index).trim();
                 if (parsedText != '') {
                     let newLine = new Line(parsedText, line.lineNumber);
-                    if (this.inBoldBlock) {
-                        newLine.emphasis.push(EmphasisType.bold);
+                    newLine.emphasis = [...line.emphasis];
+                    if (blockFlag.value) {
+                        newLine.emphasis.push(emphasisType);
                     }
                     updatedLines.push(newLine);
                 }
-                this.inBoldBlock = !this.inBoldBlock;
-                text = text.substring(index + this.patterns.bold.length).trim();
+                blockFlag.value = !blockFlag.value;
+                text = text.substring(index + pattern.length).trim();
             }
             else if (text !== '' || updatedLines.length === 0) {
                 let newLine = new Line(text, line.lineNumber);
-                if (this.inBoldBlock) {
-                    newLine.emphasis.push(EmphasisType.bold);
+                newLine.emphasis = [...line.emphasis];
+                if (blockFlag.value) {
+                    newLine.emphasis.push(emphasisType);
                 }
                 updatedLines.push(newLine);
             }
@@ -47,6 +78,7 @@ export class Emphasis {
     }
 
     removeEscapeCharacter(line: Line) {
-        Markup.removeEsacpe(line, this.patterns.bold);
+        Markup.removeEsacpe(line, this.patterns.bold[0]);
+        Markup.removeEsacpe(line, this.patterns.italic);
     }
 }
