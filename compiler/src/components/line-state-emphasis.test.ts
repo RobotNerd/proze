@@ -9,19 +9,19 @@ describe('LineState', () => {
         CompilerMessages.getInstance().reset();
     });
 
-    test('parses bold block that takes up the entire line', () => { entireLine('__abcd__', [EmphasisType.bold]); });
-    test('parses italic block that takes up the entire line', () => { entireLine('*abcd*', [EmphasisType.italic]); });
+    test('parses block that takes up the entire line', () => {
+        entireLine('__abcd__', [EmphasisType.bold]);
+        entireLine('*abcd*', [EmphasisType.italic]);
+    });
     function entireLine(given: string, emphasis: EmphasisType[]) {
         const results: Line[] = [new Line('abcd', 0)];
         results[0].emphasis =emphasis;
         testSingleLine(given, results);
     }
 
-    test('parses bold block that takes up the entire line with leading whitespace', () => {
-        entireLineLeadingWhitespace('    __abcd__', [EmphasisType.bold])
-    });
-    test('parses italic block that takes up the entire line with leading whitespace', () => {
-        entireLineLeadingWhitespace('    *abcd*', [EmphasisType.italic])
+    test('parses block that takes up the entire line with leading whitespace', () => {
+        entireLineLeadingWhitespace('    __abcd__', [EmphasisType.bold]);
+        entireLineLeadingWhitespace('    *abcd*', [EmphasisType.italic]);
     });
     function entireLineLeadingWhitespace(given: string, emphasis: EmphasisType[]) {
         const results: Line[] = [new Line('abcd', 0)];
@@ -29,10 +29,8 @@ describe('LineState', () => {
         testSingleLine(given, results);
     }
 
-    test('does not require whitespace before bold token', () => {
+    test('does not require whitespace before markup token', () => {
         noLeadingWhitespaceRequired('a__b__cd', [EmphasisType.bold]);
-    });
-    test('does not require whitespace before italic token', () => {
         noLeadingWhitespaceRequired('a*b*cd', [EmphasisType.italic]);
     });
     function noLeadingWhitespaceRequired(given: string, emphasis: EmphasisType[]) {
@@ -47,8 +45,10 @@ describe('LineState', () => {
         testSingleLine(given, results);
     }
 
-    test('parses bold block at the beginning of a line', () => { beginningOfLine('__a__ b', [EmphasisType.bold]); });
-    test('parses italic block at the beginning of a line', () => { beginningOfLine('*a* b', [EmphasisType.italic]); });
+    test('parses block at the beginning of a line', () => {
+        beginningOfLine('__a__ b', [EmphasisType.bold]);
+        beginningOfLine('*a* b', [EmphasisType.italic]);
+    });
     function beginningOfLine(given: string, emphasis: EmphasisType[]) {
         const results: Line[] = [
             new Line('a', 0),
@@ -59,8 +59,10 @@ describe('LineState', () => {
         testSingleLine(given, results);
     }
 
-    test('parses bold block in the middle of a line', () => { middleOfLine('a __b__ c', [EmphasisType.bold]); });
-    test('parses italic block in the middle of a line', () => { middleOfLine('a *b* c', [EmphasisType.italic]); });
+    test('parses block in the middle of a line', () => {
+        middleOfLine('a __b__ c', [EmphasisType.bold]);
+        middleOfLine('a *b* c', [EmphasisType.italic]);
+    });
     function middleOfLine(given: string, emphasis: EmphasisType[]) {
         const results: Line[] = [
             new Line('a', 0),
@@ -73,8 +75,10 @@ describe('LineState', () => {
         testSingleLine(given, results);
     }
 
-    test('parses bold block at the end of a line', () => { endOfLine('a __b__', [EmphasisType.bold]); });
-    test('parses italic block at the end of a line', () => { endOfLine('a *b*', [EmphasisType.italic]); });
+    test('parses block at the end of a line', () => {
+        endOfLine('a __b__', [EmphasisType.bold]);
+        endOfLine('a *b*', [EmphasisType.italic]);
+    });
     function endOfLine(given: string, emphasis: EmphasisType[]) {
         const results: Line[] = [
             new Line('a', 0),
@@ -85,10 +89,8 @@ describe('LineState', () => {
         testSingleLine(given, results);
     }
 
-    test('parses bold block that covers multiple lines', () => {
+    test('parses block that covers multiple lines', () => {
         multipleLines(['a __b', 'c', 'd__ e'], [EmphasisType.bold]);
-    });
-    test('parses italic block that covers multiple lines', () => {
         multipleLines(['a *b', 'c', 'd* e'], [EmphasisType.italic]);
     });
     function multipleLines(given: string[], emphasis: EmphasisType[]) {
@@ -107,15 +109,9 @@ describe('LineState', () => {
         testMultiLine(given, results);
     }
 
-    test('extends bold emphasis to EOF if closing token not found', () => {
-        noClosingToken(
-            ['a __b', 'c', 'd e'], [EmphasisType.bold]
-        );
-    });
-    test('extends italic emphasis to EOF if closing token not found', () => {
-        noClosingToken(
-            ['a *b', 'c', 'd e'], [EmphasisType.italic]
-        );
+    test('extends emphasis to EOF if closing token not found', () => {
+        noClosingToken(['a __b', 'c', 'd e'], [EmphasisType.bold]);
+        noClosingToken(['a *b', 'c', 'd e'], [EmphasisType.italic]);
     });
     function noClosingToken(given: string[], emphasis: EmphasisType[]) {
         const results: Line[] = [
@@ -131,22 +127,12 @@ describe('LineState', () => {
         testMultiLine(given, results);
     }
 
-    test('extends bold emphasis to EOF if closing token is commented out by line comment', () => {
+    test('extends emphasis to EOF if closing token is hidden', () => {
         closingTokenHidden(['a __b', 'c ## __', 'd e'], [EmphasisType.bold]);
-    });
-    test('extends italic emphasis to EOF if closing token is commented out by line comment', () => {
         closingTokenHidden(['a *b', 'c ## *', 'd e'], [EmphasisType.italic]);
-    });
-    test('extends bold emphasis to EOF if closing token is commented out by block comment', () => {
         closingTokenHidden(['a __b', 'c ### __', '### d e'], [EmphasisType.bold]);
-    });
-    test('extends italic emphasis to EOF if closing token is commented out by block comment', () => {
         closingTokenHidden(['a *b', 'c ### *', '### d e'], [EmphasisType.italic]);
-    });
-    test('extends bold emphasis to EOF if closing token is in bracket block', () => {
         closingTokenHidden(['a __b', 'c [__]', 'd e'], [EmphasisType.bold]);
-    });
-    test('extends italic emphasis to EOF if closing token is in bracket block', () => {
         closingTokenHidden(['a *b', 'c [*]', 'd e'], [EmphasisType.italic]);
     });
     function closingTokenHidden(given: string[], emphasis: EmphasisType[]) {
@@ -163,10 +149,8 @@ describe('LineState', () => {
         testMultiLine(given, results);
     }
 
-    test('does not apply bold if start/end tokens are commented out on a single line', () => {
+    test('does not apply markup if start/end tokens are commented out on a single line', () => {
         markupCommentedOutSingleLine('a ### __ ### b ### __ ###');
-    });
-    test('does not apply italic if start/end tokens are commented out on a single line', () => {
         markupCommentedOutSingleLine('a ### * ### b ### * ###');
     });
     function markupCommentedOutSingleLine(given: string) {
@@ -175,16 +159,10 @@ describe('LineState', () => {
         testSingleLine(given, results);
     }
 
-    test('escaping bold markup token does not start an emphasis block', () => {
+    test('escaping markup token does not start an emphasis block', () => {
         escapeStartingToken('a \\__ b', 'a __ b');
-    });
-    test('escaping italic markup token does not start an emphasis block', () => {
         escapeStartingToken('a \\* b', 'a * b');
-    });
-    test('escaping bold markup token does not start an emphasis block if no leading whitespace', () => {
         escapeStartingToken('a\\__b', 'a__b');
-    });
-    test('escaping italic markup token does not start an emphasis block if no leading whitespace', () => {
         escapeStartingToken('a\\*b', 'a*b');
     });
     function escapeStartingToken(given: string, expected: string) {
@@ -193,10 +171,8 @@ describe('LineState', () => {
         testSingleLine(given, results);
     }
 
-    test('extends bold emphasis to EOF if closing token is escaped', () => {
+    test('extends emphasis to EOF if closing token is escaped', () => {
         escapeClosingToken(['a __b', 'c \\__', 'd e'], '__', [EmphasisType.bold]);
-    });
-    test('extends italic emphasis to EOF if closing token is escaped', () => {
         escapeClosingToken(['a *b', 'c \\*', 'd e'], '*', [EmphasisType.italic]);
     });
     function escapeClosingToken(given: string[], token: string, emphasis: EmphasisType[]) {
