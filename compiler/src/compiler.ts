@@ -11,7 +11,7 @@ import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
 import { Title } from './components/title';
 import { Token } from './components/token';
-import { readFileSync } from 'fs';
+import { readdirSync, readFileSync, statSync } from 'fs';
 import { CompilerMessages } from './util/compiler-messages';
 import { ParseError } from './util/parse-error';
 
@@ -26,6 +26,26 @@ export class Compiler {
     constructor(args: any) {
         this.args = args;
         this.lineState = new LineState();
+    }
+    
+    private applyLineType(line: Line) {
+        switch(line.lineType) {
+            case LineType.metadata:
+                const metadata = Metadata.getInstance().parse(line);
+                this.assignMetadata(metadata);
+                break;
+            case LineType.paragraph:
+                this.components.push(new Text(line.text));
+                break;
+            case LineType.emptyLine:
+                this.parseEmptyLine();
+                break;
+            case LineType.unknown:
+                CompilerMessages.getInstance().add(
+                    new ParseError('Unparseable line', line.lineNumber)
+                );
+                break;
+        }
     }
 
     private assignMetadata(metadata: MetadataInterface) {
@@ -64,6 +84,13 @@ export class Compiler {
         return formatter.getOutput();
     }
 
+    private filePaths(): string[] {
+        if (statSync(this.args.path).isDirectory()) {
+            return this.loadDirectory(this.args.path);
+        }
+        return [this.args.path];
+    }
+
     private isFirstComponent() {
         return this.components.length == 0;
     }
@@ -71,6 +98,21 @@ export class Compiler {
     private loadFile(path: string): string[] {
         let content = readFileSync(path, 'utf-8');
         return content.split(/\r?\n/);
+    }
+
+    private loadDirectory(basePath: string): string[] {
+        const allFiles: string[] = readdirSync(basePath).sort();
+        let prozeFiles: string[] = [];
+        for (let path of allFiles) {
+            const fullPath = `${basePath}/${path}`;
+            if (path.endsWith('.proze')) {
+                prozeFiles.push(fullPath);
+            }
+            else if (statSync(fullPath).isDirectory()) {
+                prozeFiles = prozeFiles.concat(this.loadDirectory(fullPath));
+            }
+        }
+        return prozeFiles;
     }
 
     private parseEmptyLine() {
@@ -88,33 +130,16 @@ export class Compiler {
     }
 
     private parseLines() {
-        const lines = this.loadFile(this.args.path);
-        for(let i=0; i < lines.length; i++) {
-            const splitLines: Line[] = this.lineState.update(new Line(lines[i], i));
-            if (splitLines.length == 0) {
-                continue;
-            }
-            for (let line of splitLines) {
-                switch(line.lineType) {
-                    case LineType.metadata:
-                        const metadata = Metadata.getInstance().parse(line);
-                        this.assignMetadata(metadata);
-                        break;
-                    case LineType.paragraph:
-                        // TODO add components for bold/italic if present
-                        this.components.push(new Text(line.text));
-                        break;
-                    case LineType.emptyLine:
-                        this.parseEmptyLine();
-                        break;
-                    case LineType.unknown:
-                        CompilerMessages.getInstance().add(
-                            new ParseError('Unparseable line', line.lineNumber)
-                        );
-                        break;
+        const prozeFilePaths = this.filePaths();
+        for (let path of prozeFilePaths) {
+            const textLines = this.loadFile(path);
+            for(let i=0; i < textLines.length; i++) {
+                const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
+                for (let line of updatedLines) {
+                    this.applyLineType(line);
                 }
             }
+            this.components.push(new EmptyComponent(Token.eof));
         }
-        this.components.push(new EmptyComponent(Token.eof));
     }
 }

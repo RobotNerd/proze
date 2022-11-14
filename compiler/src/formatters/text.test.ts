@@ -29,6 +29,13 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    test('parses all files in a directory if there is no config', () => {
+        mockArgs.path = 'test-data/multiple-files/no-config/';
+        let expected = 'test-data/multiple-files/no-config/no-config.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
     // Metadata
 
     test('allows no metadata fields to be provided', () => {
