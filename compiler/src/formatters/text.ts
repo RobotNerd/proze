@@ -93,7 +93,8 @@ export class TextFormatter {
     }
 
     private isLastComponent(i: number) {
-        return (i == this.components.length - 1) || this.components[i+1].token == Token.eof;
+        return (i == this.components.length - 1) ||
+            (i == this.components.length - 2 && this.components[i+1].token == Token.eof);
     }
 
     private startChapter(chapter: Chapter) {

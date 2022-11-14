@@ -11,7 +11,7 @@ import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
 import { Title } from './components/title';
 import { Token } from './components/token';
-import { readFileSync } from 'fs';
+import { readdirSync, readFileSync, statSync } from 'fs';
 import { CompilerMessages } from './util/compiler-messages';
 import { ParseError } from './util/parse-error';
 
@@ -73,6 +73,21 @@ export class Compiler {
         return content.split(/\r?\n/);
     }
 
+    private loadDirectory(basePath: string): string[] {
+        const allFiles: string[] = readdirSync(basePath).sort();
+        let prozeFiles: string[] = [];
+        for (let path of allFiles) {
+            const fullPath = `${basePath}/${path}`;
+            if (path.endsWith('.proze')) {
+                prozeFiles.push(fullPath);
+            }
+            else if (statSync(fullPath).isDirectory()) {
+                prozeFiles = prozeFiles.concat(this.loadDirectory(fullPath));
+            }
+        }
+        return prozeFiles;
+    }
+
     private parseEmptyLine() {
         let lastElement: Component | null = null;
         if (this.components.length > 0) {
@@ -88,33 +103,36 @@ export class Compiler {
     }
 
     private parseLines() {
-        const lines = this.loadFile(this.args.path);
-        for(let i=0; i < lines.length; i++) {
-            const splitLines: Line[] = this.lineState.update(new Line(lines[i], i));
-            if (splitLines.length == 0) {
-                continue;
-            }
-            for (let line of splitLines) {
-                switch(line.lineType) {
-                    case LineType.metadata:
-                        const metadata = Metadata.getInstance().parse(line);
-                        this.assignMetadata(metadata);
-                        break;
-                    case LineType.paragraph:
-                        // TODO add components for bold/italic if present
-                        this.components.push(new Text(line.text));
-                        break;
-                    case LineType.emptyLine:
-                        this.parseEmptyLine();
-                        break;
-                    case LineType.unknown:
-                        CompilerMessages.getInstance().add(
-                            new ParseError('Unparseable line', line.lineNumber)
-                        );
-                        break;
+        let prozeFiles = statSync(this.args.path).isDirectory() ? this.loadDirectory(this.args.path) : [this.args.path];
+        for (let path of prozeFiles) {
+            const lines = this.loadFile(path);
+            for(let i=0; i < lines.length; i++) {
+                const splitLines: Line[] = this.lineState.update(new Line(lines[i], i));
+                if (splitLines.length == 0) {
+                    continue;
+                }
+                for (let line of splitLines) {
+                    switch(line.lineType) {
+                        case LineType.metadata:
+                            const metadata = Metadata.getInstance().parse(line);
+                            this.assignMetadata(metadata);
+                            break;
+                        case LineType.paragraph:
+                            // TODO add components for bold/italic if present
+                            this.components.push(new Text(line.text));
+                            break;
+                        case LineType.emptyLine:
+                            this.parseEmptyLine();
+                            break;
+                        case LineType.unknown:
+                            CompilerMessages.getInstance().add(
+                                new ParseError('Unparseable line', line.lineNumber)
+                            );
+                            break;
+                    }
                 }
             }
+            this.components.push(new EmptyComponent(Token.eof));
         }
-        this.components.push(new EmptyComponent(Token.eof));
     }
 }
