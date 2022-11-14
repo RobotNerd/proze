@@ -135,9 +135,6 @@ export class Compiler {
             const textLines = this.loadFile(path);
             for(let i=0; i < textLines.length; i++) {
                 const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
-                if (updatedLines.length == 0) {
-                    continue;
-                }
                 for (let line of updatedLines) {
                     this.applyLineType(line);
                 }
