@@ -27,6 +27,26 @@ export class Compiler {
         this.args = args;
         this.lineState = new LineState();
     }
+    
+    private applyLineType(line: Line) {
+        switch(line.lineType) {
+            case LineType.metadata:
+                const metadata = Metadata.getInstance().parse(line);
+                this.assignMetadata(metadata);
+                break;
+            case LineType.paragraph:
+                this.components.push(new Text(line.text));
+                break;
+            case LineType.emptyLine:
+                this.parseEmptyLine();
+                break;
+            case LineType.unknown:
+                CompilerMessages.getInstance().add(
+                    new ParseError('Unparseable line', line.lineNumber)
+                );
+                break;
+        }
+    }
 
     private assignMetadata(metadata: MetadataInterface) {
         switch(true) {
@@ -62,6 +82,13 @@ export class Compiler {
             throw new CompileError('Failed to compile due to parse errors.');
         }
         return formatter.getOutput();
+    }
+
+    private filePaths(): string[] {
+        if (statSync(this.args.path).isDirectory()) {
+            return this.loadDirectory(this.args.path);
+        }
+        return [this.args.path];
     }
 
     private isFirstComponent() {
@@ -103,33 +130,16 @@ export class Compiler {
     }
 
     private parseLines() {
-        let prozeFiles = statSync(this.args.path).isDirectory() ? this.loadDirectory(this.args.path) : [this.args.path];
-        for (let path of prozeFiles) {
-            const lines = this.loadFile(path);
-            for(let i=0; i < lines.length; i++) {
-                const splitLines: Line[] = this.lineState.update(new Line(lines[i], i));
-                if (splitLines.length == 0) {
+        const prozeFilePaths = this.filePaths();
+        for (let path of prozeFilePaths) {
+            const textLines = this.loadFile(path);
+            for(let i=0; i < textLines.length; i++) {
+                const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
+                if (updatedLines.length == 0) {
                     continue;
                 }
-                for (let line of splitLines) {
-                    switch(line.lineType) {
-                        case LineType.metadata:
-                            const metadata = Metadata.getInstance().parse(line);
-                            this.assignMetadata(metadata);
-                            break;
-                        case LineType.paragraph:
-                            // TODO add components for bold/italic if present
-                            this.components.push(new Text(line.text));
-                            break;
-                        case LineType.emptyLine:
-                            this.parseEmptyLine();
-                            break;
-                        case LineType.unknown:
-                            CompilerMessages.getInstance().add(
-                                new ParseError('Unparseable line', line.lineNumber)
-                            );
-                            break;
-                    }
+                for (let line of updatedLines) {
+                    this.applyLineType(line);
                 }
             }
             this.components.push(new EmptyComponent(Token.eof));
