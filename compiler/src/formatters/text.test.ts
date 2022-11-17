@@ -36,6 +36,13 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    test('compiles files in a directory by the order provided in the config', () => {
+        mockArgs.path = 'test-data/multiple-files/with-config-json/';
+        let expected = 'test-data/multiple-files/with-config-json/with-config-json.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
     // Metadata
 
     test('allows no metadata fields to be provided', () => {

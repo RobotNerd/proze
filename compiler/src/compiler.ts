@@ -2,6 +2,8 @@ import { Author } from './components/author';
 import { Chapter } from './components/chapter';
 import { CompileError } from './util/compile-error';
 import { Component, EmptyComponent } from './components/component';
+import { ConfigInterface, ConfigParser } from './util/config';
+import { ProzeFile } from './util/proze-file';
 import { Format, ProzeArgs } from './util/cli-arguments';
 import { Line, LineType } from './components/line';
 import { LineState } from './components/line-state';
@@ -11,7 +13,6 @@ import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
 import { Title } from './components/title';
 import { Token } from './components/token';
-import { readdirSync, readFileSync, statSync } from 'fs';
 import { CompilerMessages } from './util/compiler-messages';
 import { ParseError } from './util/parse-error';
 
@@ -22,10 +23,12 @@ export class Compiler {
     private lineState: LineState;
     private title: Title | null = null;
     private components: Component[] = [];
+    private config: ConfigInterface | null = null;
 
     constructor(args: any) {
         this.args = args;
         this.lineState = new LineState();
+        this.config = ConfigParser.load(this.args.path);
     }
     
     private applyLineType(line: Line) {
@@ -84,35 +87,8 @@ export class Compiler {
         return formatter.getOutput();
     }
 
-    private filePaths(): string[] {
-        if (statSync(this.args.path).isDirectory()) {
-            return this.loadDirectory(this.args.path);
-        }
-        return [this.args.path];
-    }
-
     private isFirstComponent() {
         return this.components.length == 0;
-    }
-
-    private loadFile(path: string): string[] {
-        let content = readFileSync(path, 'utf-8');
-        return content.split(/\r?\n/);
-    }
-
-    private loadDirectory(basePath: string): string[] {
-        const allFiles: string[] = readdirSync(basePath).sort();
-        let prozeFiles: string[] = [];
-        for (let path of allFiles) {
-            const fullPath = `${basePath}/${path}`;
-            if (path.endsWith('.proze')) {
-                prozeFiles.push(fullPath);
-            }
-            else if (statSync(fullPath).isDirectory()) {
-                prozeFiles = prozeFiles.concat(this.loadDirectory(fullPath));
-            }
-        }
-        return prozeFiles;
     }
 
     private parseEmptyLine() {
@@ -130,9 +106,9 @@ export class Compiler {
     }
 
     private parseLines() {
-        const prozeFilePaths = this.filePaths();
+        const prozeFilePaths = ProzeFile.paths(this.args, this.config);
         for (let path of prozeFilePaths) {
-            const textLines = this.loadFile(path);
+            const textLines = ProzeFile.load(path);
             for(let i=0; i < textLines.length; i++) {
                 const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
                 for (let line of updatedLines) {
