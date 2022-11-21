@@ -57,9 +57,6 @@ export class Compiler {
                 this.author = metadata as Author;
                 break;
             case metadata instanceof Chapter:
-                if (!this.isFirstComponent()) {
-                    this.components.push(new EmptyComponent(Token.end_chapter));
-                }
                 this.components.push(metadata as Chapter);
                 break;
             case metadata instanceof Section:
