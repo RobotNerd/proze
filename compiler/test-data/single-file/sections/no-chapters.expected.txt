@@ -1,5 +1,5 @@
 My Document
-by Jon Document
+by Jon Doe
 
 
 A named section
