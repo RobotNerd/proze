@@ -84,10 +84,6 @@ export class Compiler {
         return formatter.getOutput();
     }
 
-    private isFirstComponent() {
-        return this.components.length == 0;
-    }
-
     private parseEmptyLine() {
         let lastElement: Component | null = null;
         if (this.components.length > 0) {
