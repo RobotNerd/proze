@@ -84,15 +84,25 @@ export class Compiler {
         return formatter.getOutput();
     }
 
-    private parseEmptyLine() {
-        let lastElement: Component | null = null;
-        if (this.components.length > 0) {
-            lastElement = this.components[this.components.length - 1];
+    private lastActiveComponent(): Component | null {
+        let lastComponent: Component | null = null;
+        const ignoreComponents = [Token.eof];
+        let i = this.components.length - 1;
+        while (i >= 0 && lastComponent === null) {
+            if (!ignoreComponents.includes(this.components[i].token)) {
+                lastComponent = this.components[i];
+            }
+            i--;
         }
+        return lastComponent;
+    }
+
+    private parseEmptyLine() {
+        let lastComponent = this.lastActiveComponent();
         if (
-            lastElement !== null &&
-            lastElement.token != Token.end_paragraph &&
-            lastElement.token != Token.chapter
+            lastComponent !== null &&
+            lastComponent.token != Token.end_paragraph &&
+            lastComponent.token != Token.chapter
         ) {
             this.components.push(new EmptyComponent(Token.end_paragraph));
         }
