@@ -2,6 +2,8 @@ import { Author } from './components/author';
 import { Chapter } from './components/chapter';
 import { CompileError } from './util/compile-error';
 import { Component, EmptyComponent } from './components/component';
+import { ConfigInterface, ConfigParser } from './util/config';
+import { ProzeFile } from './util/proze-file';
 import { Format, ProzeArgs } from './util/cli-arguments';
 import { Line, LineType } from './components/line';
 import { LineState } from './components/line-state';
@@ -11,7 +13,6 @@ import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
 import { Title } from './components/title';
 import { Token } from './components/token';
-import { readdirSync, readFileSync, statSync } from 'fs';
 import { CompilerMessages } from './util/compiler-messages';
 import { ParseError } from './util/parse-error';
 
@@ -22,10 +23,12 @@ export class Compiler {
     private lineState: LineState;
     private title: Title | null = null;
     private components: Component[] = [];
+    private config: ConfigInterface | null = null;
 
     constructor(args: any) {
         this.args = args;
         this.lineState = new LineState();
+        this.config = ConfigParser.load(this.args.path);
     }
     
     private applyLineType(line: Line) {
@@ -54,9 +57,6 @@ export class Compiler {
                 this.author = metadata as Author;
                 break;
             case metadata instanceof Chapter:
-                if (!this.isFirstComponent()) {
-                    this.components.push(new EmptyComponent(Token.end_chapter));
-                }
                 this.components.push(metadata as Chapter);
                 break;
             case metadata instanceof Section:
@@ -84,55 +84,34 @@ export class Compiler {
         return formatter.getOutput();
     }
 
-    private filePaths(): string[] {
-        if (statSync(this.args.path).isDirectory()) {
-            return this.loadDirectory(this.args.path);
-        }
-        return [this.args.path];
-    }
-
-    private isFirstComponent() {
-        return this.components.length == 0;
-    }
-
-    private loadFile(path: string): string[] {
-        let content = readFileSync(path, 'utf-8');
-        return content.split(/\r?\n/);
-    }
-
-    private loadDirectory(basePath: string): string[] {
-        const allFiles: string[] = readdirSync(basePath).sort();
-        let prozeFiles: string[] = [];
-        for (let path of allFiles) {
-            const fullPath = `${basePath}/${path}`;
-            if (path.endsWith('.proze')) {
-                prozeFiles.push(fullPath);
+    private lastActiveComponent(): Component | null {
+        let lastComponent: Component | null = null;
+        const ignoreComponents = [Token.eof];
+        let i = this.components.length - 1;
+        while (i >= 0 && lastComponent === null) {
+            if (!ignoreComponents.includes(this.components[i].token)) {
+                lastComponent = this.components[i];
             }
-            else if (statSync(fullPath).isDirectory()) {
-                prozeFiles = prozeFiles.concat(this.loadDirectory(fullPath));
-            }
+            i--;
         }
-        return prozeFiles;
+        return lastComponent;
     }
 
     private parseEmptyLine() {
-        let lastElement: Component | null = null;
-        if (this.components.length > 0) {
-            lastElement = this.components[this.components.length - 1];
-        }
+        let lastComponent = this.lastActiveComponent();
         if (
-            lastElement !== null &&
-            lastElement.token != Token.end_paragraph &&
-            lastElement.token != Token.chapter
+            lastComponent !== null &&
+            lastComponent.token != Token.end_paragraph &&
+            lastComponent.token != Token.chapter
         ) {
             this.components.push(new EmptyComponent(Token.end_paragraph));
         }
     }
 
     private parseLines() {
-        const prozeFilePaths = this.filePaths();
+        const prozeFilePaths = ProzeFile.paths(this.args, this.config);
         for (let path of prozeFilePaths) {
-            const textLines = this.loadFile(path);
+            const textLines = ProzeFile.load(path);
             for(let i=0; i < textLines.length; i++) {
                 const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
                 for (let line of updatedLines) {

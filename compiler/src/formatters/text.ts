@@ -10,6 +10,7 @@ export class TextFormatter {
 
     private content: string[] = [];
     private currentTextBlock: string[] = [];
+    private isFirstChapter: boolean = true;
 
     constructor(
         private author: Author | null,
@@ -56,10 +57,10 @@ export class TextFormatter {
             let component = this.components[i];
             switch(component.token) {
                 case Token.chapter:
+                    if (!this.isFirstChapter) {
+                        this.endChapter();
+                    }
                     this.startChapter(component as Chapter);
-                    break;
-                case Token.end_chapter:
-                    this.endChapter();
                     break;
                 case Token.end_paragraph:
                     this.endParagraph(i);
@@ -98,6 +99,7 @@ export class TextFormatter {
     }
 
     private startChapter(chapter: Chapter) {
+        this.isFirstChapter = false;
         this.content.push(chapter.getOutput() + '\n\n');
     }
 }
