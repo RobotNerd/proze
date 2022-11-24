@@ -60,6 +60,12 @@ export class Strip {
         return updatedLine;
     }
 
+    escapeCharacter(line: Line) {
+        Markup.removeEsacpe(line, StrippedToken.BlockComment[0]);
+        Markup.removeEsacpe(line, StrippedToken.OpenBracket);
+        Markup.removeEsacpe(line, StrippedToken.CloseBracket);
+    }
+
     private nextToken(text: string): [StrippedToken, number] {
         const requireWhitespaceBefore = false;
         const blockCommentIndex = Markup.findNextToken(text, StrippedToken.BlockComment);
@@ -85,7 +91,6 @@ export class Strip {
     }
     
     private removeBlockComment(text: string, index: number): [string, string] {
-        // TODO rename parsedText to left and remainingText to right
         let left: string = '';
         let right: string;
         if (!this.inBracketBlock) {
@@ -98,20 +103,7 @@ export class Strip {
         return [left, right];
     }
 
-    private startBracketBlock(text: string, index: number): [string, string] {
-        // TODO rename parsedText to left and remainingText to right
-        let left: string = '';
-        let right: string;
-        if (!this.inBlockComment && !this.inBracketBlock) {
-            left = text.substring(0, index).trim();
-            this.inBracketBlock = true;
-        }
-        right = text.substring(index + StrippedToken.OpenBracket.length).trim();
-        return [left, right];
-    }
-
     private removeBracketBlock(text: string, index: number, lineNumber: number): [string, string] {
-        // TODO rename parsedText to left and remainingText to right
         let left: string = '';
         let right: string;
         if (!this.inBlockComment) {
@@ -133,12 +125,6 @@ export class Strip {
         return [left, right];
     }
 
-    escapeCharacter(line: Line) {
-        Markup.removeEsacpe(line, StrippedToken.BlockComment[0]);
-        Markup.removeEsacpe(line, StrippedToken.OpenBracket);
-        Markup.removeEsacpe(line, StrippedToken.CloseBracket);
-    }
-
     private removeLineComment(text: string, index: number): [string, string] {
         if (this.inBlockComment || this.inBracketBlock) {
             return ['', text.substring(index + StrippedToken.LineComment.length).trim()];
@@ -149,5 +135,16 @@ export class Strip {
     reset() {
         this.inBlockComment = false;
         this.inBracketBlock = false;
+    }
+
+    private startBracketBlock(text: string, index: number): [string, string] {
+        let left: string = '';
+        let right: string;
+        if (!this.inBlockComment && !this.inBracketBlock) {
+            left = text.substring(0, index).trim();
+            this.inBracketBlock = true;
+        }
+        right = text.substring(index + StrippedToken.OpenBracket.length).trim();
+        return [left, right];
     }
 }
