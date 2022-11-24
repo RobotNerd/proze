@@ -42,8 +42,8 @@ export class LineState {
     }
 
     update(line: Line): Line[] {
-        let sanitizedLine = this.sanitize(line);
-        let updatedLines = this.applyEmphasis(sanitizedLine);
+        let strippedLine = this.strip.commentsAndBrackets(line);
+        let updatedLines = this.applyEmphasis(strippedLine);
 
         for (let updatedLine of updatedLines) {
             if (!this.inParagraph && Metadata.getInstance().isMetadata(updatedLine)) {
@@ -66,12 +66,5 @@ export class LineState {
     reset() {
         this.inParagraph = false;
         this.strip.reset();
-    }
-
-    private sanitize(line: Line | null): Line | null {
-        let updatedLine = this.strip.blockComment(line);
-        updatedLine = this.strip.lineComment(updatedLine);
-        updatedLine = this.strip.bracketBlock(updatedLine);
-        return updatedLine;
     }
 }
