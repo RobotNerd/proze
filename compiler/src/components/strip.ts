@@ -86,40 +86,40 @@ export class Strip {
     
     private removeBlockComment(text: string, index: number): [string, string] {
         // TODO rename parsedText to left and remainingText to right
-        let parsedText: string = '';
-        let remainingText: string;
+        let left: string = '';
+        let right: string;
         if (!this.inBracketBlock) {
             if (!this.inBlockComment) {
-                parsedText = text.substring(0, index).trim();
+                left = text.substring(0, index).trim();
             }
             this.inBlockComment = !this.inBlockComment;
         }
-        remainingText = text.substring(index + StrippedToken.BlockComment.length).trim();
-        return [parsedText, remainingText];
+        right = text.substring(index + StrippedToken.BlockComment.length).trim();
+        return [left, right];
     }
 
     private startBracketBlock(text: string, index: number): [string, string] {
         // TODO rename parsedText to left and remainingText to right
-        let parsedText: string = '';
-        let remainingText: string;
+        let left: string = '';
+        let right: string;
         if (!this.inBlockComment && !this.inBracketBlock) {
-            parsedText = text.substring(0, index).trim();
+            left = text.substring(0, index).trim();
             this.inBracketBlock = true;
         }
-        remainingText = text.substring(index + StrippedToken.OpenBracket.length).trim();
-        return [parsedText, remainingText];
+        right = text.substring(index + StrippedToken.OpenBracket.length).trim();
+        return [left, right];
     }
 
     private removeBracketBlock(text: string, index: number, lineNumber: number): [string, string] {
         // TODO rename parsedText to left and remainingText to right
-        let parsedText: string = '';
-        let remainingText: string;
+        let left: string = '';
+        let right: string;
         if (!this.inBlockComment) {
             if (this.inBracketBlock) {
                 this.inBracketBlock = false;
             }
             else {
-                parsedText = text.substring(0, index).trim();
+                left = text.substring(0, index).trim();
                 let message = [
                     'Closing bracket "]" found without prior matching opening bracket.',
                     'If you want this to be in the output, esacpe it with a "\\" character.'
@@ -129,8 +129,8 @@ export class Strip {
                 );
             }
         }
-        remainingText = text.substring(index + StrippedToken.CloseBracket.length).trim();
-        return [parsedText, remainingText];
+        right = text.substring(index + StrippedToken.CloseBracket.length).trim();
+        return [left, right];
     }
 
     escapeCharacter(line: Line) {
