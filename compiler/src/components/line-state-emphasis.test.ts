@@ -1,4 +1,3 @@
-import { stringify } from "querystring";
 import { CompilerMessages } from "../util/compiler-messages";
 import { EmphasisType, Line } from "./line";
 import { testMultiLine, testSingleLine } from './line-state-test-helper';

@@ -61,7 +61,8 @@ export class LineState {
 
         if (!this.inParagraph && Metadata.getInstance().isMetadata(strippedLine)) {
             strippedLine.lineType = LineType.metadata;
-            // TODO strip escape chars
+            this.strip.escapeCharacter(strippedLine);
+            this.emphasis.removeEscapeCharacter(strippedLine);
             return [strippedLine];
         }
 
