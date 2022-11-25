@@ -17,7 +17,7 @@ describe('LineState', () => {
     });
 
     test('strips text in a bracket block taking up the entire line', () => {
-        testSingleLine('[XXX]', '');
+        testSingleLine('[XXX]', []);
     });
 
     test('strips text in a bracket block from the middle of a line', () => {
