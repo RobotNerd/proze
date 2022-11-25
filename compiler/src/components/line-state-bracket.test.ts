@@ -38,6 +38,90 @@ describe('LineState', () => {
         );
     });
 
+    test('removes bracketed line mid-paragraph', () => {
+        testMultiLine(
+            [
+                'abc',
+                '[ZZZ]',
+                'def',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 2),
+            ]
+        );
+    });
+
+    test('removes bracketed line mid-paragraph with leading whitespace', () => {
+        testMultiLine(
+            [
+                'abc',
+                '   [ZZZ]',
+                'def',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 2),
+            ]
+        );
+    });
+
+    test('removes bracketed line at beginning of paragraph', () => {
+        testMultiLine(
+            [
+                '[ZZZ]',
+                'abc',
+                'def',
+            ],
+            [
+                new Line('abc', 1),
+                new Line('def', 2),
+            ]
+        );
+    });
+
+    test('removes bracketed line at beginning of paragraph with leading whitespace', () => {
+        testMultiLine(
+            [
+                '   [ZZZ]',
+                'abc',
+                'def',
+            ],
+            [
+                new Line('abc', 1),
+                new Line('def', 2),
+            ]
+        );
+    });
+
+    test('removes bracketed line at end of paragraph', () => {
+        testMultiLine(
+            [
+                'abc',
+                'def',
+                '[ZZZ]',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 1),
+            ]
+        );
+    });
+
+    test('removes bracketed line at end of paragraph with leading whitespace', () => {
+        testMultiLine(
+            [
+                'abc',
+                'def',
+                '   [ZZZ]',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 1),
+            ]
+        );
+    });
+
     test('ignores a bracket block hidden by a line comment', () => {
         testSingleLine(
             'abc ## XXX [XXX] XXX',

@@ -49,6 +49,62 @@ describe('LineState', () => {
         );
     });
 
+    test('removes commented line at beginning of paragraph', () => {
+        testMultiLine(
+            [
+                '## ZZZ',
+                'abc',
+                'def',
+            ],
+            [
+                new Line('abc', 1),
+                new Line('def', 2),
+            ]
+        );
+    });
+
+    test('removes commented line at beginning of paragraph with leading whitespace', () => {
+        testMultiLine(
+            [
+                '   ## ZZZ',
+                'abc',
+                'def',
+            ],
+            [
+                new Line('abc', 1),
+                new Line('def', 2),
+            ]
+        );
+    });
+
+    test('removes commented line at end of paragraph', () => {
+        testMultiLine(
+            [
+                'abc',
+                'def',
+                '## ZZZ',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 1),
+            ]
+        );
+    });
+
+    test('removes commented line at beginning of end with leading whitespace', () => {
+        testMultiLine(
+            [
+                'abc',
+                'def',
+                '   ## ZZZ',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 1),
+            ]
+        );
+    });
+
     test('returns nothing if entire line is leading whitespace followed by a comment', () => {
         testSingleLine('     ## XXX', []);
     });
@@ -128,6 +184,62 @@ describe('LineState', () => {
             [
                 new Line('abc', 0),
                 new Line('def', 2),
+            ]
+        );
+    });
+
+    test('removes block-commented line at beginning of paragraph', () => {
+        testMultiLine(
+            [
+                '### ZZZ ###',
+                'abc',
+                'def',
+            ],
+            [
+                new Line('abc', 1),
+                new Line('def', 2),
+            ]
+        );
+    });
+
+    test('removes block-commented line at beginning of paragraph with leading whitespace', () => {
+        testMultiLine(
+            [
+                '   ### ZZZ ###',
+                'abc',
+                'def',
+            ],
+            [
+                new Line('abc', 1),
+                new Line('def', 2),
+            ]
+        );
+    });
+
+    test('removes block-commented line at end of paragraph', () => {
+        testMultiLine(
+            [
+                'abc',
+                'def',
+                '### ZZZ ###',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 1),
+            ]
+        );
+    });
+
+    test('removes block-commented line at beginning of end with leading whitespace', () => {
+        testMultiLine(
+            [
+                'abc',
+                'def',
+                '   ### ZZZ ###',
+            ],
+            [
+                new Line('abc', 0),
+                new Line('def', 1),
             ]
         );
     });
