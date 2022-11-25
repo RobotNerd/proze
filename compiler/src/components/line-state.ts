@@ -48,7 +48,6 @@ export class LineState {
     }
 
     update(line: Line): Line[] {
-        // TODO refactor to split into multiple functions
         let strippedLine = this.strip.commentsAndBrackets(line);
         this.checkWhitespaceOnlyLine(line, strippedLine);
         if (this.isWhitespaceOnly) {
