@@ -1,5 +1,5 @@
 import { CompilerMessages } from "../util/compiler-messages";
-import { Line, LineType } from "./line";
+import { Line } from "./line";
 import { LineState } from "./line-state";
 import { testSingleLine, testMultiLine } from './line-state-test-helper';
 
