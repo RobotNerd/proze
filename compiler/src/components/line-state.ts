@@ -6,6 +6,7 @@ import { Strip } from "./strip";
 export class LineState {
 
     inParagraph: boolean = false;
+    isWhitespaceOnly: boolean = false;
     
     private emphasis: Emphasis;
     private strip: Strip;
@@ -37,26 +38,38 @@ export class LineState {
         return updatedLines;
     }
 
-    private isEmptyLine(line: Line): boolean {
-        return line.text.trim() == '';
+    private checkWhitespaceOnlyLine(line: Line | null, strippedLine: Line | null) {
+        this.isWhitespaceOnly = false;
+        if (line && strippedLine) {
+            this.isWhitespaceOnly =
+                line.text.length == strippedLine.text.length &&
+                line.text.trim().length === 0;
+        }
     }
 
     update(line: Line): Line[] {
+        // TODO refactor to split into multiple functions
         let strippedLine = this.strip.commentsAndBrackets(line);
-        let updatedLines = this.applyEmphasis(strippedLine);
+        this.checkWhitespaceOnlyLine(line, strippedLine);
+        if (this.isWhitespaceOnly) {
+            this.inParagraph = false;
+            return [new Line('', line.lineNumber, LineType.emptyLine)];
+        }
 
+        if (strippedLine === null || strippedLine.text.trim() === '') {
+            return [];
+        }
+
+        if (!this.inParagraph && Metadata.getInstance().isMetadata(strippedLine)) {
+            strippedLine.lineType = LineType.metadata;
+            // TODO strip escape chars
+            return [strippedLine];
+        }
+
+        this.inParagraph = true;
+        let updatedLines = this.applyEmphasis(strippedLine);
         for (let updatedLine of updatedLines) {
-            if (!this.inParagraph && Metadata.getInstance().isMetadata(updatedLine)) {
-                updatedLine.lineType = LineType.metadata;
-            }
-            else if (this.isEmptyLine(updatedLine)) {
-                this.inParagraph = false;
-                updatedLine.lineType = LineType.emptyLine;
-            }
-            else {
-                this.inParagraph = true;
-                updatedLine.lineType = LineType.paragraph;
-            }
+            updatedLine.lineType = LineType.paragraph
             this.strip.escapeCharacter(updatedLine);
             this.emphasis.removeEscapeCharacter(updatedLine);
         }
