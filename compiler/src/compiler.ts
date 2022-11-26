@@ -8,6 +8,7 @@ import { Format, ProzeArgs } from './util/cli-arguments';
 import { Line, LineType } from './components/line';
 import { LineState } from './components/line-state';
 import { Metadata, MetadataInterface } from './components/metadata';
+import { Names } from './components/names';
 import { Section } from './components/section';
 import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
@@ -115,6 +116,7 @@ export class Compiler {
             for(let i=0; i < textLines.length; i++) {
                 const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
                 for (let line of updatedLines) {
+                    Names.checkForInvalid(line, this.config);
                     this.applyLineType(line);
                 }
             }

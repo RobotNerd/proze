@@ -43,6 +43,25 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    test('creates parse error if invalid name found', () => {
+        mockArgs.path = 'test-data/multiple-files/invalid-names/';
+        const compiler = new Compiler(mockArgs);
+        try {
+            let output = compiler.compile();
+            expect('').toBe('expected CompileError to be thrown');
+        }
+        catch(e: unknown) {
+            if (e instanceof CompileError) {
+                expect(e).toBeInstanceOf(CompileError);
+                expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
+                expect(CompilerMessages.getInstance().errors.length).toBe(6);
+            }
+            else {
+                throw e;
+            }
+        }
+    });
+
     // Metadata
 
     test('allows no metadata fields to be provided', () => {
@@ -64,12 +83,17 @@ describe('text formatter', () => {
         const compiler = new Compiler(mockArgs);
         try {
             let output = compiler.compile();
-            throw new Error('expected CompileError to be thrown');
+            expect('').toBe('expected CompileError to be thrown');
         }
         catch(e: unknown) {
-            expect(e).toBeInstanceOf(CompileError);
-            expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
-            expect(CompilerMessages.getInstance().errors.length).toBe(1);
+            if (e instanceof CompileError) {
+                expect(e).toBeInstanceOf(CompileError);
+                expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
+                expect(CompilerMessages.getInstance().errors.length).toBe(1);
+            }
+            else {
+                throw e;
+            }
         }
     });
 
