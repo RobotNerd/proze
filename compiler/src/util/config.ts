@@ -5,7 +5,12 @@ export interface ConfigCompilerOptionsInterface {
     order?: string[];
 }
 
+export interface ConfigNames {
+    invalid?: string [];
+}
+
 export interface ConfigInterface {
+    names?: ConfigNames;
     compile?: ConfigCompilerOptionsInterface;
 }
 
