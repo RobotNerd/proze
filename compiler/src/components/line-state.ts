@@ -47,31 +47,49 @@ export class LineState {
         }
     }
 
-    update(line: Line): Line[] {
-        let strippedLine = this.strip.commentsAndBrackets(line);
-        this.checkWhitespaceOnlyLine(line, strippedLine);
-        if (this.isWhitespaceOnly) {
-            this.inParagraph = false;
-            return [new Line('', line.lineNumber, LineType.emptyLine)];
-        }
+    private isMetadata(strippedLine: Line): boolean {
+        return !this.inParagraph && Metadata.getInstance().isMetadata(strippedLine);
+    }
 
-        if (strippedLine === null || strippedLine.text.trim() === '') {
-            return [];
-        }
+    private onEmptyLine(line: Line): Line[] {
+        this.inParagraph = false;
+        return [new Line('', line.lineNumber, LineType.emptyLine)];
+    }
 
-        if (!this.inParagraph && Metadata.getInstance().isMetadata(strippedLine)) {
-            strippedLine.lineType = LineType.metadata;
-            this.strip.escapeCharacter(strippedLine);
-            this.emphasis.removeEscapeCharacter(strippedLine);
-            return [strippedLine];
-        }
+    private onMetadata(strippedLine: Line): Line[] {
+        strippedLine.lineType = LineType.metadata;
+        this.strip.escapeCharacter(strippedLine);
+        this.emphasis.removeEscapeCharacter(strippedLine);
+        return [strippedLine];
+    }
 
+    private onText(strippedLine: Line): Line[] {
         this.inParagraph = true;
         let updatedLines = this.applyEmphasis(strippedLine);
         for (let updatedLine of updatedLines) {
             updatedLine.lineType = LineType.paragraph
             this.strip.escapeCharacter(updatedLine);
             this.emphasis.removeEscapeCharacter(updatedLine);
+        }
+        return updatedLines;
+    }
+
+    update(line: Line): Line[] {
+        let updatedLines: Line[];
+        let strippedLine = this.strip.commentsAndBrackets(line);
+        this.checkWhitespaceOnlyLine(line, strippedLine);
+
+        if (this.isWhitespaceOnly) {
+            updatedLines = this.onEmptyLine(line);
+        }
+        else if (strippedLine === null || strippedLine.text.trim() === '') {
+            updatedLines = [];
+        }
+        else if (this.isMetadata(strippedLine)) {
+            updatedLines = this.onMetadata(strippedLine);
+        }
+        else {
+            updatedLines = this.onText(strippedLine);
         }
         return updatedLines;
     }
