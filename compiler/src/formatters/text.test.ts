@@ -62,6 +62,20 @@ describe('text formatter', () => {
         }
     });
 
+    test('compiles files with a "yaml" config file', () => {
+        mockArgs.path = 'test-data/multiple-files/config-file-yaml/';
+        let expected = 'test-data/multiple-files/config-file-yaml/config-file-yaml.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
+    test('compiles files with a "yml" config file', () => {
+        mockArgs.path = 'test-data/multiple-files/config-file-yml/';
+        let expected = 'test-data/multiple-files/config-file-yml/config-file-yml.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
     // Metadata
 
     test('allows no metadata fields to be provided', () => {

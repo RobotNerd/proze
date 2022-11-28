@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, statSync } from "fs";
 import { ProzeFile } from './proze-file';
+import YAML from 'yaml';
 
 export interface ConfigCompilerOptionsInterface {
     order?: string[];
@@ -18,7 +19,8 @@ export class ConfigParser {
 
     private static allowedConfigExtensions: string[] = [
         'json',
-        // TODO add yaml and yml
+        'yaml',
+        'yml',
     ];
 
     private static buildFilePaths(config: ConfigInterface | null, basePath: string) {
@@ -40,15 +42,27 @@ export class ConfigParser {
     }
 
     private static configFilePath(path: string): string | null {
+        let configPath: string | null = null;
+        let foundConfigFiles = [];
         if (statSync(path).isDirectory()) {
             for (let ext of ConfigParser.allowedConfigExtensions) {
-                let configPath = `${path}/config.${ext}`;
-                if (existsSync(configPath)) {
-                    return configPath;
+                let tmpPath = `${path}/config.${ext}`;
+                if (existsSync(tmpPath)) {
+                    foundConfigFiles.push(tmpPath);
                 }
             }
         }
-        return null;
+        if (foundConfigFiles.length > 0) {
+            if (foundConfigFiles.length > 1) {
+                throw new Error(
+                    'Multiple config files found in project directory. ' +
+                    'There should be only one.\n' +
+                    `${foundConfigFiles}`
+                );
+            }
+            configPath = foundConfigFiles[0];
+        }
+        return configPath;
     }
 
     static load(path: string): ConfigInterface | null {
@@ -56,7 +70,12 @@ export class ConfigParser {
         const configPath = ConfigParser.configFilePath(path);
         if (configPath !== null) {
             let content = readFileSync(configPath, 'utf-8');
-            config = JSON.parse(content);
+            if (configPath.endsWith('json')) {
+                config = JSON.parse(content);
+            }
+            else if (configPath.endsWith('yaml') || configPath.endsWith('yml')) {
+                config = YAML.parse(content);
+            }
         }
         ConfigParser.buildFilePaths(config, path);
         return config;
