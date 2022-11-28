@@ -29,20 +29,6 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
-    test('parses all files in a directory if there is no config', () => {
-        mockArgs.path = 'test-data/multiple-files/no-config/';
-        let expected = 'test-data/multiple-files/no-config/no-config.expected.txt';
-        const compiler = new Compiler(mockArgs);
-        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
-    });
-
-    test('compiles files in a directory by the order provided in the config', () => {
-        mockArgs.path = 'test-data/multiple-files/with-config-json/';
-        let expected = 'test-data/multiple-files/with-config-json/with-config-json.expected.txt';
-        const compiler = new Compiler(mockArgs);
-        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
-    });
-
     test('creates parse error if invalid name found', () => {
         mockArgs.path = 'test-data/multiple-files/invalid-names/';
         const compiler = new Compiler(mockArgs);
@@ -62,6 +48,22 @@ describe('text formatter', () => {
         }
     });
 
+    // Config file
+
+    test('parses all files in a directory if there is no config', () => {
+        mockArgs.path = 'test-data/multiple-files/no-config/';
+        let expected = 'test-data/multiple-files/no-config/no-config.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
+    test('compiles files in a directory by the order provided in the config', () => {
+        mockArgs.path = 'test-data/multiple-files/with-config-json/';
+        let expected = 'test-data/multiple-files/with-config-json/with-config-json.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
     test('compiles files with a "yaml" config file', () => {
         mockArgs.path = 'test-data/multiple-files/config-file-yaml/';
         let expected = 'test-data/multiple-files/config-file-yaml/config-file-yaml.expected.txt';
@@ -74,6 +76,18 @@ describe('text formatter', () => {
         let expected = 'test-data/multiple-files/config-file-yml/config-file-yml.expected.txt';
         const compiler = new Compiler(mockArgs);
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
+    test('throws error if multiple config files exist in a directory', () => {
+        mockArgs.path = 'test-data/multiple-files/multiple-config-files/';
+        try {
+            const compiler = new Compiler(mockArgs);
+            let output = compiler.compile();
+            expect('').toBe('expected CompileError to be thrown');
+        }
+        catch(e) {
+            expect((e as Error).message).toContain('Multiple config files found');
+        }
     });
 
     // Metadata
