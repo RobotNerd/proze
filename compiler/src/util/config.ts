@@ -43,7 +43,15 @@ export class ConfigParser {
 
     private static configFilePath(path: string): string | null {
         let configPath: string | null = null;
-        let foundConfigFiles = [];
+        let foundConfigFiles: string[] = this.findConfigFiles(path);
+        if (foundConfigFiles.length > 0) {
+            configPath = foundConfigFiles[0];
+        }
+        return configPath;
+    }
+
+    private static findConfigFiles(path: string): string[] {
+        let foundConfigFiles: string[] = [];
         if (statSync(path).isDirectory()) {
             for (let ext of ConfigParser.allowedConfigExtensions) {
                 let tmpPath = `${path}/config.${ext}`;
@@ -52,32 +60,41 @@ export class ConfigParser {
                 }
             }
         }
-        if (foundConfigFiles.length > 0) {
-            if (foundConfigFiles.length > 1) {
-                throw new Error(
-                    'Multiple config files found in project directory. ' +
-                    'There should be only one.\n' +
-                    `${foundConfigFiles}`
-                );
-            }
-            configPath = foundConfigFiles[0];
+        if (foundConfigFiles.length > 1) {
+            throw new Error(
+                'Multiple config files found in project directory. ' +
+                'There should be only one.\n' +
+                `${foundConfigFiles}`
+            );
         }
-        return configPath;
+        return foundConfigFiles;
     }
 
     static load(path: string): ConfigInterface | null {
         let config: ConfigInterface | null = null;
         const configPath = ConfigParser.configFilePath(path);
         if (configPath !== null) {
-            let content = readFileSync(configPath, 'utf-8');
-            if (configPath.endsWith('json')) {
-                config = JSON.parse(content);
-            }
-            else if (configPath.endsWith('yaml') || configPath.endsWith('yml')) {
-                config = YAML.parse(content);
+            switch(true) {
+                case configPath.endsWith('json'):
+                    config = this.parseJSON(configPath);
+                    break;
+                case configPath.endsWith('yaml') || configPath.endsWith('yml'):
+                    config = this.parseYAML(configPath);
+                    break;
             }
         }
         ConfigParser.buildFilePaths(config, path);
         return config;
     }
+
+    private static parseJSON(path: string): ConfigInterface {
+        let content = readFileSync(path, 'utf-8');
+        return JSON.parse(content);
+    }
+
+    private static parseYAML(path: string): ConfigInterface {
+        let content = readFileSync(path, 'utf-8');
+        return YAML.parse(content);
+    }
+
 }
