@@ -1,9 +1,8 @@
-import { Author } from '../components/author';
 import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
+import { ProjectMetadata } from '../components/metadata';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
-import { Title } from '../components/title';
 import { Token } from '../components/token';
 
 export class TextFormatter {
@@ -13,8 +12,7 @@ export class TextFormatter {
     private isFirstChapter: boolean = true;
 
     constructor(
-        private author: Author | null,
-        private title: Title | null,
+        private projectMetadata: ProjectMetadata,
         private components: Component[]
     ) {}
 
@@ -81,11 +79,11 @@ export class TextFormatter {
 
     private getOutputHeader(): string {
         let header = '';
-        if (this.title) {
-            header += this.title.name + '\n';
+        if (this.projectMetadata.title) {
+            header += this.projectMetadata.title.name + '\n';
         }
-        if (this.author) {
-            header += `by ${this.author.name}\n`;
+        if (this.projectMetadata.author) {
+            header += `by ${this.projectMetadata.author.name}\n`;
         }
         if (header != '') {
             header += '\n\n';

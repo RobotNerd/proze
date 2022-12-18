@@ -14,8 +14,9 @@ enum Tag {
     Title = 'Title',
 }
 
-export interface MetadataInterface {
-    name: string;
+export interface ProjectMetadata {
+    author?: Author;
+    title?: Title;
 }
 
 export class Metadata {
@@ -27,6 +28,9 @@ export class Metadata {
     // Example of a named chapter: "Chapter: My Chapter"
     // Example of a non-named chapter: "Chapter:"
     public hasChapterNames: boolean = false;
+
+    // Global level metadata that applies to the entire project.
+    public projectMetadta: ProjectMetadata = {};
 
     private static patterns = {
         tag: /^(Title|Author|Chapter|Section):/,
@@ -52,12 +56,12 @@ export class Metadata {
         return Metadata.startsWithTag(line) !== null;
     }
 
-    parse(line: Line): MetadataInterface {
+    parse(line: Line): Chapter | Section | null {
         const tag = Metadata.startsWithTag(line);
-        let component: MetadataInterface = { name: '' };
+        let component: Chapter | Section | null = null;
         switch(tag) {
             case Tag.Author:
-                component = this.parseAuthor(line);
+                this.projectMetadta.author = this.parseAuthor(line) as Author;
                 break;
             case Tag.Chapter:
                 component = this.parseChapter(line);
@@ -67,7 +71,7 @@ export class Metadata {
                 component = this.parseSection(line);
                 break;
             case Tag.Title:
-                component = this.parseTitle(line);
+                this.projectMetadta.title = this.parseTitle(line) as Title;
                 break;
             default:
                 CompilerMessages.getInstance().add(
@@ -77,8 +81,8 @@ export class Metadata {
         return component;
     }
 
-    private parseAuthor(line: Line): MetadataInterface {
-        let component: MetadataInterface = { name: '' };
+    private parseAuthor(line: Line): Author | null {
+        let component: Author | null = null;
         const match = line.text.match(Metadata.patterns.content);
         if (match) {
             component = new Author(match[1]);
@@ -94,9 +98,9 @@ export class Metadata {
         return component;
     }
 
-    private parseChapter(line: Line): MetadataInterface {
+    private parseChapter(line: Line): Chapter | null {
         let name = '';
-        let component: MetadataInterface = { name: name };
+        let component: Chapter | null = null;
         const match = line.text.match(Metadata.patterns.content);
         if (match) {
             name = match[1];
@@ -106,9 +110,9 @@ export class Metadata {
         return component;
     }
 
-    private parseSection(line: Line): MetadataInterface {
+    private parseSection(line: Line): Section | null {
         let name = '';
-        let component: MetadataInterface = { name: name };
+        let component: Section | null = null;
         const match = line.text.match(Metadata.patterns.content);
         if (match) {
             name = match[1];
@@ -117,8 +121,8 @@ export class Metadata {
         return component;
     }
 
-    private parseTitle(line: Line): MetadataInterface {
-        let component: MetadataInterface = { name: '' };
+    private parseTitle(line: Line): Title | null {
+        let component: Title | null = null;
         const match = line.text.match(Metadata.patterns.content);
         if (match) {
             component = new Title(match[1]);
@@ -141,6 +145,7 @@ export class Metadata {
     reset() {
         this.chapterNumber = 0;
         this.hasChapterNames = false;
+        this.projectMetadta = {};
     }
 
     private static startsWithTag(line: Line): Tag | null {

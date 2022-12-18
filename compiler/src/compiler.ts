@@ -1,4 +1,3 @@
-import { Author } from './components/author';
 import { Chapter } from './components/chapter';
 import { CompileError } from './util/compile-error';
 import { Component, EmptyComponent } from './components/component';
@@ -7,12 +6,11 @@ import { ProzeFile } from './util/proze-file';
 import { Format, ProzeArgs } from './util/cli-arguments';
 import { Line, LineType } from './components/line';
 import { LineState } from './components/line-state';
-import { Metadata, MetadataInterface } from './components/metadata';
+import { Metadata } from './components/metadata';
 import { Names } from './components/names';
 import { Section } from './components/section';
 import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
-import { Title } from './components/title';
 import { Token } from './components/token';
 import { CompilerMessages } from './util/compiler-messages';
 import { ParseError } from './util/parse-error';
@@ -20,9 +18,7 @@ import { ParseError } from './util/parse-error';
 export class Compiler {
 
     private args: ProzeArgs;
-    private author: Author | null = null;
     private lineState: LineState;
-    private title: Title | null = null;
     private components: Component[] = [];
     private config: ConfigInterface | null = null;
 
@@ -36,7 +32,9 @@ export class Compiler {
         switch(line.lineType) {
             case LineType.metadata:
                 const metadata = Metadata.getInstance().parse(line);
-                this.assignMetadata(metadata);
+                if (metadata) {
+                    this.addMetadataComponent(metadata);
+                }
                 break;
             case LineType.paragraph:
                 this.components.push(new Text(line.text));
@@ -52,19 +50,13 @@ export class Compiler {
         }
     }
 
-    private assignMetadata(metadata: MetadataInterface) {
+    private addMetadataComponent(metadata: Chapter | Section) {
         switch(true) {
-            case metadata instanceof Author:
-                this.author = metadata as Author;
-                break;
             case metadata instanceof Chapter:
                 this.components.push(metadata as Chapter);
                 break;
             case metadata instanceof Section:
                 this.components.push(metadata as Section);
-                break;
-            case metadata instanceof Title:
-                this.title = metadata as Title;
                 break;
         }
     }
@@ -74,7 +66,7 @@ export class Compiler {
         let formatter;
         switch(this.args.format) {
             case Format.text:
-                formatter = new TextFormatter(this.author, this.title, this.components);
+                formatter = new TextFormatter(Metadata.getInstance().projectMetadta, this.components);
                 break;
             default:
                 throw new Error(`unrecognized format: ${this.args.format}`);
