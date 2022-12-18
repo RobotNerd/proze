@@ -33,7 +33,7 @@ export class Compiler {
             case LineType.metadata:
                 const metadata = Metadata.getInstance().parse(line);
                 if (metadata) {
-                    this.assignMetadata(metadata);
+                    this.addMetadataComponent(metadata);
                 }
                 break;
             case LineType.paragraph:
@@ -50,7 +50,7 @@ export class Compiler {
         }
     }
 
-    private assignMetadata(metadata: Chapter | Section) {
+    private addMetadataComponent(metadata: Chapter | Section) {
         switch(true) {
             case metadata instanceof Chapter:
                 this.components.push(metadata as Chapter);
