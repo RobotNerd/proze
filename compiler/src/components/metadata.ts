@@ -23,7 +23,7 @@ export class Metadata {
 
     private static instance: Metadata;
     private chapterNumber: number = 0;
-    
+
     // Set to true if any chapter tag is parsed that has a name.
     // Example of a named chapter: "Chapter: My Chapter"
     // Example of a non-named chapter: "Chapter:"
