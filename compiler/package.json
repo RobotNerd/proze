@@ -32,6 +32,8 @@
     "typescript": "^4.8.2"
   },
   "dependencies": {
+    "@types/pdfmake": "^0.2.8",
+    "pdfmake": "^0.2.8",
     "yaml": "^2.1.3"
   }
 }
