@@ -26,7 +26,7 @@
      showgrid="false"
      showborder="false"
      inkscape:zoom="1"
-     inkscape:cx="455.5"
+     inkscape:cx="455"
      inkscape:cy="475"
      inkscape:window-width="2560"
      inkscape:window-height="1371"
@@ -38,7 +38,8 @@
      inkscape:deskcolor="#505050" /><defs
      id="defs2"><linearGradient
        id="swatch1"
-       inkscape:swatch="solid"><stop
+       inkscape:swatch="solid"
+       inkscape:label="background"><stop
          style="stop-color:#ffffff;stop-opacity:1;"
          offset="0"
          id="stop1" /></linearGradient><linearGradient
