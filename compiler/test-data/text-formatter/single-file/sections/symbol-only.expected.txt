@@ -1,0 +1,16 @@
+My Document
+by Jon Doe
+
+
+Example
+
+This is the text of the first section.
+
+---
+
+This is the text of the next section.
+
+
+Another Example
+
+This chapter does not have any sections.

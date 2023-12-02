@@ -1,0 +1,11 @@
+My Document
+by Jon Doe
+
+
+A named section
+
+This is the text of the first section.
+
+---
+
+This is the text of the next section.
