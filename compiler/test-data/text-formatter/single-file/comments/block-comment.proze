@@ -1,0 +1,17 @@
+Title: Block comments
+
+###
+
+Chapter: Not applicable
+
+This text will be ignored. None of it will be in the compiled text.
+
+###
+
+This line will be in the text.
+The first part of this line will be in the text, ### this won't
+neither with this
+or this, ### and so will this.
+
+
+Present ### not present ### present ### not present###not present### not present.

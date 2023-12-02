@@ -1,0 +1,11 @@
+{
+    "compile": {
+        "order": [
+            "b/",
+            "d.proze",
+            "a.proze",
+            "e/f.proze",
+            "e/e.proze"
+        ]
+    }
+}
