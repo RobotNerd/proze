@@ -1,5 +1,0 @@
----
-compile:
-  order:
-    - b.proze
-    - a.proze
