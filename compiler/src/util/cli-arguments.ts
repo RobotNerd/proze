@@ -1,6 +1,7 @@
 export class ShowHelpError extends Error {}
 
 export enum Format {
+    pdf = "pdf",
     text = "text",
 }
 
@@ -17,6 +18,9 @@ let helpMessage = `Usage: proze compiler
         -h, --help: Show this help message.
         --format: Target format for the generated output file (default: text)
         --path: Path to a proze file or a project directory.
+
+    Available output formats (for use with the --format argument)
+        - [${Object.keys(Format)}]
 `;
 
 export class ArgParser {
@@ -26,7 +30,7 @@ export class ArgParser {
     constructor() {
         this.args = {
             format: Format.text,
-            path: '',
+            path: '.',
         };
     }
 
