@@ -8,6 +8,7 @@ import { Line, LineType } from './components/line';
 import { LineState } from './components/line-state';
 import { Metadata } from './components/metadata';
 import { Names } from './components/names';
+import { PdfFormatter } from './formatters/pdf';
 import { Section } from './components/section';
 import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
@@ -65,6 +66,9 @@ export class Compiler {
         this.parseLines();
         let formatter;
         switch(this.args.format) {
+            case Format.pdf:
+                formatter = new PdfFormatter(Metadata.getInstance().projectMetadta, this.components);
+                break;
             case Format.text:
                 formatter = new TextFormatter(Metadata.getInstance().projectMetadta, this.components);
                 break;

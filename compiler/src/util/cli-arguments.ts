@@ -12,12 +12,12 @@ export interface ProzeArgs {
 
 let helpMessage = `Usage: proze compiler
 
-    proze [--format FORMAT] [--input-string STRING]
+    proze [--format FORMAT] [--path PATH]
     
     Optional arguments:
         -h, --help: Show this help message.
         --format: Target format for the generated output file (default: text)
-        --path: Path to a proze file or a project directory.
+        --path: Path to a proze file or a project directory. Defaults to current directory.
 
     Available output formats (for use with the --format argument)
         - [${Object.keys(Format)}]
