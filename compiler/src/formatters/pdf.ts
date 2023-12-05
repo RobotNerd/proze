@@ -66,19 +66,15 @@ export class PdfFormatter implements Formatter {
         }
     }
 
-    getContent(): string {
+    private generateDoc(): PDFKit.PDFDocument {
         let docDefinition = {
             content: [
-                'First paragraph',
+                'First paragraph UUUUUUUUUUU',
                 'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
             ]
         };
 
         let pdfDoc = this.printer.createPdfKitDocument(docDefinition);
-        pdfDoc.pipe(fs.createWriteStream('/tmp/basics.pdf'));
-        pdfDoc.end();
-
-        return pdfDoc.toString();
 
         // for (let i = 0; i < this.components.length; i++) {
         //     let component = this.components[i];
@@ -104,6 +100,12 @@ export class PdfFormatter implements Formatter {
         //     }
         // }
         // return this.getOutputHeader() + this.content.join('');
+
+        return pdfDoc;
+    }
+
+    getContent(): string {
+        return "WARNING: You need to provide the path to the file name (--file arg) for pdf documents.";
     }
 
     private getOutputHeader(): string {
@@ -131,14 +133,7 @@ export class PdfFormatter implements Formatter {
     }
 
     writeToFile(path: string): void {
-        let docDefinition = {
-            content: [
-                'First paragraph',
-                'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
-            ]
-        };
-
-        let pdfDoc = this.printer.createPdfKitDocument(docDefinition);
+        let pdfDoc: PDFKit.PDFDocument = this.generateDoc();
         pdfDoc.pipe(fs.createWriteStream(path));
         pdfDoc.end();
     }
