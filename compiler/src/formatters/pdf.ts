@@ -6,14 +6,15 @@ import { Text } from '../components/text';
 import { Token } from '../components/token';
 
 import type { Formatter } from './formatter';
+import type { Content, TDocumentDefinitions } from 'pdfmake/interfaces';
 
 import PdfPrinter = require("pdfmake");
 import * as fs from 'fs';
 
 export class PdfFormatter implements Formatter {
 
-    private content: string[] = [];
     private currentTextBlock: string[] = [];
+    private docDefinition: TDocumentDefinitions;
     private isFirstChapter: boolean = true;
     private printer: PdfPrinter;
 
@@ -21,6 +22,26 @@ export class PdfFormatter implements Formatter {
         private projectMetadata: ProjectMetadata,
         private components: Component[]
     ) {
+        this.docDefinition = {
+            content: [],
+            styles: {
+                header: {
+                    fontSize: 18,
+                    bold: true
+                },
+                subheader: {
+                    fontSize: 15,
+                    bold: true
+                },
+                quote: {
+                    italics: true
+                },
+                small: {
+                    fontSize: 8
+                }
+            }
+        };
+
         // TODO default fonts and load font paths from config
         this.printer = new PdfPrinter({
             Roboto: {
@@ -33,15 +54,52 @@ export class PdfFormatter implements Formatter {
     }
 
     private addSection(section: Section) {
-        this.content.push(section.getOutput());
+        (this.docDefinition.content as Content[]).push({
+            text: section.getOutput(),
+            style: 'subheader',
+        });
     }
 
     private addText(text: Text) {
         this.currentTextBlock.push(text.text);
     }
 
+    private addTitle() {
+        if (this.projectMetadata.title) {
+            (this.docDefinition.content as Content[]).push({
+                text: this.projectMetadata.title.name,
+                style: 'header',
+            });
+        }
+
+        if (this.projectMetadata.author) {
+            (this.docDefinition.content as Content[]).push(
+                `by ${this.projectMetadata.author.name}\n`
+            );
+        }
+
+        (this.docDefinition.content as Content[]).push({
+            text: '',
+            pageBreak: 'after',
+        });
+    }
+
+    private addTOC() {
+        (this.docDefinition.content as Content[]).push({
+            toc: {
+                title: {
+                    text: 'Table of Contents',
+                    style: 'header',
+                },
+            }
+        });
+    }
+
     private endChapter() {
-        this.content.push('\n');
+        (this.docDefinition.content as Content[]).push({
+            text: '',
+            pageBreak: 'after',
+        });
     }
 
     private endOfFile(i: number) {
@@ -55,71 +113,50 @@ export class PdfFormatter implements Formatter {
 
     private endParagraph(i: number) {
         if (this.currentTextBlock.length > 0) {
-            this.content.push(this.currentTextBlock.join(' '));
+            (this.docDefinition.content as Content[]).push(this.currentTextBlock.join(' '));
             this.currentTextBlock = [];
         }
         if (this.isLastComponent(i)) {
-            this.content.push('\n');
+            (this.docDefinition.content as Content[]).push('\n');
         }
         else {
-            this.content.push('\n\n');
+            (this.docDefinition.content as Content[]).push('\n\n');
         }
     }
 
     private generateDoc(): PDFKit.PDFDocument {
-        let docDefinition = {
-            content: [
-                'First paragraph UUUUUUUUUUU',
-                'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
-            ]
-        };
+        this.addTitle();
+        this.addTOC();
 
-        let pdfDoc = this.printer.createPdfKitDocument(docDefinition);
+        for (let i = 0; i < this.components.length; i++) {
+            let component = this.components[i];
+            switch (component.token) {
+                case Token.chapter:
+                    if (!this.isFirstChapter) {
+                        this.endChapter();
+                    }
+                    this.startChapter(component as Chapter);
+                    break;
+                case Token.end_paragraph:
+                    this.endParagraph(i);
+                    break;
+                case Token.eof:
+                    this.endOfFile(i);
+                    break;
+                case Token.section:
+                    this.addSection(component as Section);
+                    break;
+                case Token.text:
+                    this.addText(component as Text);
+                    break;
+            }
+        }
 
-        // for (let i = 0; i < this.components.length; i++) {
-        //     let component = this.components[i];
-        //     switch (component.token) {
-        //         case Token.chapter:
-        //             if (!this.isFirstChapter) {
-        //                 this.endChapter();
-        //             }
-        //             this.startChapter(component as Chapter);
-        //             break;
-        //         case Token.end_paragraph:
-        //             this.endParagraph(i);
-        //             break;
-        //         case Token.eof:
-        //             this.endOfFile(i);
-        //             break;
-        //         case Token.section:
-        //             this.addSection(component as Section);
-        //             break;
-        //         case Token.text:
-        //             this.addText(component as Text);
-        //             break;
-        //     }
-        // }
-        // return this.getOutputHeader() + this.content.join('');
-
-        return pdfDoc;
+        return this.printer.createPdfKitDocument(this.docDefinition);
     }
 
     getContent(): string {
         return "WARNING: You need to provide the path to the file name (--file arg) for pdf documents.";
-    }
-
-    private getOutputHeader(): string {
-        let header = '';
-        if (this.projectMetadata.title) {
-            header += this.projectMetadata.title.name + '\n';
-        }
-        if (this.projectMetadata.author) {
-            header += `by ${this.projectMetadata.author.name}\n`;
-        }
-        if (header != '') {
-            header += '\n\n';
-        }
-        return header;
     }
 
     private isLastComponent(i: number) {
@@ -129,7 +166,10 @@ export class PdfFormatter implements Formatter {
 
     private startChapter(chapter: Chapter) {
         this.isFirstChapter = false;
-        this.content.push(chapter.getOutput() + '\n\n');
+        (this.docDefinition.content as Content[]).push({
+            text: chapter.getOutput(),
+            style: 'header',
+        });
     }
 
     writeToFile(path: string): void {
