@@ -15,7 +15,6 @@ export class PdfFormatter implements Formatter {
 
     private currentTextBlock: string[] = [];
     private docDefinition: TDocumentDefinitions;
-    private isFirstChapter: boolean = true;
     private printer: PdfPrinter;
 
     constructor(
@@ -32,12 +31,6 @@ export class PdfFormatter implements Formatter {
                 subheader: {
                     fontSize: 15,
                     bold: true
-                },
-                quote: {
-                    italics: true
-                },
-                small: {
-                    fontSize: 8
                 }
             }
         };
@@ -95,13 +88,6 @@ export class PdfFormatter implements Formatter {
         });
     }
 
-    private endChapter() {
-        (this.docDefinition.content as Content[]).push({
-            text: '',
-            pageBreak: 'after',
-        });
-    }
-
     private endOfFile(i: number) {
         if (this.currentTextBlock.length > 0) {
             // A hanging paragraph can occur when a block comment is started in
@@ -132,9 +118,6 @@ export class PdfFormatter implements Formatter {
             let component = this.components[i];
             switch (component.token) {
                 case Token.chapter:
-                    if (!this.isFirstChapter) {
-                        this.endChapter();
-                    }
                     this.startChapter(component as Chapter);
                     break;
                 case Token.end_paragraph:
@@ -165,10 +148,11 @@ export class PdfFormatter implements Formatter {
     }
 
     private startChapter(chapter: Chapter) {
-        this.isFirstChapter = false;
         (this.docDefinition.content as Content[]).push({
-            text: chapter.getOutput(),
+            pageBreak: 'before',
             style: 'header',
+            text: chapter.getOutput(),
+            tocItem: true,
         });
     }
 
