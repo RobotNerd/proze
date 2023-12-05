@@ -17,6 +17,7 @@ describe('text formatter', () => {
         CompilerMessages.getInstance().reset();
         Metadata.getInstance().reset();
         mockArgs = {
+            file: '',
             format: Format.text,
             path: '',
         };

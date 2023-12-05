@@ -19,6 +19,7 @@ describe('CLI arg parser', () => {
     test('parses format', () => {
         const argParser = new ArgParser();
         let result: ProzeArgs = {
+            file: '',
             format: Format.text,
             path: 'test',
         };
@@ -29,6 +30,7 @@ describe('CLI arg parser', () => {
     test('parses input string', () => {
         const argParser = new ArgParser();
         let result: ProzeArgs = {
+            file: '',
             format: Format.text,
             path: 'test',
         };

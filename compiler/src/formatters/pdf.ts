@@ -5,10 +5,12 @@ import { Section } from '../components/section';
 import { Text } from '../components/text';
 import { Token } from '../components/token';
 
+import type { Formatter } from './formatter';
+
 import PdfPrinter = require("pdfmake");
 import * as fs from 'fs';
 
-export class PdfFormatter {
+export class PdfFormatter implements Formatter {
 
     private content: string[] = [];
     private currentTextBlock: string[] = [];
@@ -64,7 +66,7 @@ export class PdfFormatter {
         }
     }
 
-    getOutput(): PDFKit.PDFDocument {
+    getContent(): string {
         let docDefinition = {
             content: [
                 'First paragraph',
@@ -76,7 +78,7 @@ export class PdfFormatter {
         pdfDoc.pipe(fs.createWriteStream('/tmp/basics.pdf'));
         pdfDoc.end();
 
-        return pdfDoc;
+        return pdfDoc.toString();
 
         // for (let i = 0; i < this.components.length; i++) {
         //     let component = this.components[i];
@@ -126,5 +128,18 @@ export class PdfFormatter {
     private startChapter(chapter: Chapter) {
         this.isFirstChapter = false;
         this.content.push(chapter.getOutput() + '\n\n');
+    }
+
+    writeToFile(path: string): void {
+        let docDefinition = {
+            content: [
+                'First paragraph',
+                'Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines'
+            ]
+        };
+
+        let pdfDoc = this.printer.createPdfKitDocument(docDefinition);
+        pdfDoc.pipe(fs.createWriteStream(path));
+        pdfDoc.end();
     }
 }

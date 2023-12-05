@@ -15,6 +15,7 @@ import { TextFormatter } from './formatters/text';
 import { Token } from './components/token';
 import { CompilerMessages } from './util/compiler-messages';
 import { ParseError } from './util/parse-error';
+import type { Formatter } from './formatters/formatter';
 
 export class Compiler {
 
@@ -64,7 +65,7 @@ export class Compiler {
 
     compile() {
         this.parseLines();
-        let formatter;
+        let formatter: Formatter;
         switch(this.args.format) {
             case Format.pdf:
                 formatter = new PdfFormatter(Metadata.getInstance().projectMetadta, this.components);
@@ -78,7 +79,16 @@ export class Compiler {
         if (CompilerMessages.getInstance().hasErrors()) {
             throw new CompileError('Failed to compile due to parse errors.');
         }
-        return formatter.getOutput();
+
+        if (this.args.file !== '') {
+            let path: string = this.args.file;
+            if (!path.endsWith(`.${this.args.format}`)) {
+                path = `${this.args.file}.${this.args.format}`;
+            }
+            formatter.writeToFile(path);
+            return '';
+        }
+        return formatter.getContent();
     }
 
     private lastActiveComponent(): Component | null {
