@@ -81,14 +81,18 @@ export class Compiler {
         }
 
         if (this.args.file !== '') {
-            let path: string = this.args.file;
-            if (!path.endsWith(`.${this.args.format}`)) {
-                path = `${this.args.file}.${this.args.format}`;
-            }
-            formatter.writeToFile(path);
+            formatter.writeToFile(this.getFilePath());
             return '';
         }
         return formatter.getContent();
+    }
+
+    private getFilePath(): string {
+        let path: string = this.args.file;
+        if (!path.endsWith(`.${this.args.format}`)) {
+            path = `${this.args.file}.${this.args.format}`;
+        }
+        return path;
     }
 
     private lastActiveComponent(): Component | null {
