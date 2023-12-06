@@ -24,10 +24,14 @@ export class PdfFormatter implements Formatter {
         this.docDefinition = {
             pageSize: 'A5',
             content: [],
+            footer: this.formatFooter,
             styles: {
                 author: {
                     alignment: 'center',
                     fontSize: 18,
+                },
+                footer: {
+                    alignment: 'center',
                 },
                 header: {
                     bold: true,
@@ -127,6 +131,16 @@ export class PdfFormatter implements Formatter {
             (this.docDefinition.content as Content[]).push('\n\n');
         }
     }
+
+    private formatFooter(currentPage: number, pageCount: number) {
+        if (currentPage === 1) {
+            return '';
+        }
+        return {
+            text: currentPage.toString() + ' of ' + pageCount,
+            style: 'footer',
+        };
+    };
 
     private generateDoc(): PDFKit.PDFDocument {
         this.addTitle();
