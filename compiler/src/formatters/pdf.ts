@@ -6,7 +6,7 @@ import { Text } from '../components/text';
 import { Token } from '../components/token';
 
 import type { Formatter } from './formatter';
-import type { Content, TDocumentDefinitions } from 'pdfmake/interfaces';
+import type { Content, ContextPageSize, TDocumentDefinitions } from 'pdfmake/interfaces';
 
 import PdfPrinter = require("pdfmake");
 import * as fs from 'fs';
@@ -25,18 +25,26 @@ export class PdfFormatter implements Formatter {
             pageSize: 'A5',
             content: [],
             footer: this.formatFooter,
+            header: (currentPage: number, _pageCount: number, _pageSize: ContextPageSize) => {
+                const title = this.projectMetadata.title ? this.projectMetadata.title.name : '';
+                return this.formatHeader(currentPage, title);
+            },
             styles: {
                 author: {
                     alignment: 'center',
                     fontSize: 18,
                 },
+                chapter: {
+                    bold: true,
+                    fontSize: 18,
+                    margin: [0, 0, 0, 18],
+                },
                 footer: {
                     alignment: 'center',
                 },
                 header: {
-                    bold: true,
-                    fontSize: 18,
-                    margin: [0, 0, 0, 18],
+                    alignment: 'center',
+                    margin: [0, 8, 0, 0],
                 },
                 sectionName: {
                     bold: true,
@@ -104,7 +112,7 @@ export class PdfFormatter implements Formatter {
             toc: {
                 title: {
                     text: 'Table of Contents',
-                    style: 'header',
+                    style: 'chapter',
                 },
             }
         });
@@ -141,6 +149,16 @@ export class PdfFormatter implements Formatter {
             style: 'footer',
         };
     };
+
+    private formatHeader(currentPage: number, title: string): Content {
+        if (currentPage === 1) {
+            return '';
+        }
+        return {
+            text: title,
+            style: 'header',
+        };
+    }
 
     private generateDoc(): PDFKit.PDFDocument {
         this.addTitle();
@@ -182,7 +200,7 @@ export class PdfFormatter implements Formatter {
     private startChapter(chapter: Chapter) {
         (this.docDefinition.content as Content[]).push({
             pageBreak: 'before',
-            style: 'header',
+            style: 'chapter',
             text: chapter.getOutput(),
             tocItem: true,
         });
