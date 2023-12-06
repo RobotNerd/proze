@@ -30,12 +30,18 @@ export class PdfFormatter implements Formatter {
                     fontSize: 18,
                 },
                 header: {
+                    bold: true,
                     fontSize: 18,
-                    bold: true
+                    margin: [0, 0, 0, 18],
                 },
-                subheader: {
-                    fontSize: 15,
-                    bold: true
+                sectionName: {
+                    bold: true,
+                    fontSize: 12,
+                },
+                sectionSymbol: {
+                    alignment: 'center',
+                    bold: true,
+                    fontSize: 12,
                 },
                 title: {
                     alignment: 'center',
@@ -60,7 +66,7 @@ export class PdfFormatter implements Formatter {
     private addSection(section: Section) {
         (this.docDefinition.content as Content[]).push({
             text: section.getOutput(),
-            style: 'subheader',
+            style: section.isNamed() ? 'sectionName' : 'sectionSymbol',
         });
     }
 
