@@ -39,7 +39,7 @@ export class Compiler {
                 }
                 break;
             case LineType.paragraph:
-                this.components.push(new Text(line.text));
+                this.components.push(new Text(line));
                 break;
             case LineType.emptyLine:
                 this.parseEmptyLine();

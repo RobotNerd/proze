@@ -42,7 +42,7 @@ export class TextFormatter implements Formatter {
 
     private endParagraph(i: number) {
         if (this.currentTextBlock.length > 0) {
-            this.content.push(this.currentTextBlock.join(' '));
+            this.content.push(this.currentTextBlock.join(''));
             this.currentTextBlock = [];
         }
         if (this.isLastComponent(i)) {

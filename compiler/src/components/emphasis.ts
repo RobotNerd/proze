@@ -53,7 +53,7 @@ export class Emphasis {
         do {
             index = Markup.findNextToken(text, pattern, requireWhitespaceBefore);
             if (index >= 0) {
-                let parsedText = text.substring(0, index).trim();
+                let parsedText = text.substring(0, index);
                 if (parsedText != '') {
                     let newLine = new Line(parsedText, line.lineNumber);
                     newLine.emphasis = [...line.emphasis];
@@ -63,7 +63,7 @@ export class Emphasis {
                     updatedLines.push(newLine);
                 }
                 blockFlag.value = !blockFlag.value;
-                text = text.substring(index + pattern.length).trim();
+                text = text.substring(index + pattern.length);
             }
             else if (text !== '' || updatedLines.length === 0) {
                 let newLine = new Line(text, line.lineNumber);
@@ -80,5 +80,10 @@ export class Emphasis {
     removeEscapeCharacter(line: Line) {
         Markup.removeEsacpe(line, this.patterns.bold[0]);
         Markup.removeEsacpe(line, this.patterns.italic);
+    }
+
+    reset() {
+        this.inBoldBlock = { value: false };
+        this.inItalicBlock = { value: false };
     }
 }

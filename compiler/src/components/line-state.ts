@@ -53,6 +53,7 @@ export class LineState {
 
     private onEmptyLine(line: Line): Line[] {
         this.inParagraph = false;
+        this.emphasis.reset();
         return [new Line('', line.lineNumber, LineType.emptyLine)];
     }
 

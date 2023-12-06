@@ -1,5 +1,6 @@
 import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
+import { EmphasisType } from '../components/line';
 import { ProjectMetadata } from '../components/metadata';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
@@ -13,7 +14,7 @@ import * as fs from 'fs';
 
 export class PdfFormatter implements Formatter {
 
-    private currentTextBlock: string[] = [];
+    private currentTextBlock: Content[] = [];
     private docDefinition: TDocumentDefinitions;
     private printer: PdfPrinter;
 
@@ -83,7 +84,20 @@ export class PdfFormatter implements Formatter {
     }
 
     private addText(text: Text) {
-        this.currentTextBlock.push(text.text);
+        let style = {
+            bold: false,
+            italics: false,
+        };
+        if (text.emphasis.indexOf(EmphasisType.bold) >= 0) {
+            style.bold = true;
+        }
+        if (text.emphasis.indexOf(EmphasisType.italic) >= 0) {
+            style.italics = true;
+        }
+        this.currentTextBlock.push({
+            text: text.text,
+            style: style,
+        });
     }
 
     private addTitle() {
@@ -129,7 +143,9 @@ export class PdfFormatter implements Formatter {
 
     private endParagraph(i: number) {
         if (this.currentTextBlock.length > 0) {
-            (this.docDefinition.content as Content[]).push(this.currentTextBlock.join(' '));
+            (this.docDefinition.content as Content[]).push({
+                text: this.currentTextBlock
+            });
             this.currentTextBlock = [];
         }
         if (this.isLastComponent(i)) {
