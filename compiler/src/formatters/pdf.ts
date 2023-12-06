@@ -72,7 +72,6 @@ export class PdfFormatter implements Formatter {
         if (this.projectMetadata.title) {
             (this.docDefinition.content as Content[]).push({
                 text: this.projectMetadata.title.name,
-                // margin: [100, 200, 0, 10],
                 style: 'title',
             });
         }
