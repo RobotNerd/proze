@@ -22,8 +22,13 @@ export class PdfFormatter implements Formatter {
         private components: Component[]
     ) {
         this.docDefinition = {
+            pageSize: 'A5',
             content: [],
             styles: {
+                author: {
+                    alignment: 'center',
+                    fontSize: 18,
+                },
                 header: {
                     fontSize: 18,
                     bold: true
@@ -31,7 +36,13 @@ export class PdfFormatter implements Formatter {
                 subheader: {
                     fontSize: 15,
                     bold: true
-                }
+                },
+                title: {
+                    alignment: 'center',
+                    bold: true,
+                    fontSize: 30,
+                    margin: [0, 200, 0, 0],
+                },
             }
         };
 
@@ -61,14 +72,16 @@ export class PdfFormatter implements Formatter {
         if (this.projectMetadata.title) {
             (this.docDefinition.content as Content[]).push({
                 text: this.projectMetadata.title.name,
-                style: 'header',
+                // margin: [100, 200, 0, 10],
+                style: 'title',
             });
         }
 
         if (this.projectMetadata.author) {
-            (this.docDefinition.content as Content[]).push(
-                `by ${this.projectMetadata.author.name}\n`
-            );
+            (this.docDefinition.content as Content[]).push({
+                text: `by ${this.projectMetadata.author.name}\n`,
+                style: 'author',
+        });
         }
 
         (this.docDefinition.content as Content[]).push({
