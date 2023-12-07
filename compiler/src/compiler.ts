@@ -27,7 +27,9 @@ export class Compiler {
     constructor(args: any) {
         this.args = args;
         this.lineState = new LineState();
-        this.config = ConfigParser.load(this.args.path);
+        if (this.args.inputString === '') {
+            this.config = ConfigParser.load(this.args.path);
+        }
     }
     
     private applyLineType(line: Line) {
@@ -64,7 +66,12 @@ export class Compiler {
     }
 
     compile() {
-        this.parseLines();
+        if (this.args.inputString === '') {
+            this.parseLines();
+        }
+        else {
+            this.parseContent(this.args.inputString.split('\n'));
+        }
         let formatter: Formatter;
         switch(this.args.format) {
             case Format.pdf:
@@ -119,18 +126,22 @@ export class Compiler {
         }
     }
 
+    private parseContent(textLines: string[]) {
+        for(let i=0; i < textLines.length; i++) {
+            const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
+            for (let line of updatedLines) {
+                Names.checkForInvalid(line, this.config);
+                this.applyLineType(line);
+            }
+        }
+        this.components.push(new EmptyComponent(Token.eof));
+    }
+
     private parseLines() {
         const prozeFilePaths = ProzeFile.paths(this.args, this.config);
         for (let path of prozeFilePaths) {
             const textLines = ProzeFile.load(path);
-            for(let i=0; i < textLines.length; i++) {
-                const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
-                for (let line of updatedLines) {
-                    Names.checkForInvalid(line, this.config);
-                    this.applyLineType(line);
-                }
-            }
-            this.components.push(new EmptyComponent(Token.eof));
+            this.parseContent(textLines);
         }
     }
 }
