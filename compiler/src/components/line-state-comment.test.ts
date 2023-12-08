@@ -1,305 +1,216 @@
-import { CompilerMessages } from "../util/compiler-messages";
-import { Line } from "./line";
-import { testSingleLine, testMultiLine } from './line-state-test-helper';
+import { ProzeArgs } from '../util/cli-arguments';
+import { TestUtils } from "../util/test-utils";
 
 describe('LineState', () => {
 
+    let mockArgs: ProzeArgs;
+
     beforeEach(() => {
-        CompilerMessages.getInstance().reset();
+        mockArgs = TestUtils.resetCompiler();
+        mockArgs.path = '';
     });
 
     // Line comment
 
     test('strips line comments from the end of a line', () => {
-        testSingleLine(
-            'abc ## XXX',
-            'abc'
-        );
+        mockArgs.inputString = 'abc ## XXX';
+        TestUtils.runTest(mockArgs, 'abc\n');
     });
 
     test('returns nothing if entire line is commented out', () => {
-        testSingleLine('## XXX', []);
+        mockArgs.inputString = '## XXX';
+        TestUtils.runTest(mockArgs, '');
     });
 
     test('does not treat a fully-commented out line mid-paragraph as an empty line', () => {
-        testMultiLine(
-            [
-                'abc',
-                '## ZZZ',
-                'def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc',
+            '## ZZZ',
+            'def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('does not treat a commented out line mid-paragraph as an empty line even with leading whitespace', () => {
-        testMultiLine(
-            [
-                'abc',
-                '   ## ZZZ',
-                'def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc',
+            '   ## ZZZ',
+            'def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes commented line at beginning of paragraph', () => {
-        testMultiLine(
-            [
-                '## ZZZ',
-                'abc',
-                'def',
-            ],
-            [
-                new Line('abc', 1),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            '## ZZZ',
+            'abc',
+            'def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes commented line at beginning of paragraph with leading whitespace', () => {
-        testMultiLine(
-            [
-                '   ## ZZZ',
-                'abc',
-                'def',
-            ],
-            [
-                new Line('abc', 1),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            '   ## ZZZ',
+            'abc',
+            'def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes commented line at end of paragraph', () => {
-        testMultiLine(
-            [
-                'abc',
-                'def',
-                '## ZZZ',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 1),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc',
+            'def',
+            '## ZZZ',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes commented line at beginning of end with leading whitespace', () => {
-        testMultiLine(
-            [
-                'abc',
-                'def',
-                '   ## ZZZ',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 1),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc',
+            'def',
+            '   ## ZZZ',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('returns nothing if entire line is leading whitespace followed by a comment', () => {
-        testSingleLine('     ## XXX', []);
+        mockArgs.inputString = '     ## XXX';
+        TestUtils.runTest(mockArgs, '');
     });
 
     // Comment block
 
     test('strips a comment block from middle of a line', () => {
-        testSingleLine(
-            'abc ### XXX ### def',
-            'abc def'
-        );
+        mockArgs.inputString = 'abc ### XXX ### def';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('strips a comment block from the beginning of a line', () => {
-        testSingleLine(
-            '### XXX ### abc',
-            'abc'
-        );
+        mockArgs.inputString = '### XXX ### abc';
+        TestUtils.runTest(mockArgs, 'abc\n');
     });
 
     test('requires whitespace before block comment if not at beginning of the line', () => {
-        testSingleLine(
-            'abc def### ghi',
-            'abc def### ghi'
-        );
+        mockArgs.inputString = 'abc def### ghi';
+        TestUtils.runTest(mockArgs, 'abc def### ghi\n');
     });
 
     test('strips a comment block from the end of a line', () => {
-        testSingleLine(
-            'abc   ### XXX ###  ',
-            'abc'
-        );
+        mockArgs.inputString = 'abc   ### XXX ###  ';
+        TestUtils.runTest(mockArgs, 'abc\n');
     });
 
     test('strips multiple comment blocks from a line', () => {
-        testSingleLine(
-            'a ### XXX ### b ### XXX ### c',
-            'a b c'
-        );
+        mockArgs.inputString = 'a ### XXX ### b ### XXX ### c';
+        TestUtils.runTest(mockArgs, 'a b c\n');
     });
 
     test('parsed block comments over multiple lines', () => {
-        testMultiLine(
-            [
-                'abc ### XXX',
-                'ZZZ',
-                'XXX ### def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc ### XXX',
+            'ZZZ',
+            'XXX ### def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('does not treat a fully block-commented out line mid-paragraph as an empty line', () => {
-        testMultiLine(
-            [
-                'abc',
-                '### ZZZ ###',
-                'def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc',
+            '### ZZZ ###',
+            'def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('does not treat a block-commented out line mid-paragraph as an empty line even with leading whitespace', () => {
-        testMultiLine(
-            [
-                'abc',
-                '   ### ZZZ ###',
-                'def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc',
+            '   ### ZZZ ###',
+            'def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes block-commented line at beginning of paragraph', () => {
-        testMultiLine(
-            [
-                '### ZZZ ###',
-                'abc',
-                'def',
-            ],
-            [
-                new Line('abc', 1),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            '### ZZZ ###',
+            'abc',
+            'def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes block-commented line at beginning of paragraph with leading whitespace', () => {
-        testMultiLine(
-            [
-                '   ### ZZZ ###',
-                'abc',
-                'def',
-            ],
-            [
-                new Line('abc', 1),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            '   ### ZZZ ###',
+            'abc',
+            'def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes block-commented line at end of paragraph', () => {
-        testMultiLine(
-            [
-                'abc',
-                'def',
-                '### ZZZ ###',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 1),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc',
+            'def',
+            '### ZZZ ###',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes block-commented line at beginning of end with leading whitespace', () => {
-        testMultiLine(
-            [
-                'abc',
-                'def',
-                '   ### ZZZ ###',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 1),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc',
+            'def',
+            '   ### ZZZ ###',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
+    
 
     // Line comment and block comment interaction
 
     test('line comment hides block comments', () => {
-        testMultiLine(
-            [
-                'abc ## XXX ### ZZZ',
-                'def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc ## XXX ### ZZZ',
+            'def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('block comment hides line comment', () => {
-        testSingleLine(
-            'abc ### XXX ## XXX',
-            'abc'
-        );
+        mockArgs.inputString = 'abc ### XXX ## XXX';
+        TestUtils.runTest(mockArgs, 'abc\n');
     });
 
     // Escaped comments
 
     test('ignores an escaped block comment', () => {
-        testSingleLine(
-            'abc \\### def',
-            'abc ### def'
-        );
+        mockArgs.inputString = 'abc \\### def';
+        TestUtils.runTest(mockArgs, 'abc ### def\n');
     });
-
+    
     test('ignores an escaped block inside another block comment', () => {
-        testSingleLine(
-            'abc ### XXX \\### ### def',
-            'abc def'
-        );
+        mockArgs.inputString = 'abc ### XXX \\### ### def';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
-
+    
     test('ignores an escaped line comment', () => {
-        testSingleLine(
-            'abc \\## def',
-            'abc ## def'
-        );
+        mockArgs.inputString = 'abc \\## def';
+        TestUtils.runTest(mockArgs, 'abc ## def\n');
     });
-
+    
     test('ignores an escaped line comment hidden by another line comment', () => {
-        testSingleLine(
-            'abc ## XXX \\## XXX',
-            'abc'
-        );
+        mockArgs.inputString = 'abc ## XXX \\## XXX';
+        TestUtils.runTest(mockArgs, 'abc\n');
     });
-
+    
     test('ignores an escaped block hidden by a line comment', () => {
-        testSingleLine(
-            'abc ## XXX ### XXX ### XXX \\### XXX',
-            'abc'
-        );
+        mockArgs.inputString = 'abc ## XXX ### XXX ### XXX \\### XXX';
+        TestUtils.runTest(mockArgs, 'abc\n');
     });
 });
