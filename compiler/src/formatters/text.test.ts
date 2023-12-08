@@ -19,6 +19,7 @@ describe('text formatter', () => {
         mockArgs = {
             file: '',
             format: Format.text,
+            inputString: '',
             path: '',
         };
     });
