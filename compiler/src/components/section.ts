@@ -11,9 +11,13 @@ export class Section implements Component {
     ) {}
 
     getOutput(): string {
-        if (this.name !== '') {
+        if (this.isNamed()) {
             return this.name;
         }
         return this.symbol;
+    }
+
+    isNamed(): boolean {
+        return this.name !== '';
     }
 }

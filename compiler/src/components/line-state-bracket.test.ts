@@ -1,208 +1,115 @@
 import { CompilerMessages } from "../util/compiler-messages";
 import { Line } from "./line";
 import { LineState } from "./line-state";
-import { testSingleLine, testMultiLine } from './line-state-test-helper';
+import { ProzeArgs } from '../util/cli-arguments';
+import { TestUtils } from "../util/test-utils";
 
 describe('LineState', () => {
 
+    let mockArgs: ProzeArgs;
+
     beforeEach(() => {
-        CompilerMessages.getInstance().reset();
+        mockArgs = TestUtils.resetCompiler();
+        mockArgs.path = '';
     });
 
     test('strips text in a bracket block from the middle of a line', () => {
-        testSingleLine(
-            'abc [XXX] def',
-            'abc def'
-        );
+        mockArgs.inputString = 'abc [XXX] def';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('strips text in a bracket block taking up the entire line', () => {
-        testSingleLine('[XXX]', []);
+        mockArgs.inputString = '[XXX]';
+        TestUtils.runTest(mockArgs, '');
     });
 
     test('strips text in a bracket block from the middle of a line', () => {
-        testSingleLine('[XXX] abc', 'abc');
+        mockArgs.inputString = '[XXX] abc';
+        TestUtils.runTest(mockArgs, 'abc\n');
     });
 
     test('strips text in a bracket block over multiple lines', () => {
-        testMultiLine(
-            [
-                'abc [XXX',
-                'ZZZ',
-                'XXX ] def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = 'abc [XXX\nZZZ\nXXX] def';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes bracketed line mid-paragraph', () => {
-        testMultiLine(
-            [
-                'abc',
-                '[ZZZ]',
-                'def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = 'abc\n[ZZZ]\ndef';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes bracketed line mid-paragraph with leading whitespace', () => {
-        testMultiLine(
-            [
-                'abc',
-                '   [ZZZ]',
-                'def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = 'abc\n   [ZZZ]\ndef';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes bracketed line at beginning of paragraph', () => {
-        testMultiLine(
-            [
-                '[ZZZ]',
-                'abc',
-                'def',
-            ],
-            [
-                new Line('abc', 1),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = '[ZZZ]\nabc\ndef';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes bracketed line at beginning of paragraph with leading whitespace', () => {
-        testMultiLine(
-            [
-                '   [ZZZ]',
-                'abc',
-                'def',
-            ],
-            [
-                new Line('abc', 1),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = '   [ZZZ]\nabc\ndef';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes bracketed line at end of paragraph', () => {
-        testMultiLine(
-            [
-                'abc',
-                'def',
-                '[ZZZ]',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 1),
-            ]
-        );
+        mockArgs.inputString = 'abc\ndef\n[ZZZ]';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('removes bracketed line at end of paragraph with leading whitespace', () => {
-        testMultiLine(
-            [
-                'abc',
-                'def',
-                '   [ZZZ]',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 1),
-            ]
-        );
+        mockArgs.inputString = 'abc\ndef\n   [ZZZ]';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('ignores a bracket block hidden by a line comment', () => {
-        testSingleLine(
-            'abc ## XXX [XXX] XXX',
-            'abc'
-        );
+        mockArgs.inputString = 'abc ## XXX [XXX] XXX';
+        TestUtils.runTest(mockArgs, 'abc\n');
     });
 
     test('ignores a bracket block hidden by a block comment on a single line', () => {
-        testSingleLine(
-            'abc ### XXX [XXX] XXX ### def',
-            'abc def'
-        );
+        mockArgs.inputString = 'abc ### XXX [XXX] XXX ### def';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('ignores a bracket block hidden by a block comment over multiple lines', () => {
-        testMultiLine(
-            [
-                'abc ### XXX [',
-                'ZZZ',
-                ']XXX ### def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 2),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc ### XXX [',
+            'ZZZ',
+            ']XXX ### def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('ignores line and block comments contained within a bracket block', () => {
-        testMultiLine(
-            [
-                'abc [XXX',
-                'ZZZ ### ZZZ',
-                '### YYY',
-                '] def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 3),
-            ]
-        );
+        mockArgs.inputString = [
+            'abc [XXX',
+            'ZZZ ### ZZZ',
+            '### YYY',
+            '] def',
+        ].join('\n');
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('ignores beginning bracket block hidden by a line comment', () => {
-        testMultiLine(
-            [
-                'abc ## XXX [',
-                'def',
-            ],
-            [
-                new Line('abc', 0),
-                new Line('def', 1),
-            ]
-        );
+        mockArgs.inputString = 'abc ## XXX [\ndef';
+        TestUtils.runTest(mockArgs, 'abc def\n');
     });
 
     test('ignores beginning bracket block hidden by a block comment', () => {
-        testMultiLine(
-            [
-                'abc ### XXX [ ### def',
-                'ghi',
-            ],
-            [
-                new Line('abc def', 0),
-                new Line('ghi', 1),
-            ]
-        );
+        mockArgs.inputString = 'abc ### XXX [ ### def\nghi';
+        TestUtils.runTest(mockArgs, 'abc def ghi\n');
     });
 
     test('ignores escaped brackets', () => {
-        testSingleLine(
-            'abc \\[ def \\] ghi',
-            'abc [ def ] ghi'
-        );
+        mockArgs.inputString = 'abc \\[ def \\] ghi';
+        TestUtils.runTest(mockArgs, 'abc [ def ] ghi\n');
     });
 
     test('ignores escaped brackets within a bracket block', () => {
-        testSingleLine(
-            'abc [ XXX \\[ XXX \\] XXX ]',
-            'abc'
-        );
+        mockArgs.inputString = 'abc [ XXX \\[ XXX \\] XXX ]';
+        TestUtils.runTest(mockArgs, 'abc\n');
     });
 
     test('throws compile error on unescaped closing bracket without matching opening bracket', () => {

@@ -5,7 +5,10 @@ import { Section } from '../components/section';
 import { Text } from '../components/text';
 import { Token } from '../components/token';
 
-export class TextFormatter {
+import type { Formatter } from './formatter';
+import * as fs from 'fs';
+
+export class TextFormatter implements Formatter {
 
     private content: string[] = [];
     private currentTextBlock: string[] = [];
@@ -39,7 +42,7 @@ export class TextFormatter {
 
     private endParagraph(i: number) {
         if (this.currentTextBlock.length > 0) {
-            this.content.push(this.currentTextBlock.join(' '));
+            this.content.push(this.currentTextBlock.join('').trim());
             this.currentTextBlock = [];
         }
         if (this.isLastComponent(i)) {
@@ -50,7 +53,7 @@ export class TextFormatter {
         }
     }
 
-    getOutput(): string {
+    private generateContent(): string {
         for (let i=0; i < this.components.length; i++) {
             let component = this.components[i];
             switch(component.token) {
@@ -77,6 +80,10 @@ export class TextFormatter {
         return this.getOutputHeader() + this.content.join('');
     }
 
+    getContent(): string {
+        return this.generateContent();
+    }
+
     private getOutputHeader(): string {
         let header = '';
         if (this.projectMetadata.title) {
@@ -99,5 +106,10 @@ export class TextFormatter {
     private startChapter(chapter: Chapter) {
         this.isFirstChapter = false;
         this.content.push(chapter.getOutput() + '\n\n');
+    }
+
+    writeToFile(path: string): void {
+        let content: string = this.generateContent();
+        fs.writeFileSync(path, content);
     }
 }

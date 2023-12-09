@@ -8,12 +8,14 @@ import { Line, LineType } from './components/line';
 import { LineState } from './components/line-state';
 import { Metadata } from './components/metadata';
 import { Names } from './components/names';
+import { PdfFormatter } from './formatters/pdf';
 import { Section } from './components/section';
 import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
 import { Token } from './components/token';
 import { CompilerMessages } from './util/compiler-messages';
 import { ParseError } from './util/parse-error';
+import type { Formatter } from './formatters/formatter';
 
 export class Compiler {
 
@@ -25,7 +27,9 @@ export class Compiler {
     constructor(args: any) {
         this.args = args;
         this.lineState = new LineState();
-        this.config = ConfigParser.load(this.args.path);
+        if (this.args.inputString === '') {
+            this.config = ConfigParser.load(this.args.path);
+        }
     }
     
     private applyLineType(line: Line) {
@@ -37,7 +41,7 @@ export class Compiler {
                 }
                 break;
             case LineType.paragraph:
-                this.components.push(new Text(line.text));
+                this.components.push(new Text(line));
                 break;
             case LineType.emptyLine:
                 this.parseEmptyLine();
@@ -62,9 +66,17 @@ export class Compiler {
     }
 
     compile() {
-        this.parseLines();
-        let formatter;
+        if (this.args.inputString === '') {
+            this.parseLines();
+        }
+        else {
+            this.parseContent(this.args.inputString.split('\n'));
+        }
+        let formatter: Formatter;
         switch(this.args.format) {
+            case Format.pdf:
+                formatter = new PdfFormatter(Metadata.getInstance().projectMetadta, this.components);
+                break;
             case Format.text:
                 formatter = new TextFormatter(Metadata.getInstance().projectMetadta, this.components);
                 break;
@@ -74,7 +86,20 @@ export class Compiler {
         if (CompilerMessages.getInstance().hasErrors()) {
             throw new CompileError('Failed to compile due to parse errors.');
         }
-        return formatter.getOutput();
+
+        if (this.args.file !== '') {
+            formatter.writeToFile(this.getFilePath());
+            return '';
+        }
+        return formatter.getContent();
+    }
+
+    private getFilePath(): string {
+        let path: string = this.args.file;
+        if (!path.endsWith(`.${this.args.format}`)) {
+            path = `${this.args.file}.${this.args.format}`;
+        }
+        return path;
     }
 
     private lastActiveComponent(): Component | null {
@@ -101,18 +126,22 @@ export class Compiler {
         }
     }
 
+    private parseContent(textLines: string[]) {
+        for(let i=0; i < textLines.length; i++) {
+            const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
+            for (let line of updatedLines) {
+                Names.checkForInvalid(line, this.config);
+                this.applyLineType(line);
+            }
+        }
+        this.components.push(new EmptyComponent(Token.eof));
+    }
+
     private parseLines() {
         const prozeFilePaths = ProzeFile.paths(this.args, this.config);
         for (let path of prozeFilePaths) {
             const textLines = ProzeFile.load(path);
-            for(let i=0; i < textLines.length; i++) {
-                const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
-                for (let line of updatedLines) {
-                    Names.checkForInvalid(line, this.config);
-                    this.applyLineType(line);
-                }
-            }
-            this.components.push(new EmptyComponent(Token.eof));
+            this.parseContent(textLines);
         }
     }
 }

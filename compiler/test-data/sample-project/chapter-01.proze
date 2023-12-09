@@ -1,0 +1,21 @@
+Chapter: An Unwelcome Arrival
+
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Nullam justo odio, varius in accumsan vitae, imperdiet a erat.
+Vivamus feugiat, sem eu luctus ullamcorper, orci augue venenatis libero,
+## This line will be ignored in the output.
+nec volutpat tellus libero eget ipsum.
+Nullam maximus lacinia tempus.
+Nunc ipsum nibh, auctor maximus rhoncus id, elementum sit amet dolor.
+Fusce hendrerit finibus tortor in mattis. Ut eget tellus at erat accumsan gravida.
+Aliquam finibus [NOTE text in brackets is ignored] ullamcorper tempus.
+Suspendisse at massa et arcu pulvinar auctor.
+Nunc luctus dapibus gravida. Praesent eu aliquet est.
+Integer eget leo velit.
+Praesent eu placerat est.
+
+###
+Multiple lines can be commented out.
+Just used the triple-# symbol.
+###

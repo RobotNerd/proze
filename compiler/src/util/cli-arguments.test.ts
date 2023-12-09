@@ -19,7 +19,9 @@ describe('CLI arg parser', () => {
     test('parses format', () => {
         const argParser = new ArgParser();
         let result: ProzeArgs = {
+            file: '',
             format: Format.text,
+            inputString: '',
             path: 'test',
         };
         expect(argParser.parseArgs(['--format', 'text', '--path', 'test'])).toEqual(result);
@@ -29,7 +31,9 @@ describe('CLI arg parser', () => {
     test('parses input string', () => {
         const argParser = new ArgParser();
         let result: ProzeArgs = {
+            file: '',
             format: Format.text,
+            inputString: '',
             path: 'test',
         };
         expect(argParser.parseArgs(

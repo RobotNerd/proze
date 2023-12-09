@@ -53,6 +53,7 @@ export class LineState {
 
     private onEmptyLine(line: Line): Line[] {
         this.inParagraph = false;
+        this.emphasis.reset();
         return [new Line('', line.lineNumber, LineType.emptyLine)];
     }
 
@@ -67,7 +68,7 @@ export class LineState {
         this.inParagraph = true;
         let updatedLines = this.applyEmphasis(strippedLine);
         for (let updatedLine of updatedLines) {
-            updatedLine.lineType = LineType.paragraph
+            updatedLine.lineType = LineType.paragraph;
             this.strip.escapeCharacter(updatedLine);
             this.emphasis.removeEscapeCharacter(updatedLine);
         }
@@ -90,6 +91,9 @@ export class LineState {
         }
         else {
             updatedLines = this.onText(strippedLine);
+
+            // Add single space to join text separated only by '\n' into a single paragraph.
+            updatedLines.push(new Line(' ', line.lineNumber, LineType.paragraph));
         }
         return updatedLines;
     }

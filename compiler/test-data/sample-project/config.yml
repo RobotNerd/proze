@@ -1,0 +1,8 @@
+---
+compile:
+  order:
+    - title.proze
+    - prologue.proze
+    - chapter-01.proze
+    - chapter-02.proze
+    - chapter-03.proze

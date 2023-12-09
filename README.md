@@ -22,6 +22,10 @@ If you're interested in developing your own compiler or editor plugin for proze,
 read through the [technical specification](./doc/technical-specification.md).
 There you'll find the gritty details of the proze format.
 
+## Using the compiler
+
+Read the [compiler instructions](./doc/compiler.md);
+
 ## Supported editors
 
 These editors have plugins that support syntax highlighting proze.
