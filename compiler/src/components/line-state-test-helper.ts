@@ -28,10 +28,6 @@ export function testMultiLine(given: string[], results: Line[]) {
         const line = new Line(given[i], i);
         newLines = newLines.concat(lineState.update(line));
     }
-    console.log('NEWLINES');
-    console.log(newLines);
-    console.log('\nRESULTS');
-    console.log(results);
     expect(newLines.length).toBe(results.length);
     for (let i=0; i < results.length; i++) {
         expect(newLines[i].text).toBe(results[i].text);
