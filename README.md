@@ -9,7 +9,7 @@ writing stories.
 
 How does it work?
 - Write your story in plain text using the proze format.
-- Use a supported text editor to get syntax highlighting.
+- Use a [supported text editor](#supported-editors) to get syntax highlighting.
 - Compile your project into a target format (PDF, Word doc, etc).
 - Profit!
 
@@ -24,13 +24,14 @@ There you'll find the gritty details of the proze format.
 
 ## Using the compiler
 
-Read the [compiler instructions](./doc/compiler.md);
+Read the [compiler instructions](./doc/compiler.md).
 
 ## Supported editors
 
 These editors have plugins that support syntax highlighting proze.
 
 - [vim](https://github.com/RobotNerd/proze-english-vim)
+- [Visual Studio Code](https://github.com/RobotNerd/proze-vscode)
 
 ## Acknowledgements
 
