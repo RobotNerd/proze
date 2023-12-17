@@ -1,88 +1,101 @@
-## Headers
+# Header tags
 
-Tags are used to define document metadata.
+Header tags are used to define titles and subtitles in the document.
 
-General rules:
-- Tags must be left-justified.
-- A tag must be on its own line.
-- Multiple tags can be grouped together on contiguous lines,
-  but they should be separated from paragraphs by a blank line.
+Example:
 
-> TODO Consider allowing multiple titles per project. For example,
->      an anthology of short stories would have a title and author
->      for each story. Be smart enough to treat the title tag the
->      same as a chapter in this scenario.
-
-Metadata tags:
-- Title
-  - The tag `Title:` followed by the title of the work.
-  - There can be only one title per project.
-  - The title should be in the very first document in the config
-    file (see [Configuration: project compilation configuration](#configuration-project-compilation-configuration)).
-  - The title should be on the first line of the file in which it is located.
-  - All text between the `Title:` tag and a line break is recognized
-    as the title of the project.
-- Chapter
-  - The tag `Chapter:` acts the same as `Title:` unless otherwise noted.
-  - There can be multiple chapter tags per project.
-  - All text between the `Chapter:` tag and a line break is recognized
-    as the title of the project.
-    - Adding a chapter title is optional. In other words, a line with
-      only the text `Chapter:` will act as a chapter break.
-- Author
-  - The tag `Author:` must be followed by the name of the writer.
-  - Author tags can be placed immediately after title, chapter, or section tags.
-- Section
-  - The tag `Section:` acts the same as `Chapter:` unless otherwise noted.
-  - Sections occur within a chapter.
-  - Including a section name is optional.
-  - A chapter can contain multiple sections.
-  - At least one blank line must be placed before the section tag, and
-    at least one blank line must be placed after it.
-- Section break
-  - The tag `---` is a shortcut for a section tag without a title.
-
-An example title:
-
-```
+```proze
 Title: A Windy Day
 Author: Mary Sue
 
 
+Chapter: Leaves
+
 It was a bright and windy day. The sun shone down on the grassy field...
 ```
 
-An example chapter:
+## Title
 
-```
-Chapter: Leaves
+Use this to set the title for your story. There can only be one title per project.
 
-
-A gust of wind brushed past a pile of autumn leaves, kicking them up...
-```
-
-An example section, with a title:
-
-```
-...causing the doors to swing shut.
-
-
-Section: Inside
-
-
-The barren limbs of a sapling brushed against the glass, echoing in the...
+```proze
+Title: My Story
 ```
 
-Alternatively, a section break (no title) example:
+## Author
 
+Use this to set the name of the story author.
+
+```proze
+Author: John Doe
 ```
-...the fire burned out during the long, cold night.
 
+## Chapter
 
+Use this to start a new chapter. You can have multiple chapters in a proze project.
+
+Chapter titles are optional. Here's an example of a chapter with a title.
+
+```proze
+Chapter: My Chapter
+
+It was a bright and windy day. The sun shone down on the grassy field...
+```
+
+Here's an example of a chapter without a title.
+
+```proze
+Chapter:
+
+It was a bright and windy day. The sun shone down on the grassy field...
+```
+
+If you don't include a chapter title, the compile will generate a numbered chapter, e.g. `Chapter 3`.
+
+## Section
+
+Sections are used to break up a chapter into parts. Section titles are optional.
+
+```proze
+Section: A section
+```
+
+A section without a title.
+
+```proze
+Section:
+```
+
+Another way to write a section without a title.
+
+```proze
 ---
-
-
-The morning brought frost-covered grass on the lawn under a cold sky...
 ```
+
+The compiler will use the section title in the output document. If you don't include a title, then the compiler will insert `---` between paragraphs.
+
+
+## Things to watch out for
+
+Header tags must be left-justified (i.e. no space to the left) and on a line by themselves.
+
+```proze
+Title: This is a valid title
+
+   Title: But this is not a valid title
+```
+
+There needs to be at least one blank line between a header tag and the paragraphs of the story. You can group header tags together without blank lines.
+
+
+```proze
+Title: Valid title and author tags
+Author: Mary Sue
+
+
+Title: Not a valid title
+It was a bright and windy day. The sun shone down on the grassy field...
+```
+
 
 [Previous: Formatting](./formatting.md) | [Proze Language](./proze-language.md) | [Next: Commnets](./comments.md)
