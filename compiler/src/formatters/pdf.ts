@@ -155,12 +155,6 @@ export class PdfFormatter implements Formatter {
             });
             this.currentTextBlock = [];
         }
-        if (this.isLastComponent(i)) {
-            (this.docDefinition.content as Content[]).push('\n');
-        }
-        else {
-            (this.docDefinition.content as Content[]).push('\n\n');
-        }
     }
 
     private formatFooter(currentPage: number, pageCount: number) {
