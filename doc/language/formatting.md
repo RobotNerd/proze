@@ -1,19 +1,34 @@
 # Formatting
 
-## Bold and Italic
+Proze supports simple markup that you can use for formatting your story.
 
-- Text placed between a pair of `*` characters is *italicized*.
-  - The italicized block ends at the second `*`.
-  - If no closing `*` is found, the italicized block ends at the
-    next blank line.
-- Text placed between pairs of double underscores `__` is __bold__.
-  - The bold block ends at the second `__`.
-  - If no closing `__` is found, the bold block ends at the next
-    blank line.
+## Bold
+
+Text can be formatted as bold by using a pair of `__` characters.
+
+Example
+
+```proze
+Everything between __the double underscores__ will be shown in __bold__.
+```
+
+If you forget to include the second `__`, then the bold formatting will automatically end at the next blank line.
+
+## Italic
+
+Text can be formatted as italic by using a pair of `*` characters.
+
+Example
+
+```proze
+Everything between *the asterisks* will be shown in *italic*.
+```
+
+If you forget to include the second `*`, then the italic formatting will automatically end at the next blank line.
 
 ## Em Dash
 
-- The [Em Dash](https://en.wikipedia.org/wiki/Dash#Em_dash) is represented
-  by two contiguous hyphens `--` within a paragraph.
+Use two contiguous hyphens `--` for an [Em Dash](https://en.wikipedia.org/wiki/Dash#Em_dash).
+
 
 [Previous: Dialogue](./dialogue.md) | [Proze Language](./proze-language.md) | [Next: Headers](./headers.md)
