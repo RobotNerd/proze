@@ -15,7 +15,7 @@ These documents describe the proze language format.
 - [Files](./files.md)
 - [Configuration file](./config.md)
   - [Config: Special Names](./config-names.md)
-  - [Config: Compile Order](./config-compile-order.md)
+  - [Config: Compiler Settings](./config-compiler.md)
 - [Syntax Highlighting](./syntax-highlighting.md)
 
 [Next: Paragraphs](./paragraphs.md)

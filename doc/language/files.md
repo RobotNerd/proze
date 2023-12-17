@@ -1,4 +1,3 @@
-
 ## File extension
 
 Proze files are UTF-8 and use the file extension `.proze`.

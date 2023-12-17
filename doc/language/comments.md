@@ -109,7 +109,6 @@ Compiles to this.
 This is not### a valid block comment.
 ```
 
-
 ## What if I want `##` or `###` in my document?
 
 If you want to include `##` or `###` in your compiled document, just add a backslash `\` before the comment characters.
