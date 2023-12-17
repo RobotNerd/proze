@@ -9,28 +9,25 @@ writing stories.
 
 How does it work?
 - Write your story in plain text using the proze format.
-- Use a supported text editor to get syntax highlighting.
+- Use a [supported text editor](#supported-editors) to get syntax highlighting.
 - Compile your project into a target format (PDF, Word doc, etc).
 - Profit!
 
 ## Where do I get started?
 
-The easist path is to go through the [tutorial](./doc/tutorial.md). It walks you
-through every step of setting up proze to compiling a project for publishing.
-
-If you're interested in developing your own compiler or editor plugin for proze,
-read through the [technical specification](./doc/technical-specification.md).
-There you'll find the gritty details of the proze format.
+Read the [Proze Language Guide](./doc/language/proze-language.md). It details
+the language syntax with examples on how to use it.
 
 ## Using the compiler
 
-Read the [compiler instructions](./doc/compiler.md);
+Read the [compiler instructions](./doc/compiler.md).
 
 ## Supported editors
 
 These editors have plugins that support syntax highlighting proze.
 
 - [vim](https://github.com/RobotNerd/proze-english-vim)
+- [Visual Studio Code](https://github.com/RobotNerd/proze-vscode)
 
 ## Acknowledgements
 
