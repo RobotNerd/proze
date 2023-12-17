@@ -12,4 +12,4 @@ One of the benefits of proze is syntax highlighting. This requires using a [text
 - Special names
 
 
-[Previous: Configuration Compile Order](./config-compile-order.md) | [Proze Language](./proze-language.md)()
+[Previous: Compiler Configuration](./config-compiler.md) | [Proze Language](./proze-language.md)
