@@ -52,11 +52,13 @@ export class PdfFormatter implements Formatter {
                 sectionName: {
                     bold: true,
                     fontSize: 12,
+                    margin: [0, 10, 0, 10],
                 },
                 sectionSymbol: {
                     alignment: 'center',
                     bold: true,
                     fontSize: 12,
+                    margin: [0, 10, 0, 10],
                 },
                 title: {
                     alignment: 'center',
