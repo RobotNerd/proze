@@ -4,6 +4,7 @@ import YAML from 'yaml';
 
 export interface ConfigCompilerOptionsInterface {
     order?: string[];
+    indent?: boolean;
 }
 
 export interface ConfigNames {
@@ -13,6 +14,12 @@ export interface ConfigNames {
 export interface ConfigInterface {
     names?: ConfigNames;
     compile?: ConfigCompilerOptionsInterface;
+}
+
+const DefaultConfig: ConfigInterface = {
+    compile: {
+        indent: true,
+    },
 }
 
 export class ConfigParser {
@@ -83,7 +90,18 @@ export class ConfigParser {
                     break;
             }
         }
+        config = this.mergeDefault(config as ConfigInterface);
         ConfigParser.buildFilePaths(config, path);
+        return config;
+    }
+
+    static mergeDefault(config: ConfigInterface): ConfigInterface {
+        if (!config.compile) {
+            config.compile = DefaultConfig.compile;
+        }
+        else if (config.compile.indent === undefined) {
+            config.compile.indent = DefaultConfig.compile?.indent;
+        }
         return config;
     }
 
