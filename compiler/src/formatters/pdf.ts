@@ -1,5 +1,6 @@
 import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
+import { ConfigInterface } from '../util/config';
 import { EmphasisType } from '../components/line';
 import { ProjectMetadata } from '../components/metadata';
 import { Section } from '../components/section';
@@ -7,10 +8,12 @@ import { Text } from '../components/text';
 import { Token } from '../components/token';
 
 import type { Formatter } from './formatter';
-import type { Content, ContextPageSize, TDocumentDefinitions } from 'pdfmake/interfaces';
+import type { Content, ContextPageSize, Margins, TDocumentDefinitions } from 'pdfmake/interfaces';
 
 import PdfPrinter = require("pdfmake");
 import * as fs from 'fs';
+
+const LeadingWhitespace = "      ";
 
 export class PdfFormatter implements Formatter {
 
@@ -20,7 +23,8 @@ export class PdfFormatter implements Formatter {
 
     constructor(
         private projectMetadata: ProjectMetadata,
-        private components: Component[]
+        private components: Component[],
+        private config: ConfigInterface | null
     ) {
         this.docDefinition = {
             pageSize: 'A5',
@@ -50,11 +54,13 @@ export class PdfFormatter implements Formatter {
                 sectionName: {
                     bold: true,
                     fontSize: 12,
+                    margin: this.sectionMargin(),
                 },
                 sectionSymbol: {
                     alignment: 'center',
                     bold: true,
                     fontSize: 12,
+                    margin: this.sectionMargin(),
                 },
                 title: {
                     alignment: 'center',
@@ -74,6 +80,22 @@ export class PdfFormatter implements Formatter {
                 bolditalics: '/tmp/fonts/Roboto-MediumItalic.ttf'
             }
         });
+    }
+
+    private sectionMargin(): Margins {
+        if (this.config?.compile?.indent) {
+            return [0, 10, 0, 10];
+        }
+        return 0;
+    }
+
+    private addLeadingWhitesapace() {
+        if (this.config?.compile?.indent) {
+            this.currentTextBlock.unshift({
+                text: LeadingWhitespace,
+                style: { preserveLeadingSpaces: true },
+            });
+        }
     }
 
     private addSection(section: Section) {
@@ -143,15 +165,13 @@ export class PdfFormatter implements Formatter {
 
     private endParagraph(i: number) {
         if (this.currentTextBlock.length > 0) {
+            this.addLeadingWhitesapace();
             (this.docDefinition.content as Content[]).push({
                 text: this.currentTextBlock
             });
             this.currentTextBlock = [];
         }
-        if (this.isLastComponent(i)) {
-            (this.docDefinition.content as Content[]).push('\n');
-        }
-        else {
+        if (!this.config?.compile?.indent) {
             (this.docDefinition.content as Content[]).push('\n\n');
         }
     }

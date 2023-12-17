@@ -75,7 +75,10 @@ export class Compiler {
         let formatter: Formatter;
         switch(this.args.format) {
             case Format.pdf:
-                formatter = new PdfFormatter(Metadata.getInstance().projectMetadta, this.components);
+                formatter = new PdfFormatter(
+                    Metadata.getInstance().projectMetadta,
+                    this.components,
+                    this.config);
                 break;
             case Format.text:
                 formatter = new TextFormatter(Metadata.getInstance().projectMetadta, this.components);
