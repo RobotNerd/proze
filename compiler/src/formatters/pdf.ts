@@ -12,6 +12,8 @@ import type { Content, ContextPageSize, TDocumentDefinitions } from 'pdfmake/int
 import PdfPrinter = require("pdfmake");
 import * as fs from 'fs';
 
+const LEADING_WHITESPACE = "      ";
+
 export class PdfFormatter implements Formatter {
 
     private currentTextBlock: Content[] = [];
@@ -143,6 +145,11 @@ export class PdfFormatter implements Formatter {
 
     private endParagraph(i: number) {
         if (this.currentTextBlock.length > 0) {
+            // Add the leading tab at the beginning of the paragraph.
+            this.currentTextBlock.unshift({
+                text: LEADING_WHITESPACE,
+                style: { preserveLeadingSpaces: true },
+            });
             (this.docDefinition.content as Content[]).push({
                 text: this.currentTextBlock
             });
