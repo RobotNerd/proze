@@ -78,6 +78,13 @@ export class PdfFormatter implements Formatter {
         });
     }
 
+    private addLeadingWhitesapace() {
+        this.currentTextBlock.unshift({
+            text: LEADING_WHITESPACE,
+            style: { preserveLeadingSpaces: true },
+        });
+    }
+
     private addSection(section: Section) {
         (this.docDefinition.content as Content[]).push({
             text: section.getOutput(),
@@ -145,11 +152,7 @@ export class PdfFormatter implements Formatter {
 
     private endParagraph(i: number) {
         if (this.currentTextBlock.length > 0) {
-            // Add the leading tab at the beginning of the paragraph.
-            this.currentTextBlock.unshift({
-                text: LEADING_WHITESPACE,
-                style: { preserveLeadingSpaces: true },
-            });
+            this.addLeadingWhitesapace();
             (this.docDefinition.content as Content[]).push({
                 text: this.currentTextBlock
             });
