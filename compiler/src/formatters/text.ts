@@ -21,7 +21,7 @@ export class TextFormatter implements Formatter {
     ) {}
 
     private addEmDash(emdash: EmDash) {
-        this.content.push(emdash.toString());
+        this.currentTextBlock.push(emdash.toString());
     }
 
     private addSection(section: Section) {

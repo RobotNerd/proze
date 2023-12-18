@@ -96,6 +96,9 @@ export class ConfigParser {
     }
 
     static mergeDefault(config: ConfigInterface): ConfigInterface {
+        if (!config) {
+            return DefaultConfig;
+        }
         if (!config.compile) {
             config.compile = DefaultConfig.compile;
         }

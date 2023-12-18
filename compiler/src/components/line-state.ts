@@ -70,7 +70,7 @@ export class LineState {
         let updatedLines = this.applyEmphasis(strippedLine);
         updatedLines = EmDashParser.parse(updatedLines);
         for (let updatedLine of updatedLines) {
-            if (updatedLine.lineType == LineType.unknown) {
+            if (updatedLine.lineType === LineType.unknown) {
                 updatedLine.lineType = LineType.paragraph;
             }
             this.strip.escapeCharacter(updatedLine);

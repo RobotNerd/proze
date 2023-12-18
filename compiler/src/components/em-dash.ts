@@ -12,7 +12,9 @@ export class EmDashParser {
     for (let line of lines) {
       let splitText = line.text.split(EmDashProze);
       for (let i=0; i < splitText.length; i++) {
-        updatedLines.push(new Line(splitText[i], line.lineNumber, line.lineType));
+        let newLine = new Line(splitText[i], line.lineNumber, line.lineType);
+        newLine.emphasis = line.emphasis;
+        updatedLines.push(newLine);
         if (i < splitText.length - 1) {
           updatedLines.push(new Line(EmDashProze, line.lineNumber, LineType.emdash));
         }
