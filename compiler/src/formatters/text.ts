@@ -1,5 +1,6 @@
 import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
+import { EmDash } from '../components/em-dash';
 import { ProjectMetadata } from '../components/metadata';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
@@ -18,6 +19,10 @@ export class TextFormatter implements Formatter {
         private projectMetadata: ProjectMetadata,
         private components: Component[]
     ) {}
+
+    private addEmDash(emdash: EmDash) {
+        this.currentTextBlock.push(emdash.toString());
+    }
 
     private addSection(section: Section) {
         this.content.push(section.getOutput());
@@ -62,6 +67,9 @@ export class TextFormatter implements Formatter {
                         this.endChapter();
                     }
                     this.startChapter(component as Chapter);
+                    break;
+                case Token.emdash:
+                    this.addEmDash((component as EmDash));
                     break;
                 case Token.end_paragraph:
                     this.endParagraph(i);

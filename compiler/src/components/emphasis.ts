@@ -1,4 +1,4 @@
-import { Line, EmphasisType, LineType } from "./line";
+import { Line, EmphasisType } from "./line";
 import { Markup } from "../util/markup";
 
 interface BooleanReference {

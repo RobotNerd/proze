@@ -12,6 +12,7 @@ import type { Content, ContextPageSize, Margins, TDocumentDefinitions } from 'pd
 
 import PdfPrinter = require("pdfmake");
 import * as fs from 'fs';
+import { EmDash } from '../components/em-dash';
 
 const LeadingWhitespace = "      ";
 
@@ -87,6 +88,12 @@ export class PdfFormatter implements Formatter {
             return [0, 10, 0, 10];
         }
         return 0;
+    }
+
+    private addEmDash(emdash: EmDash) {
+        this.currentTextBlock.push({
+            text: emdash.toUnicode(),
+        });
     }
 
     private addLeadingWhitesapace() {
@@ -206,6 +213,9 @@ export class PdfFormatter implements Formatter {
                 case Token.chapter:
                     this.startChapter(component as Chapter);
                     break;
+                case Token.emdash:
+                    this.addEmDash((component as EmDash));
+                    break;
                 case Token.end_paragraph:
                     this.endParagraph(i);
                     break;
@@ -226,11 +236,6 @@ export class PdfFormatter implements Formatter {
 
     getContent(): string {
         return "WARNING: You need to provide the path to the file name (--file arg) for pdf documents.";
-    }
-
-    private isLastComponent(i: number) {
-        return (i == this.components.length - 1) ||
-            (i == this.components.length - 2 && this.components[i + 1].token == Token.eof);
     }
 
     private startChapter(chapter: Chapter) {

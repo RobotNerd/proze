@@ -1,4 +1,5 @@
 export enum LineType {
+    emdash = 'emdash',
     emptyLine = 'emptyLine',
     metadata = 'metadata',
     paragraph = 'paragraph',

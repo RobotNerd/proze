@@ -1,3 +1,4 @@
+import { EmDashParser } from "./em-dash";
 import { Emphasis } from "./emphasis";
 import { Line, LineType } from "./line";
 import { Metadata } from "./metadata";
@@ -67,8 +68,11 @@ export class LineState {
     private onText(strippedLine: Line): Line[] {
         this.inParagraph = true;
         let updatedLines = this.applyEmphasis(strippedLine);
+        updatedLines = EmDashParser.parse(updatedLines);
         for (let updatedLine of updatedLines) {
-            updatedLine.lineType = LineType.paragraph;
+            if (updatedLine.lineType === LineType.unknown) {
+                updatedLine.lineType = LineType.paragraph;
+            }
             this.strip.escapeCharacter(updatedLine);
             this.emphasis.removeEscapeCharacter(updatedLine);
         }

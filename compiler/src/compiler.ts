@@ -1,21 +1,22 @@
+import type { Formatter } from './formatters/formatter';
 import { Chapter } from './components/chapter';
 import { CompileError } from './util/compile-error';
+import { CompilerMessages } from './util/compiler-messages';
 import { Component, EmptyComponent } from './components/component';
 import { ConfigInterface, ConfigParser } from './util/config';
-import { ProzeFile } from './util/proze-file';
+import { EmDash } from './components/em-dash';
 import { Format, ProzeArgs } from './util/cli-arguments';
 import { Line, LineType } from './components/line';
 import { LineState } from './components/line-state';
 import { Metadata } from './components/metadata';
 import { Names } from './components/names';
+import { ParseError } from './util/parse-error';
 import { PdfFormatter } from './formatters/pdf';
+import { ProzeFile } from './util/proze-file';
 import { Section } from './components/section';
 import { Text } from './components/text';
 import { TextFormatter } from './formatters/text';
 import { Token } from './components/token';
-import { CompilerMessages } from './util/compiler-messages';
-import { ParseError } from './util/parse-error';
-import type { Formatter } from './formatters/formatter';
 
 export class Compiler {
 
@@ -34,6 +35,9 @@ export class Compiler {
     
     private applyLineType(line: Line) {
         switch(line.lineType) {
+            case LineType.emdash:
+                this.components.push(new EmDash());
+                break;
             case LineType.metadata:
                 const metadata = Metadata.getInstance().parse(line);
                 if (metadata) {
