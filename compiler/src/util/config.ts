@@ -101,6 +101,7 @@ export class ConfigParser {
         }
         config = this.mergeDefault(config as ConfigInterface);
         ConfigParser.buildFilePaths(config, path);
+        this.splitNames(config);
         return config;
     }
 
@@ -112,7 +113,37 @@ export class ConfigParser {
         let mergedConfig = {...DefaultConfig};
 
         if (config.names) {
-            mergedConfig.names = {...DefaultConfig.names, ...config.names};
+            // Using the ts-expect-error directive here to keep the code from
+            // being confusing with a bunch of unnecessary lines to check values
+            // that explicity exist.
+
+            // @ts-expect-error mergeConfig.names is explicity defined
+            mergedConfig.names.characters =
+                this.pickNameList(
+                    config.names.characters,
+                    // @ts-expect-error DefaultConfig.names is explicity defined
+                    DefaultConfig.names.characters);
+
+            // @ts-expect-error mergeConfig.names is explicity defined
+            mergedConfig.names.invalid =
+                this.pickNameList(
+                    config.names.invalid,
+                    // @ts-expect-error DefaultConfig.names is explicity defined
+                    DefaultConfig.names.invalid);
+
+            // @ts-expect-error mergeConfig.names is explicity defined
+            mergedConfig.names.places =
+                this.pickNameList(
+                    config.names.places,
+                    // @ts-expect-error DefaultConfig.names is explicity defined
+                    DefaultConfig.names.places);
+
+            // @ts-expect-error mergeConfig.names is explicity defined
+            mergedConfig.names.things =
+                this.pickNameList(
+                    config.names.things,
+                    // @ts-expect-error DefaultConfig.names is explicity defined
+                    DefaultConfig.names.things);
         }
 
         if (config.compile) {
@@ -131,6 +162,36 @@ export class ConfigParser {
     private static parseYAML(path: string): ConfigInterface {
         let content = readFileSync(path, 'utf-8');
         return YAML.parse(content);
+    }
+
+    private static pickNameList(fromFile: string[], DefaultValue: string[]): string[] {
+        if (fromFile) {
+            return fromFile;
+        }
+        return DefaultValue;
+    }
+
+    private static split(names: string[]): string[] {
+        let splitNames: string[] = [];
+        for (let name of names) {
+            splitNames = splitNames.concat(name.split(',').map(item => item.trim()));
+        }
+        return splitNames;
+    }
+
+    private static splitNames(config: ConfigInterface): void {
+        if (config.names?.characters) {
+            config.names.characters = this.split(config.names.characters);
+        }
+        if (config.names?.places) {
+            config.names.places = this.split(config.names.places);
+        }
+        if (config.names?.things) {
+            config.names.things = this.split(config.names.things);
+        }
+        if (config.names?.invalid) {
+            config.names.invalid = this.split(config.names.invalid);
+        }
     }
 
 }
