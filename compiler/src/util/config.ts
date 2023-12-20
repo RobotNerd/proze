@@ -8,7 +8,10 @@ export interface ConfigCompilerOptionsInterface {
 }
 
 export interface ConfigNames {
-    invalid?: string [];
+    characters: string[];
+    invalid: string[];
+    places: string[];
+    things: string [];
 }
 
 export interface ConfigInterface {
@@ -17,6 +20,12 @@ export interface ConfigInterface {
 }
 
 const DefaultConfig: ConfigInterface = {
+    names: {
+        characters: [],
+        invalid: [],
+        places: [],
+        things: [],
+    },
     compile: {
         indent: true,
     },
@@ -99,13 +108,19 @@ export class ConfigParser {
         if (!config) {
             return DefaultConfig;
         }
-        if (!config.compile) {
-            config.compile = DefaultConfig.compile;
+
+        let mergedConfig = {...DefaultConfig};
+
+        if (config.names) {
+            mergedConfig.names = {...DefaultConfig.names, ...config.names};
         }
-        else if (config.compile.indent === undefined) {
-            config.compile.indent = DefaultConfig.compile?.indent;
+
+        if (config.compile) {
+            mergedConfig.compile = {...DefaultConfig.compile, ...config.compile};
+            mergedConfig.compile.order = config.compile.order;
         }
-        return config;
+
+        return mergedConfig;
     }
 
     private static parseJSON(path: string): ConfigInterface {
