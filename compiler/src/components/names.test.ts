@@ -47,19 +47,19 @@ describe("LineState", () => {
     expect(CompilerMessages.getInstance().errors.length).toBe(1);
   });
 
+  test('does not match shorter invalid name if part of a larger non-invalid word', () => {
+    const line = new Line('Johnathan Smith is one name.', 1, LineType.paragraph);
+    Names.findInvalid(line, config);
+    expect(CompilerMessages.getInstance().hasErrors()).toBe(false);
+  });
+
   test('matches shorter invalid name among substrings when longer name not matched', () => {
-    const line = new Line('Johnathan is one name.', 1, LineType.paragraph);
+    config.names!.invalid = ['John,John Smith'];
+    const line = new Line('John Smalls is one name.', 1, LineType.paragraph);
     Names.findInvalid(line, config);
     expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
     expect(CompilerMessages.getInstance().errors.length).toBe(1);
     expect(CompilerMessages.getInstance().errors[0].message).toContain('John');
-    expect(CompilerMessages.getInstance().errors[0].message).not.toContain('Johnny');
+    expect(CompilerMessages.getInstance().errors[0].message).not.toContain('Smalls');
   });
-
-  /** TODO
-   * - test case
-   *   - invalid: "John,John Smith"
-   *   - line: "Johnny Smith said hi."
-   *   - no errors
-  **/
 });

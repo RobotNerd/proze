@@ -11,7 +11,7 @@ export class TrieNode {
 export class Trie {
   root: TrieNode;
 
-  constructor() {
+  constructor(private terminators: string[]) {
     this.root = new TrieNode();
   }
 
@@ -28,8 +28,26 @@ export class Trie {
     current.isEndOfWord = true;
   }
 
+  // Determine if the current character is the end of a word.
+  // 
+  // Example:
+  // - Invalid word: John
+  // - Text: Johnny was his name.
+  // - When reaching the first 'n' of "Johnny", the trie will match against the word
+  //   "John." This is incorrect, since "John" is a substring of the larger word "Johnny".
+  // 
+  private isEndOfWord(node: TrieNode, text: string, i: number): boolean {
+    if (i < text.length) {
+        const nextChar = text[i + 1];
+        if (node.isEndOfWord && !this.terminators.includes(nextChar)) {
+            return false;
+        }
+    }
+
+    return node.isEndOfWord;
+  }
+
   searchInText(text: string): string[] {
-    // let matches: string[] = [];
     let inProgressMatches: { node: TrieNode; startIndex: number }[] = [];
     let longestMatches: Map<number, string> = new Map();
 
@@ -41,15 +59,17 @@ export class Trie {
         if (match.node.children.has(char)) {
           match.node = match.node.children.get(char)!;
 
-          if (match.node.isEndOfWord) {
+          if (this.isEndOfWord(match.node, text, i)) {
             // Set/overwrite value with longest match found so far from the starting index.
             longestMatches.set(match.startIndex, text.substring(match.startIndex, i + 1));
           }
 
-          return true; // Continue this match
+          // Continue this match
+          return true;
         }
 
-        return false; // Remove this match as it's no longer valid
+        // Remove this match as it's no longer valid
+        return false;
       });
 
       // Check if the current character starts a new word
@@ -61,7 +81,6 @@ export class Trie {
       }
     }
 
-    // return matches;
     return Array.from(longestMatches.values());
   }
 }

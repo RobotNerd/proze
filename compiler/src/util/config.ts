@@ -112,6 +112,8 @@ export class ConfigParser {
 
         let mergedConfig = {...DefaultConfig};
 
+        // TODO replace ts-expect-error comments below with trailing "!"
+
         if (config.names) {
             // Using the ts-expect-error directive here to keep the code from
             // being confusing with a bunch of unnecessary lines to check values

@@ -4,6 +4,8 @@ import { ParseError } from "../util/parse-error";
 import { Line, LineType } from "./line";
 import { Trie } from '../util/trie';
 
+const terminators = ['.', ' ', '?', '!', ',', '"', "'", '\n', '\t'];
+
 export class Names {
 
     static delimiters: RegExp = /[.\s\?!,"]/;
@@ -48,7 +50,7 @@ export class Names {
             return
         }
 
-        let trie = new Trie();
+        let trie = new Trie(terminators);
         this.addInvalid(trie, config);
         let matches: string[] = trie.searchInText(line.text);
         for (let name of matches) {
