@@ -137,7 +137,7 @@ export class Compiler {
         for(let i=0; i < textLines.length; i++) {
             const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
             for (let line of updatedLines) {
-                Names.checkForInvalid(line, this.config);
+                Names.findInvalid(line, this.config);
                 this.applyLineType(line);
             }
         }

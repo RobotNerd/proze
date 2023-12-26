@@ -8,7 +8,10 @@ export interface ConfigCompilerOptionsInterface {
 }
 
 export interface ConfigNames {
-    invalid?: string [];
+    characters: string[];
+    invalid: string[];
+    places: string[];
+    things: string [];
 }
 
 export interface ConfigInterface {
@@ -17,6 +20,12 @@ export interface ConfigInterface {
 }
 
 const DefaultConfig: ConfigInterface = {
+    names: {
+        characters: [],
+        invalid: [],
+        places: [],
+        things: [],
+    },
     compile: {
         indent: true,
     },
@@ -92,6 +101,7 @@ export class ConfigParser {
         }
         config = this.mergeDefault(config as ConfigInterface);
         ConfigParser.buildFilePaths(config, path);
+        this.splitNames(config);
         return config;
     }
 
@@ -99,13 +109,26 @@ export class ConfigParser {
         if (!config) {
             return DefaultConfig;
         }
-        if (!config.compile) {
-            config.compile = DefaultConfig.compile;
+
+        let mergedConfig = {...DefaultConfig};
+
+        if (config.names) {
+            mergedConfig.names!.characters =
+                this.pickNameList(config.names.characters, DefaultConfig.names!.characters);
+            mergedConfig.names!.invalid =
+                this.pickNameList(config.names.invalid, DefaultConfig.names!.invalid);
+            mergedConfig.names!.places =
+                this.pickNameList(config.names.places, DefaultConfig.names!.places);
+            mergedConfig.names!.things =
+                this.pickNameList(config.names.things, DefaultConfig.names!.things);
         }
-        else if (config.compile.indent === undefined) {
-            config.compile.indent = DefaultConfig.compile?.indent;
+
+        if (config.compile) {
+            mergedConfig.compile = {...DefaultConfig.compile, ...config.compile};
+            mergedConfig.compile.order = config.compile.order;
         }
-        return config;
+
+        return mergedConfig;
     }
 
     private static parseJSON(path: string): ConfigInterface {
@@ -116,6 +139,36 @@ export class ConfigParser {
     private static parseYAML(path: string): ConfigInterface {
         let content = readFileSync(path, 'utf-8');
         return YAML.parse(content);
+    }
+
+    private static pickNameList(fromFile: string[], DefaultValue: string[]): string[] {
+        if (fromFile) {
+            return fromFile;
+        }
+        return DefaultValue;
+    }
+
+    private static split(names: string[]): string[] {
+        let splitNames: string[] = [];
+        for (let name of names) {
+            splitNames = splitNames.concat(name.split(',').map(item => item.trim()));
+        }
+        return splitNames;
+    }
+
+    private static splitNames(config: ConfigInterface): void {
+        if (config.names?.characters) {
+            config.names.characters = this.split(config.names.characters);
+        }
+        if (config.names?.places) {
+            config.names.places = this.split(config.names.places);
+        }
+        if (config.names?.things) {
+            config.names.things = this.split(config.names.things);
+        }
+        if (config.names?.invalid) {
+            config.names.invalid = this.split(config.names.invalid);
+        }
     }
 
 }
