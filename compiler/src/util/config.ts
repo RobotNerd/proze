@@ -112,40 +112,15 @@ export class ConfigParser {
 
         let mergedConfig = {...DefaultConfig};
 
-        // TODO replace ts-expect-error comments below with trailing "!"
-
         if (config.names) {
-            // Using the ts-expect-error directive here to keep the code from
-            // being confusing with a bunch of unnecessary lines to check values
-            // that explicity exist.
-
-            // @ts-expect-error mergeConfig.names is explicity defined
-            mergedConfig.names.characters =
-                this.pickNameList(
-                    config.names.characters,
-                    // @ts-expect-error DefaultConfig.names is explicity defined
-                    DefaultConfig.names.characters);
-
-            // @ts-expect-error mergeConfig.names is explicity defined
-            mergedConfig.names.invalid =
-                this.pickNameList(
-                    config.names.invalid,
-                    // @ts-expect-error DefaultConfig.names is explicity defined
-                    DefaultConfig.names.invalid);
-
-            // @ts-expect-error mergeConfig.names is explicity defined
-            mergedConfig.names.places =
-                this.pickNameList(
-                    config.names.places,
-                    // @ts-expect-error DefaultConfig.names is explicity defined
-                    DefaultConfig.names.places);
-
-            // @ts-expect-error mergeConfig.names is explicity defined
-            mergedConfig.names.things =
-                this.pickNameList(
-                    config.names.things,
-                    // @ts-expect-error DefaultConfig.names is explicity defined
-                    DefaultConfig.names.things);
+            mergedConfig.names!.characters =
+                this.pickNameList(config.names.characters, DefaultConfig.names!.characters);
+            mergedConfig.names!.invalid =
+                this.pickNameList(config.names.invalid, DefaultConfig.names!.invalid);
+            mergedConfig.names!.places =
+                this.pickNameList(config.names.places, DefaultConfig.names!.places);
+            mergedConfig.names!.things =
+                this.pickNameList(config.names.things, DefaultConfig.names!.things);
         }
 
         if (config.compile) {
