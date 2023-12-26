@@ -8,29 +8,6 @@ const terminators = ['.', ' ', '?', '!', ',', '"', "'", '\n', '\t'];
 
 export class Names {
 
-    static delimiters: RegExp = /[.\s\?!,"]/;
-
-    // TODO DEPRECATED - remove and replace with findInvalid()
-    static checkForInvalid(line: Line, config: ConfigInterface | null) {
-        if (line.lineType != LineType.metadata && line.lineType != LineType.paragraph) {
-            return;
-        }
-        if (!config?.names?.invalid) {
-            return
-        }
-        const words = line.text.split(Names.delimiters);
-        for (let name of config.names.invalid) {
-            if (words.includes(name)) {
-                CompilerMessages.getInstance().add(
-                    new ParseError(
-                        `Invalid character name found: "${name}"`,
-                        line.lineNumber
-                    )
-                );
-            }
-        }
-    }
-
     private static addInvalid(trie: Trie, config: ConfigInterface) {
         if (config.names?.invalid) {
             for (let name of config.names.invalid) {
