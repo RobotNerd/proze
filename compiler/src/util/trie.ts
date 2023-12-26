@@ -29,8 +29,9 @@ export class Trie {
   }
 
   searchInText(text: string): string[] {
-    let matches: string[] = [];
+    // let matches: string[] = [];
     let inProgressMatches: { node: TrieNode; startIndex: number }[] = [];
+    let longestMatches: Map<number, string> = new Map();
 
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
@@ -41,7 +42,8 @@ export class Trie {
           match.node = match.node.children.get(char)!;
 
           if (match.node.isEndOfWord) {
-            matches.push(text.substring(match.startIndex, i + 1));
+            // Set/overwrite value with longest match found so far from the starting index.
+            longestMatches.set(match.startIndex, text.substring(match.startIndex, i + 1));
           }
 
           return true; // Continue this match
@@ -59,6 +61,7 @@ export class Trie {
       }
     }
 
-    return matches;
+    // return matches;
+    return Array.from(longestMatches.values());
   }
 }

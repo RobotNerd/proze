@@ -40,24 +40,23 @@ describe("LineState", () => {
     expect(CompilerMessages.getInstance().errors.length).toBe(1);
   });
 
-  // // TODO - should only have one error for "Johnny"
-  // test('flags name variations', () => {
-  //   const line = new Line('Johnny is one name.', 1, LineType.paragraph);
-  //   Names.findInvalid(line, config);
-  //   console.log('errors:\n', CompilerMessages.getInstance().toString());
-  //   // expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
-  //   // expect(CompilerMessages.getInstance().errors.length).toBe(1);
-  // });
+  test('matches only the longest invalid name among substrings', () => {
+    const line = new Line('Johnny is one name.', 1, LineType.paragraph);
+    Names.findInvalid(line, config);
+    expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
+    expect(CompilerMessages.getInstance().errors.length).toBe(1);
+  });
+
+  test('matches shorter invalid name among substrings when longer name not matched', () => {
+    const line = new Line('Johnathan is one name.', 1, LineType.paragraph);
+    Names.findInvalid(line, config);
+    expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
+    expect(CompilerMessages.getInstance().errors.length).toBe(1);
+    expect(CompilerMessages.getInstance().errors[0].message).toContain('John');
+    expect(CompilerMessages.getInstance().errors[0].message).not.toContain('Johnny');
+  });
 
   /** TODO
-   * - test case
-   *   - invalid: "John,John Smith"
-   *   - text: "Johnny said something to John."
-   *   - should flag only the last John.
-   * - test case
-   *   - invalid: "John,John Smith"
-   *   - line: "John Smiley said hi."
-   *   - should only flag on John
    * - test case
    *   - invalid: "John,John Smith"
    *   - line: "Johnny Smith said hi."
