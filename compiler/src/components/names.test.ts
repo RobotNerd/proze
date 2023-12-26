@@ -62,4 +62,13 @@ describe("LineState", () => {
     expect(CompilerMessages.getInstance().errors[0].message).toContain('John');
     expect(CompilerMessages.getInstance().errors[0].message).not.toContain('Smalls');
   });
+
+  test('matches invalid words that include terminator characters', () => {
+    config.names!.invalid = ['John,Dr. Smith'];
+    const line = new Line('I heard that Dr. Smith is back in town.', 1, LineType.paragraph);
+    Names.findInvalid(line, config);
+    expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
+    expect(CompilerMessages.getInstance().errors.length).toBe(1);
+    expect(CompilerMessages.getInstance().errors[0].message).toContain('Dr. Smith');
+  });
 });
