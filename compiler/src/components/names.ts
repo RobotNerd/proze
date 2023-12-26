@@ -8,6 +8,7 @@ export class Names {
 
     static delimiters: RegExp = /[.\s\?!,"]/;
 
+    // TODO DEPRECATED - remove and replace with findInvalid()
     static checkForInvalid(line: Line, config: ConfigInterface | null) {
         if (line.lineType != LineType.metadata && line.lineType != LineType.paragraph) {
             return;

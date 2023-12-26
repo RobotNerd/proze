@@ -1,60 +1,64 @@
 export class TrieNode {
-    children: Map<string, TrieNode>;
-    isEndOfWord: boolean;
+  children: Map<string, TrieNode>;
+  isEndOfWord: boolean;
 
-    constructor() {
-        this.children = new Map();
-        this.isEndOfWord = false;
-    }
+  constructor() {
+    this.children = new Map();
+    this.isEndOfWord = false;
+  }
 }
 
 export class Trie {
-    root: TrieNode;
+  root: TrieNode;
 
-    constructor() {
-        this.root = new TrieNode();
+  constructor() {
+    this.root = new TrieNode();
+  }
+
+  insert(word: string): void {
+    let current = this.root;
+
+    for (const char of word) {
+      if (!current.children.has(char)) {
+        current.children.set(char, new TrieNode());
+      }
+      current = current.children.get(char)!;
     }
 
-    insert(word: string): void {
-        let current = this.root;
+    current.isEndOfWord = true;
+  }
 
-        for (const char of word) {
-            if (!current.children.has(char)) {
-                current.children.set(char, new TrieNode());
-            }
-            current = current.children.get(char)!;
+  searchInText(text: string): string[] {
+    let matches: string[] = [];
+    let inProgressMatches: { node: TrieNode; startIndex: number }[] = [];
+
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+
+      // Update and check in-progress matches
+      inProgressMatches = inProgressMatches.filter((match) => {
+        if (match.node.children.has(char)) {
+          match.node = match.node.children.get(char)!;
+
+          if (match.node.isEndOfWord) {
+            matches.push(text.substring(match.startIndex, i + 1));
+          }
+
+          return true; // Continue this match
         }
 
-        current.isEndOfWord = true;
+        return false; // Remove this match as it's no longer valid
+      });
+
+      // Check if the current character starts a new word
+      if (this.root.children.has(char)) {
+        inProgressMatches.push({
+          node: this.root.children.get(char)!,
+          startIndex: i,
+        });
+      }
     }
 
-    searchInText(text: string): string[] {
-        let matches: string[] = [];
-
-        // TODO rewrite this to be O(N)
-        //  - create a dict of all words in progress
-        //  - for each char, iterate through all words in progress and/or start new word
-        
-        for (let i = 0; i < text.length; i++) {
-            let current = this.root;
-            for (let j = i; j < text.length; j++) {
-                const char = text[j];
-                if (!current.children.has(char)) {
-                    break;
-                }
-
-                current = current.children.get(char)!;
-
-                // TODO don't flag as a match if you can keep going
-                // - be careful on whitespace
-                //   - it's possible to have whitespace be the next character
-                //   - but it's also possible for whitespace to end the word
-                if (current.isEndOfWord) {
-                    matches.push(text.substring(i, j + 1));
-                }
-            }
-        }
-
-        return matches;
-    }
+    return matches;
+  }
 }
