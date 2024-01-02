@@ -55,8 +55,8 @@ export class Emphasis {
             if (index >= 0) {
                 let parsedText = text.substring(0, index);
                 if (parsedText != '') {
-                    let newLine = new Line(parsedText, line.lineNumber);
-                    newLine.emphasis = [...line.emphasis];
+                    let newLine = Line.copy(line);
+                    newLine.text = parsedText;
                     if (blockFlag.value) {
                         newLine.emphasis.push(emphasisType);
                     }
@@ -66,8 +66,8 @@ export class Emphasis {
                 text = text.substring(index + pattern.length);
             }
             else if (text !== '' || updatedLines.length === 0) {
-                let newLine = new Line(text, line.lineNumber);
-                newLine.emphasis = [...line.emphasis];
+                let newLine = Line.copy(line);
+                newLine.text = text;
                 if (blockFlag.value) {
                     newLine.emphasis.push(emphasisType);
                 }

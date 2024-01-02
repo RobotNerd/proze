@@ -15,6 +15,7 @@ import * as fs from 'fs';
 import { EmDash } from '../components/em-dash';
 
 const LeadingWhitespace = "      ";
+const IndentationTabStop: number = 6;
 
 export class PdfFormatter implements Formatter {
 
@@ -83,13 +84,6 @@ export class PdfFormatter implements Formatter {
         });
     }
 
-    private sectionMargin(): Margins {
-        if (this.config?.compile?.indent) {
-            return [0, 10, 0, 10];
-        }
-        return 0;
-    }
-
     private addEmDash(emdash: EmDash) {
         this.currentTextBlock.push({
             text: emdash.toUnicode(),
@@ -126,6 +120,7 @@ export class PdfFormatter implements Formatter {
         this.currentTextBlock.push({
             text: text.text,
             style: style,
+            margin: this.textMargin(text),
         });
     }
 
@@ -236,6 +231,20 @@ export class PdfFormatter implements Formatter {
 
     getContent(): string {
         return "WARNING: You need to provide the path to the file name (--file arg) for pdf documents.";
+    }
+
+    private sectionMargin(): Margins {
+        if (this.config?.compile?.indent) {
+            return [0, 10, 0, 10];
+        }
+        return 0;
+    }
+
+    private textMargin(text: Text): Margins {
+        if (text.indentation > 0) {
+            return [text.indentation * IndentationTabStop, 10, 0, 10];
+        }
+        return 0;
     }
 
     private startChapter(chapter: Chapter) {
