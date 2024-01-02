@@ -54,15 +54,21 @@ export class LineState {
     }
 
     private parseIndentation(line: Line) {
-        let count = 0;
-        for (const char of line.text) {
-            if (char === ' ') {
-                count++;
-            } else {
-                break;
+       if (!this.inParagraph) {
+            let count = 0;
+            for (const char of line.text) {
+                if (char === ' ') {
+                    count++;
+                } else {
+                    break;
+                }
             }
+            this.indentationAmount = Math.floor(count/2);
+
+            // Remove leading whitespace now that indentation state has been processed.
+            line.text = line.text.trim();
         }
-        this.indentationAmount = Math.floor(count/2);
+        line.indentation = this.indentationAmount;
     }
 
     private onEmptyLine(line: Line): Line[] {
@@ -83,11 +89,7 @@ export class LineState {
     }
 
     private onText(strippedLine: Line): Line[] {
-        if (!this.inParagraph) {
-            this.parseIndentation(strippedLine);
-            this.removeLeadingWhitespace(strippedLine);
-        }
-        strippedLine.indentation = this.indentationAmount;
+        this.parseIndentation(strippedLine);
         this.inParagraph = true;
         let updatedLines = this.applyEmphasis(strippedLine);
         updatedLines = EmDashParser.parse(updatedLines);
@@ -99,10 +101,6 @@ export class LineState {
             this.emphasis.removeEscapeCharacter(updatedLine);
         }
         return updatedLines;
-    }
-
-    private removeLeadingWhitespace(line: Line) {
-        line.text = line.text.trim();
     }
 
     update(line: Line): Line[] {
