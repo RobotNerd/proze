@@ -15,9 +15,11 @@ import * as fs from 'fs';
 import { EmDash } from '../components/em-dash';
 
 const LeadingWhitespace = "      ";
+const IndentationTabStop: number = 25;
 
 export class PdfFormatter implements Formatter {
 
+    private indentationAmount: number = 0;
     private currentTextBlock: Content[] = [];
     private docDefinition: TDocumentDefinitions;
     private printer: PdfPrinter;
@@ -83,13 +85,6 @@ export class PdfFormatter implements Formatter {
         });
     }
 
-    private sectionMargin(): Margins {
-        if (this.config?.compile?.indent) {
-            return [0, 10, 0, 10];
-        }
-        return 0;
-    }
-
     private addEmDash(emdash: EmDash) {
         this.currentTextBlock.push({
             text: emdash.toUnicode(),
@@ -123,6 +118,7 @@ export class PdfFormatter implements Formatter {
         if (text.emphasis.indexOf(EmphasisType.italic) >= 0) {
             style.italics = true;
         }
+        this.indentationAmount = text.indentation;
         this.currentTextBlock.push({
             text: text.text,
             style: style,
@@ -174,13 +170,15 @@ export class PdfFormatter implements Formatter {
         if (this.currentTextBlock.length > 0) {
             this.addLeadingWhitesapace();
             (this.docDefinition.content as Content[]).push({
-                text: this.currentTextBlock
+                text: this.currentTextBlock,
+                margin: this.textMargin()
             });
             this.currentTextBlock = [];
         }
         if (!this.config?.compile?.indent) {
             (this.docDefinition.content as Content[]).push('\n\n');
         }
+        this.indentationAmount = 0;
     }
 
     private formatFooter(currentPage: number, pageCount: number) {
@@ -236,6 +234,21 @@ export class PdfFormatter implements Formatter {
 
     getContent(): string {
         return "WARNING: You need to provide the path to the file name (--file arg) for pdf documents.";
+    }
+
+    private sectionMargin(): Margins {
+        if (this.config?.compile?.indent) {
+            return [0, 10, 0, 10];
+        }
+        return 0;
+    }
+
+    private textMargin(): Margins {
+        if (this.indentationAmount > 0) {
+            let horizontal = this.indentationAmount * IndentationTabStop;
+            return [horizontal, 10, horizontal, 10];
+        }
+        return 0;
     }
 
     private startChapter(chapter: Chapter) {

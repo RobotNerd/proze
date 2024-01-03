@@ -6,6 +6,7 @@ import { Strip } from "./strip";
 
 export class LineState {
 
+    indentationAmount: number = 0;
     inParagraph: boolean = false;
     isWhitespaceOnly: boolean = false;
     
@@ -52,10 +53,32 @@ export class LineState {
         return !this.inParagraph && Metadata.getInstance().isMetadata(strippedLine);
     }
 
+    private parseIndentation(line: Line) {
+       if (!this.inParagraph) {
+            let count = 0;
+            for (const char of line.text) {
+                if (char === ' ') {
+                    count++;
+                } else {
+                    break;
+                }
+            }
+            this.indentationAmount = Math.floor(count/2);
+
+            // Remove leading whitespace now that indentation state has been processed.
+            line.text = line.text.trim();
+        }
+        line.indentation = this.indentationAmount;
+    }
+
     private onEmptyLine(line: Line): Line[] {
+        this.indentationAmount = 0;
         this.inParagraph = false;
         this.emphasis.reset();
-        return [new Line('', line.lineNumber, LineType.emptyLine)];
+        let newLine = Line.copy(line);
+        newLine.text = '';
+        newLine.lineType = LineType.emptyLine;
+        return [newLine];
     }
 
     private onMetadata(strippedLine: Line): Line[] {
@@ -66,6 +89,7 @@ export class LineState {
     }
 
     private onText(strippedLine: Line): Line[] {
+        this.parseIndentation(strippedLine);
         this.inParagraph = true;
         let updatedLines = this.applyEmphasis(strippedLine);
         updatedLines = EmDashParser.parse(updatedLines);
@@ -97,7 +121,11 @@ export class LineState {
             updatedLines = this.onText(strippedLine);
 
             // Add single space to join text separated only by '\n' into a single paragraph.
-            updatedLines.push(new Line(' ', line.lineNumber, LineType.paragraph));
+            let newLine = Line.copy(line);
+            newLine.text = ' ';
+            newLine.lineType = LineType.paragraph;
+            newLine.indentation = this.indentationAmount;
+            updatedLines.push(newLine);
         }
         return updatedLines;
     }

@@ -20,11 +20,12 @@ export class Strip {
             return null;
         }
 
-        let updatedLine: Line | null = null;
+        let index: number;
+        let leadingSpaces: string = this.leadingSpaces(line.text);
         let substrings: string[] = [];
         let text = line.text;
-        let index: number;
         let token: StrippedToken;
+        let updatedLine: Line | null = null;
 
         do {
             [token, index] = this.nextToken(text);
@@ -54,10 +55,24 @@ export class Strip {
                 }
             }
         } while (index != -1);
+
         if (substrings.length > 0) {
-            updatedLine = new Line(substrings.join(' ').trim(), line.lineNumber);
+            updatedLine = Line.copy(line);
+            updatedLine.text = substrings.join(' ').trim();
+            updatedLine.text = leadingSpaces + updatedLine?.text;
         }
         return updatedLine;
+    }
+
+    // Preserve leading spaces so that can be used later for setting indentation level.
+    private leadingSpaces(text: string): string {
+        let i = 0;
+        for (; i < text.length; i++) {
+            if (text[i] !== ' ') {
+                break;
+            }
+        }
+        return text.substring(0, i);
     }
 
     escapeCharacter(line: Line) {
