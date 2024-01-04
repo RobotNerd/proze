@@ -2,6 +2,7 @@ import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
 import { ConfigInterface } from '../util/config';
 import { EmphasisType } from '../components/line';
+import { Formatting } from '../util/config';
 import { ProjectMetadata } from '../components/metadata';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
@@ -22,6 +23,8 @@ export class PdfFormatter implements Formatter {
     private blockquoteLevel: number = 0;
     private currentTextBlock: Content[] = [];
     private docDefinition: TDocumentDefinitions;
+    private isFirstParagraphOfChapter: boolean = true;
+    private isFirstParagraphOfSection: boolean = false;
     private printer: PdfPrinter;
 
     constructor(
@@ -85,6 +88,17 @@ export class PdfFormatter implements Formatter {
         });
     }
 
+    private addChapter(chapter: Chapter) {
+        this.isFirstParagraphOfChapter = true;
+        this.isFirstParagraphOfSection = false;
+        (this.docDefinition.content as Content[]).push({
+            pageBreak: 'before',
+            style: 'chapter',
+            text: chapter.getOutput(),
+            tocItem: true,
+        });
+    }
+
     private addEmDash(emdash: EmDash) {
         this.currentTextBlock.push({
             text: emdash.toUnicode(),
@@ -92,7 +106,22 @@ export class PdfFormatter implements Formatter {
     }
 
     private addLeadingWhitesapace() {
-        if (this.config?.compile?.indent) {
+        let shouldIndent: boolean = false;
+        if (this.config?.compile?.formatting === Formatting.standard) {
+            if (this.isFirstParagraphOfChapter) {
+                this.isFirstParagraphOfChapter = false;
+                shouldIndent = this.config.compile?.indentFirst?.chapter!;
+            }
+            else if (this.isFirstParagraphOfSection) {
+                this.isFirstParagraphOfSection = false;
+                shouldIndent = this.config.compile?.indentFirst?.section!;
+            }
+            else {
+                shouldIndent = true;
+            }
+        }
+
+        if (shouldIndent) {
             this.currentTextBlock.unshift({
                 text: LeadingWhitespace,
                 style: { preserveLeadingSpaces: true },
@@ -101,6 +130,8 @@ export class PdfFormatter implements Formatter {
     }
 
     private addSection(section: Section) {
+        this.isFirstParagraphOfChapter = false;
+        this.isFirstParagraphOfSection = true;
         (this.docDefinition.content as Content[]).push({
             text: section.getOutput(),
             style: section.isNamed() ? 'sectionName' : 'sectionSymbol',
@@ -175,7 +206,7 @@ export class PdfFormatter implements Formatter {
             });
             this.currentTextBlock = [];
         }
-        if (!this.config?.compile?.indent) {
+        if (this.config?.compile?.formatting === Formatting.block) {
             (this.docDefinition.content as Content[]).push('\n\n');
         }
         this.blockquoteLevel = 0;
@@ -209,7 +240,7 @@ export class PdfFormatter implements Formatter {
             let component = this.components[i];
             switch (component.token) {
                 case Token.chapter:
-                    this.startChapter(component as Chapter);
+                    this.addChapter(component as Chapter);
                     break;
                 case Token.emdash:
                     this.addEmDash((component as EmDash));
@@ -237,7 +268,8 @@ export class PdfFormatter implements Formatter {
     }
 
     private sectionMargin(): Margins {
-        if (this.config?.compile?.indent) {
+        if (this.config?.compile?.formatting === Formatting.standard) {
+            // Add vertical space above/below section break.
             return [0, 10, 0, 10];
         }
         return 0;
@@ -249,15 +281,6 @@ export class PdfFormatter implements Formatter {
             return [horizontal, 10, horizontal, 10];
         }
         return 0;
-    }
-
-    private startChapter(chapter: Chapter) {
-        (this.docDefinition.content as Content[]).push({
-            pageBreak: 'before',
-            style: 'chapter',
-            text: chapter.getOutput(),
-            tocItem: true,
-        });
     }
 
     writeToFile(path: string): void {

@@ -2,9 +2,20 @@ import { existsSync, readFileSync, statSync } from "fs";
 import { ProzeFile } from './proze-file';
 import YAML from 'yaml';
 
+export enum Formatting {
+    block = 'block',
+    standard = 'standard',
+}
+
+export interface ConfigParagraphIndentation {
+    chapter?: boolean;
+    section?: boolean;
+}
+
 export interface ConfigCompilerOptionsInterface {
+    formatting?: string;
+    indentFirst?: ConfigParagraphIndentation;
     order?: string[];
-    indent?: boolean;
 }
 
 export interface ConfigNames {
@@ -27,7 +38,11 @@ const DefaultConfig: ConfigInterface = {
         things: [],
     },
     compile: {
-        indent: true,
+        formatting: Formatting.standard,
+        indentFirst: {
+            chapter: false,
+            section: false,
+        },
     },
 }
 
@@ -126,6 +141,11 @@ export class ConfigParser {
         if (config.compile) {
             mergedConfig.compile = {...DefaultConfig.compile, ...config.compile};
             mergedConfig.compile.order = config.compile.order;
+
+            // Sanitize formatting value.
+            if (!Object.keys(Formatting).includes(mergedConfig.compile?.formatting!)) {
+                mergedConfig.compile.formatting = DefaultConfig.compile?.formatting;
+            }
         }
 
         return mergedConfig;
