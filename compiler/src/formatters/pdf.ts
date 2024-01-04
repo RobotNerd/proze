@@ -23,6 +23,8 @@ export class PdfFormatter implements Formatter {
     private blockquoteLevel: number = 0;
     private currentTextBlock: Content[] = [];
     private docDefinition: TDocumentDefinitions;
+    private isFirstParagraphOfChapter: boolean = true;
+    private isFirstParagraphOfSection: boolean = false;
     private printer: PdfPrinter;
 
     constructor(
@@ -87,6 +89,8 @@ export class PdfFormatter implements Formatter {
     }
 
     private addChapter(chapter: Chapter) {
+        this.isFirstParagraphOfChapter = true;
+        this.isFirstParagraphOfSection = false;
         (this.docDefinition.content as Content[]).push({
             pageBreak: 'before',
             style: 'chapter',
@@ -102,7 +106,22 @@ export class PdfFormatter implements Formatter {
     }
 
     private addLeadingWhitesapace() {
+        let shouldIndent: boolean = false;
         if (this.config?.compile?.formatting === Formatting.standard) {
+            if (this.isFirstParagraphOfChapter) {
+                this.isFirstParagraphOfChapter = false;
+                shouldIndent = this.config.compile?.indentFirst?.chapter!;
+            }
+            else if (this.isFirstParagraphOfSection) {
+                this.isFirstParagraphOfSection = false;
+                shouldIndent = this.config.compile?.indentFirst?.section!;
+            }
+            else {
+                shouldIndent = true;
+            }
+        }
+
+        if (shouldIndent) {
             this.currentTextBlock.unshift({
                 text: LeadingWhitespace,
                 style: { preserveLeadingSpaces: true },
@@ -111,6 +130,8 @@ export class PdfFormatter implements Formatter {
     }
 
     private addSection(section: Section) {
+        this.isFirstParagraphOfChapter = false;
+        this.isFirstParagraphOfSection = true;
         (this.docDefinition.content as Content[]).push({
             text: section.getOutput(),
             style: section.isNamed() ? 'sectionName' : 'sectionSymbol',

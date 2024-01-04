@@ -14,7 +14,7 @@ export interface ConfigParagraphIndentation {
 
 export interface ConfigCompilerOptionsInterface {
     formatting?: string;
-    indent?: ConfigParagraphIndentation;
+    indentFirst?: ConfigParagraphIndentation;
     order?: string[];
 }
 
@@ -39,8 +39,8 @@ const DefaultConfig: ConfigInterface = {
     },
     compile: {
         formatting: Formatting.standard,
-        indent: {
-            chapter: true,
+        indentFirst: {
+            chapter: false,
             section: false,
         },
     },
@@ -141,6 +141,11 @@ export class ConfigParser {
         if (config.compile) {
             mergedConfig.compile = {...DefaultConfig.compile, ...config.compile};
             mergedConfig.compile.order = config.compile.order;
+
+            // Sanitize formatting value.
+            if (!Object.keys(Formatting).includes(mergedConfig.compile?.formatting!)) {
+                mergedConfig.compile.formatting = DefaultConfig.compile?.formatting;
+            }
         }
 
         return mergedConfig;
