@@ -6,11 +6,11 @@ export class Text implements Component {
     token: Token = Token.text;
     text: string;
     emphasis: EmphasisType[];
-    indentation: number = 0;
+    blockquoteLevel: number = 0;
 
     constructor(line: Line) {
         this.text = line.text;
         this.emphasis = line.emphasis;
-        this.indentation = line.indentation;
+        this.blockquoteLevel = line.blockquoteLevel;
     }
 }

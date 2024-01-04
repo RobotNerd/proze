@@ -5,7 +5,7 @@ These documents describe the proze language format.
 ## Table of Contents
 
 - [Paragraphs](./paragraphs.md)
-- [Indentation](./indentation.md)
+- [Block Quotes](./block-quotes.md)
 - [Dialogue](./dialogue.md)
 - [Formatting](./formatting.md)
 - [Headers](./headers.md)

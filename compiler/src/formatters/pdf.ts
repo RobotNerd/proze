@@ -15,11 +15,11 @@ import * as fs from 'fs';
 import { EmDash } from '../components/em-dash';
 
 const LeadingWhitespace = "      ";
-const IndentationTabStop: number = 25;
+const BlockquoteTabStop: number = 25;
 
 export class PdfFormatter implements Formatter {
 
-    private indentationAmount: number = 0;
+    private blockquoteLevel: number = 0;
     private currentTextBlock: Content[] = [];
     private docDefinition: TDocumentDefinitions;
     private printer: PdfPrinter;
@@ -118,7 +118,7 @@ export class PdfFormatter implements Formatter {
         if (text.emphasis.indexOf(EmphasisType.italic) >= 0) {
             style.italics = true;
         }
-        this.indentationAmount = text.indentation;
+        this.blockquoteLevel = text.blockquoteLevel;
         this.currentTextBlock.push({
             text: text.text,
             style: style,
@@ -178,7 +178,7 @@ export class PdfFormatter implements Formatter {
         if (!this.config?.compile?.indent) {
             (this.docDefinition.content as Content[]).push('\n\n');
         }
-        this.indentationAmount = 0;
+        this.blockquoteLevel = 0;
     }
 
     private formatFooter(currentPage: number, pageCount: number) {
@@ -244,8 +244,8 @@ export class PdfFormatter implements Formatter {
     }
 
     private textMargin(): Margins {
-        if (this.indentationAmount > 0) {
-            let horizontal = this.indentationAmount * IndentationTabStop;
+        if (this.blockquoteLevel > 0) {
+            let horizontal = this.blockquoteLevel * BlockquoteTabStop;
             return [horizontal, 10, horizontal, 10];
         }
         return 0;
