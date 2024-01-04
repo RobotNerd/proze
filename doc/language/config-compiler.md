@@ -4,24 +4,23 @@ The config file can be used to customize the output of the compiler. Here's an e
 
 ## Paragraph indentation
 
-By default, paragraph identation will have the following behavior:
+By default, the compiler uses standard formatting. With standard formatting, each paragraph identation will have the following behavior:
 
 - The first paragraph of a chapter is left-justified.
 - The first paragraph after a section break is left-justified.
 - The first line of every other paragraph will be indented.
 
-You can control this with configuration options. First, you can disable all indentation of paragraphs with this configuration.
+You can control this behavior with configuration options. First, you can disable all indentation of paragraphs with this configuration.
 
 ```yaml
 ---
 compile:
-  indent:
-    paragraph: false
+  formatting: block
 ```
 
-With this configurtaion, every paragraph will be left-justified, and blank lines will automatically be inserted between paragraphs.
+Using this configurtaion will make the output document use `block` formatting. In block formatting, every paragraph is left-justified, and blank lines are inserted between paragraphs. (The other possible formatting value is `standard` which is the default.)
 
-If you leave paragraph indentation enabled, you can choose to force indentation of the first paragraph of a chapter or section. Here's an example configuration that forces indentation of the first paragraph of both chapters and sections.
+When standard formatting is enabled, you can choose to force indentation of the first paragraph of a chapter or section. Here's an example configuration that forces indentation of the first paragraph of both chapters and sections.
 
 ```yaml
 ---
@@ -30,6 +29,8 @@ compile:
     chapter: true
     section: true
 ```
+
+Note that if you set the `paragraph` option to `false`, then the options for `chapter` and `section` are ignored.
 
 ## File order
 

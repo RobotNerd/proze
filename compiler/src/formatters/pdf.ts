@@ -2,6 +2,7 @@ import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
 import { ConfigInterface } from '../util/config';
 import { EmphasisType } from '../components/line';
+import { Formatting } from '../util/config';
 import { ProjectMetadata } from '../components/metadata';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
@@ -92,7 +93,7 @@ export class PdfFormatter implements Formatter {
     }
 
     private addLeadingWhitesapace() {
-        if (this.config?.compile?.indent) {
+        if (this.config?.compile?.formatting === Formatting.standard) {
             this.currentTextBlock.unshift({
                 text: LeadingWhitespace,
                 style: { preserveLeadingSpaces: true },
@@ -175,7 +176,7 @@ export class PdfFormatter implements Formatter {
             });
             this.currentTextBlock = [];
         }
-        if (!this.config?.compile?.indent) {
+        if (this.config?.compile?.formatting === Formatting.block) {
             (this.docDefinition.content as Content[]).push('\n\n');
         }
         this.blockquoteLevel = 0;
@@ -237,7 +238,8 @@ export class PdfFormatter implements Formatter {
     }
 
     private sectionMargin(): Margins {
-        if (this.config?.compile?.indent) {
+        if (this.config?.compile?.formatting === Formatting.standard) {
+            // Add vertical space above/below section break.
             return [0, 10, 0, 10];
         }
         return 0;

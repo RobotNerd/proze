@@ -2,9 +2,20 @@ import { existsSync, readFileSync, statSync } from "fs";
 import { ProzeFile } from './proze-file';
 import YAML from 'yaml';
 
+export enum Formatting {
+    block = 'block',
+    standard = 'standard',
+}
+
+export interface ConfigParagraphIndentation {
+    chapter?: boolean;
+    section?: boolean;
+}
+
 export interface ConfigCompilerOptionsInterface {
+    formatting?: string;
+    indent?: ConfigParagraphIndentation;
     order?: string[];
-    indent?: boolean;
 }
 
 export interface ConfigNames {
@@ -27,7 +38,11 @@ const DefaultConfig: ConfigInterface = {
         things: [],
     },
     compile: {
-        indent: true,
+        formatting: Formatting.standard,
+        indent: {
+            chapter: true,
+            section: false,
+        },
     },
 }
 
