@@ -64,7 +64,7 @@ export class Strip {
         return updatedLine;
     }
 
-    // Preserve leading spaces so that can be used later for setting indentation level.
+    // Preserve leading spaces so that can be used later for setting block quote level.
     private leadingSpaces(text: string): string {
         let i = 0;
         for (; i < text.length; i++) {

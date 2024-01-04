@@ -19,7 +19,7 @@ export class Line {
         public text: string = '',
         public lineNumber: number = -1,
         public lineType: LineType = LineType.unknown,
-        public indentation: number = 0,
+        public blockquoteLevel: number = 0,
     ) {}
 
     static copy(line: Line): Line {
@@ -27,7 +27,7 @@ export class Line {
         newLine.text = line.text;
         newLine.lineNumber = line.lineNumber;
         newLine.lineType = line.lineType;
-        newLine.indentation = line.indentation;
+        newLine.blockquoteLevel = line.blockquoteLevel;
         newLine.emphasis = [...line.emphasis];
         return newLine;
     }

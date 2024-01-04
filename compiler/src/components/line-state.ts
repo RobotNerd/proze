@@ -6,7 +6,7 @@ import { Strip } from "./strip";
 
 export class LineState {
 
-    indentationAmount: number = 0;
+    blockquoteLevel: number = 0;
     inParagraph: boolean = false;
     isWhitespaceOnly: boolean = false;
     
@@ -53,7 +53,7 @@ export class LineState {
         return !this.inParagraph && Metadata.getInstance().isMetadata(strippedLine);
     }
 
-    private parseIndentation(line: Line) {
+    private parseBlockquote(line: Line) {
        if (!this.inParagraph) {
             let count = 0;
             for (const char of line.text) {
@@ -63,16 +63,16 @@ export class LineState {
                     break;
                 }
             }
-            this.indentationAmount = Math.floor(count/2);
+            this.blockquoteLevel = Math.floor(count/2);
 
-            // Remove leading whitespace now that indentation state has been processed.
+            // Remove leading whitespace now that block quote state has been processed.
             line.text = line.text.trim();
         }
-        line.indentation = this.indentationAmount;
+        line.blockquoteLevel = this.blockquoteLevel;
     }
 
     private onEmptyLine(line: Line): Line[] {
-        this.indentationAmount = 0;
+        this.blockquoteLevel = 0;
         this.inParagraph = false;
         this.emphasis.reset();
         let newLine = Line.copy(line);
@@ -89,7 +89,7 @@ export class LineState {
     }
 
     private onText(strippedLine: Line): Line[] {
-        this.parseIndentation(strippedLine);
+        this.parseBlockquote(strippedLine);
         this.inParagraph = true;
         let updatedLines = this.applyEmphasis(strippedLine);
         updatedLines = EmDashParser.parse(updatedLines);
@@ -124,7 +124,7 @@ export class LineState {
             let newLine = Line.copy(line);
             newLine.text = ' ';
             newLine.lineType = LineType.paragraph;
-            newLine.indentation = this.indentationAmount;
+            newLine.blockquoteLevel = this.blockquoteLevel;
             updatedLines.push(newLine);
         }
         return updatedLines;
