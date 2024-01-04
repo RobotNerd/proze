@@ -86,6 +86,15 @@ export class PdfFormatter implements Formatter {
         });
     }
 
+    private addChapter(chapter: Chapter) {
+        (this.docDefinition.content as Content[]).push({
+            pageBreak: 'before',
+            style: 'chapter',
+            text: chapter.getOutput(),
+            tocItem: true,
+        });
+    }
+
     private addEmDash(emdash: EmDash) {
         this.currentTextBlock.push({
             text: emdash.toUnicode(),
@@ -210,7 +219,7 @@ export class PdfFormatter implements Formatter {
             let component = this.components[i];
             switch (component.token) {
                 case Token.chapter:
-                    this.startChapter(component as Chapter);
+                    this.addChapter(component as Chapter);
                     break;
                 case Token.emdash:
                     this.addEmDash((component as EmDash));
@@ -251,15 +260,6 @@ export class PdfFormatter implements Formatter {
             return [horizontal, 10, horizontal, 10];
         }
         return 0;
-    }
-
-    private startChapter(chapter: Chapter) {
-        (this.docDefinition.content as Content[]).push({
-            pageBreak: 'before',
-            style: 'chapter',
-            text: chapter.getOutput(),
-            tocItem: true,
-        });
     }
 
     writeToFile(path: string): void {
