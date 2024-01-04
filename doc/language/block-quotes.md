@@ -1,6 +1,6 @@
-# Indentation
+# Block Quotes
 
-Paragraphs can be treated as block quotes by using indentation. Do this by adding `2 spaces` before the first word of the paragraph.
+Paragraphs can be treated as block quotes by using leading spaces. Do this by adding `2 spaces` before the first word of the paragraph.
 
 ```proze
 It was a dark and stormy night; the rain fell in torrents—except at occasional
@@ -23,18 +23,16 @@ butcher, after rendering the same reply the inquirer had hitherto received,
 added, “But if this vill do as vell, Dummie, it is quite at your sarvice!”
 ```
 
-In the example above the second paragraph will be indented in the output. The indentation is set by the first line of the paragraph and will be reset on the next blank line.
+In the example above the second paragraph will have larger left and right margins than the surrounding text. The beginning of the block quote is set by the first line of the paragraph and will be reset on the next blank line.
 
-You can have multiple levels of indentation. This is something you would use when you're quoting another document that's also quoting another doucment (most likely encountered in blog posts and news articles). Every additional indentation level is defined by adding an additional `2 spaces` to the left of the first line of the paragraph.
+You can have multiple levels of block quotes. This is something you would use when you're quoting another document that is also quoting another doucment (e.g. something you might encounter in blog post or news article). Every additional level of block quote is defined by adding an additional `2 spaces` to the left of the first line of the paragraph.
 
-| Indentation level | Leading spaces |
+| Block quote level | Leading spaces |
 | - | - |
 | None | 0 |
 | 1 | 2 |
 | 2 | 4 |
 | 3 | 6 |
-
-And so on...
 
 ```proze
 It was a dark and stormy night; the rain fell in torrents—except at occasional
@@ -64,9 +62,7 @@ butcher, after rendering the same reply the inquirer had hitherto received,
 added, “But if this vill do as vell, Dummie, it is quite at your sarvice!”
 ```
 
-In the above example, paragraph 2 is indented once and paragraph 3 is indented once again.
-
-Indentation is relative. The amount of leading space is up to you. So if you want multiple paragraphs in your block quote to be indented the same amount, use the same amount of leading whitespace.
+In the above example, paragraph 2 is the first-level block quote and paragraph 3 is a second-level block quote with a larger left/right margin.
 
 ```proze
 It was a dark and stormy night; the rain fell in torrents—except at occasional
@@ -96,6 +92,6 @@ butcher, after rendering the same reply the inquirer had hitherto received,
 added, “But if this vill do as vell, Dummie, it is quite at your sarvice!”
 ```
 
-In this example, paragraphs 2 and 3 will be indented to the same level, representing that they're part of the same quoted document.
+In this example, paragraphs 2 and 3 will have the same margin size, representing that they're part of the same quoted document.
 
 [Previous: Paragraphs](./paragraphs.md) | [Proze Language](./proze-language.md) | [Next: Dialogue](./dialogue.md)
