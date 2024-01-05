@@ -1,5 +1,6 @@
 import { ArgParser, ShowHelpError } from './util/cli-arguments';
 import { Compiler } from './compiler';
+import { ConfigParserError } from './util/config';
 import { exit } from 'process';
 import { CompileError } from './util/compile-error';
 import { CompilerMessages } from './util/compiler-messages';
@@ -25,6 +26,10 @@ catch (e: unknown) {
     else if (e instanceof CompileError) {
         console.log(e);
         console.log(CompilerMessages.getInstance().toString());
+    }
+    else if (e instanceof ConfigParserError) {
+        console.log(`ERROR: config file: ${e.message}`);
+        console.log('   Document not compiled. Please fix the proze config file and recompile.\n');
     }
     else {
         throw e;
