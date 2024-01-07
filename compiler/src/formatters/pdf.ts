@@ -27,6 +27,7 @@ const LeadingWhitespace = "      ";
 export class PdfFormatter implements Formatter {
 
     private blockquoteLevel: number = 0;
+    private currentChapterTitle: string = '';
     private currentTextBlock: Content[] = [];
     private docDefinition: TDocumentDefinitions;
     private isFirstParagraphOfChapter: boolean = true;
@@ -131,10 +132,11 @@ export class PdfFormatter implements Formatter {
     private addChapter(chapter: Chapter) {
         this.isFirstParagraphOfChapter = true;
         this.isFirstParagraphOfSection = false;
+        this.currentChapterTitle = chapter.getOutput();
         (this.docDefinition.content as Content[]).push({
             pageBreak: 'before',
             style: 'chapter',
-            text: chapter.getOutput(),
+            text: this.currentChapterTitle,
             tocItem: true,
         });
     }
@@ -283,7 +285,7 @@ export class PdfFormatter implements Formatter {
                 value = this.projectMetadata.author ? this.projectMetadata.author.name : '';
                 break;
             case HeaderFooterValue.chapter:
-                // TODO - need to keep track of current chapter title
+                value = this.currentChapterTitle;
                 break;
             case HeaderFooterValue.page:
                 value = `${currentPage}`;
