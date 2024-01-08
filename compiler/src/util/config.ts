@@ -7,13 +7,33 @@ export enum Formatting {
     standard = 'standard',
 }
 
+export enum HeaderFooterValue {
+    author = 'author',
+    chapter = 'chapter',
+    page = 'page',
+    title = 'title',
+}
+
 export interface ConfigParagraphIndentation {
     chapter?: boolean;
     section?: boolean;
 }
 
+export interface ConfigHeaderFooterSlots {
+    center?: HeaderFooterValue;
+    left?: HeaderFooterValue;
+    right?: HeaderFooterValue;
+}
+
+export interface ConfigHeaderAndFooter {
+    even?: ConfigHeaderFooterSlots;
+    odd?: ConfigHeaderFooterSlots;
+}
+
 export interface ConfigCompilerOptionsInterface {
-    formatting?: string;
+    footer?: ConfigHeaderAndFooter;
+    formatting?: Formatting;
+    header?: ConfigHeaderAndFooter;
     indentFirst?: ConfigParagraphIndentation;
     order?: string[];
 }
@@ -39,11 +59,30 @@ const DefaultConfig: ConfigInterface = {
     },
     compile: {
         formatting: Formatting.standard,
+        header: {
+            even: {
+                left: HeaderFooterValue.page,
+                center: HeaderFooterValue.author,
+            },
+            odd: {
+                center: HeaderFooterValue.title,
+                right: HeaderFooterValue.page,
+            },
+        },
+        footer: {},
         indentFirst: {
             chapter: false,
             section: false,
         },
     },
+}
+
+export class ConfigParserError extends Error {
+    constructor(
+        public message: string
+    ) {
+        super(message);
+    }
 }
 
 export class ConfigParser {
@@ -139,16 +178,28 @@ export class ConfigParser {
         }
 
         if (config.compile) {
-            mergedConfig.compile = {...DefaultConfig.compile, ...config.compile};
-            mergedConfig.compile.order = config.compile.order;
-
-            // Sanitize formatting value.
-            if (!Object.keys(Formatting).includes(mergedConfig.compile?.formatting!)) {
-                mergedConfig.compile.formatting = DefaultConfig.compile?.formatting;
-            }
+            mergedConfig.compile = { ...DefaultConfig.compile, ...config.compile };
+            this.mergeHeaderAndFooter(mergedConfig, config);
+            this.sanitizeFormatting(mergedConfig);
+            this.sanitizeHeaderAndFooter(mergedConfig);
         }
 
         return mergedConfig;
+    }
+
+    static mergeHeaderAndFooter(mergedConfig: ConfigInterface, config: ConfigInterface) {
+        if (mergedConfig.compile) {
+            if (config.compile?.footer || config.compile?.header) {
+                mergedConfig.compile.header = {};
+                mergedConfig.compile.footer = {};
+                if (config.compile?.footer) {
+                    mergedConfig.compile.footer = config.compile.footer;
+                }
+                if (config.compile?.header) {
+                    mergedConfig.compile.header = config.compile.header;
+                }
+            }
+        }
     }
 
     private static parseJSON(path: string): ConfigInterface {
@@ -166,6 +217,53 @@ export class ConfigParser {
             return fromFile;
         }
         return DefaultValue;
+    }
+
+    private static sanitizeFormatting(config: ConfigInterface) {
+        if (config.compile) {
+            if (!Object.keys(Formatting).includes(config.compile?.formatting!)) {
+                console.warn(
+                    `CONFIG WARNING: invalid formatting value "${config.compile.formatting}" ` +
+                    `in configuration file, ` +
+                    `using "${DefaultConfig.compile?.formatting}" instead`
+                );
+                config.compile.formatting = DefaultConfig.compile?.formatting;
+            }
+        }
+    }
+
+    private static sanitizeHeaderAndFooter(config: ConfigInterface) {
+        if (config.compile?.footer?.even) {
+            this.sanitizeConfigHeaderFooterSlots(config.compile?.footer?.even);
+        }
+        if (config.compile?.footer?.odd) {
+            this.sanitizeConfigHeaderFooterSlots(config.compile?.footer?.odd);
+        }
+        if (config.compile?.header?.even) {
+            this.sanitizeConfigHeaderFooterSlots(config.compile?.header?.even);
+        }
+        if (config.compile?.header?.odd) {
+            this.sanitizeConfigHeaderFooterSlots(config.compile?.header?.odd);
+        }
+    }
+
+    private static sanitizeConfigHeaderFooterSlots(slots: ConfigHeaderFooterSlots) {
+        const message = 'Bad header/footer slot value';
+        if (slots.center) {
+            if (!Object.keys(HeaderFooterValue).includes(slots.center)) {
+                throw new ConfigParserError(`${message}: "${slots.center}"`);
+            }
+        }
+        if (slots.left) {
+            if (!Object.keys(HeaderFooterValue).includes(slots.left)) {
+                throw new ConfigParserError(`${message}: "${slots.left}"`);
+            }
+        }
+        if (slots.right) {
+            if (!Object.keys(HeaderFooterValue).includes(slots.right)) {
+                throw new ConfigParserError(`${message}: "${slots.right}"`);
+            }
+        }
     }
 
     private static split(names: string[]): string[] {

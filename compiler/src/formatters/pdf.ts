@@ -1,5 +1,6 @@
 import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
+import { ConfigHeaderFooterSlots, HeaderFooterValue } from '../util/config';
 import { ConfigInterface } from '../util/config';
 import { EmphasisType } from '../components/line';
 import { Formatting } from '../util/config';
@@ -15,8 +16,13 @@ import PdfPrinter = require("pdfmake");
 import * as fs from 'fs';
 import { EmDash } from '../components/em-dash';
 
-const LeadingWhitespace = "      ";
 const BlockquoteTabStop: number = 25;
+const HeaderFooterMargin = {
+    vertical: 8,
+    horizontal: 40,
+};
+const LeadingWhitespace = "      ";
+
 
 export class PdfFormatter implements Formatter {
 
@@ -35,10 +41,27 @@ export class PdfFormatter implements Formatter {
         this.docDefinition = {
             pageSize: 'A5',
             content: [],
-            footer: this.formatFooter,
-            header: (currentPage: number, _pageCount: number, _pageSize: ContextPageSize) => {
-                const title = this.projectMetadata.title ? this.projectMetadata.title.name : '';
-                return this.formatHeader(currentPage, title);
+            header: (currentPage: number, _pageCount: number, _pageSize: ContextPageSize): Content => {
+                if (currentPage % 2 === 0) {
+                    if (config?.compile?.header?.even) {
+                        return this.formatHeaderOrFooter(config?.compile?.header?.even, currentPage)
+                    }
+                }
+                if (config?.compile?.header?.odd) {
+                    return this.formatHeaderOrFooter(config?.compile?.header?.odd, currentPage);
+                }
+                return { text: '' };
+            },
+            footer: (currentPage: number, _pageCount: number, _pageSize: ContextPageSize): Content => {
+                if (currentPage % 2 === 0) {
+                    if (config?.compile?.footer?.even) {
+                        return this.formatHeaderOrFooter(config?.compile?.footer?.even, currentPage)
+                    }
+                }
+                if (config?.compile?.footer?.odd) {
+                    return this.formatHeaderOrFooter(config?.compile?.footer?.odd, currentPage);
+                }
+                return { text: '' };
             },
             styles: {
                 author: {
@@ -50,12 +73,29 @@ export class PdfFormatter implements Formatter {
                     fontSize: 18,
                     margin: [0, 0, 0, 18],
                 },
-                footer: {
+                headerAndFooterCenter: {
                     alignment: 'center',
+                    margin: [
+                        0,
+                        HeaderFooterMargin.vertical,
+                        0,
+                        HeaderFooterMargin.vertical],
                 },
-                header: {
+                headerAndFooterLeft: {
                     alignment: 'center',
-                    margin: [0, 8, 0, 0],
+                    margin: [
+                        HeaderFooterMargin.horizontal,
+                        HeaderFooterMargin.vertical,
+                        0,
+                        HeaderFooterMargin.vertical],
+                },
+                headerAndFooterRight: {
+                    alignment: 'center',
+                    margin: [
+                        0,
+                        HeaderFooterMargin.vertical,
+                        HeaderFooterMargin.horizontal,
+                        HeaderFooterMargin.vertical],
                 },
                 sectionName: {
                     bold: true,
@@ -212,24 +252,56 @@ export class PdfFormatter implements Formatter {
         this.blockquoteLevel = 0;
     }
 
-    private formatFooter(currentPage: number, pageCount: number) {
-        if (currentPage === 1) {
-            return '';
-        }
-        return {
-            text: currentPage.toString() + ' of ' + pageCount,
-            style: 'footer',
-        };
-    };
+    private formatHeaderOrFooter(slots: ConfigHeaderFooterSlots, currentPage: number): Content {
+        let center: string = '';
+        let left: string = '';
+        let right: string = '';
 
-    private formatHeader(currentPage: number, title: string): Content {
-        if (currentPage === 1) {
-            return '';
+        if (slots.center) {
+            center = this.getHeaderFooterValue(slots.center, currentPage);
         }
+        if (slots.left) {
+            left = this.getHeaderFooterValue(slots.left, currentPage);
+        }
+        if (slots.right) {
+            right = this.getHeaderFooterValue(slots.right, currentPage);
+        }
+
         return {
-            text: title,
-            style: 'header',
-        };
+            columns: [
+                { text: left, alignment: 'left', style: 'headerAndFooterLeft' },
+                { text: center, alignment: 'center', style: 'headerAndFooterCenter' },
+                { text: right, alignment: 'right', style: 'headerAndFooterRight' },
+            ],
+        }
+    }
+
+    private getHeaderFooterValue(headerFooterValue: HeaderFooterValue, currentPage: number): string {
+        let value: string = '';
+        switch(headerFooterValue) {
+            case HeaderFooterValue.author:
+                value = this.projectMetadata.author ? this.projectMetadata.author.name : '';
+                break;
+            case HeaderFooterValue.chapter:
+                // NOTE: As of January 2024, the pdfmake does not appear to have a way to add
+                //   custom text to the header/footer based on the page number.
+                //   Potential workaround: https://github.com/bpampuch/pdfmake/issues/1270#issuecomment-514387900
+                console.warn(
+                    `WARNING: Chapter titles in header/footer are not currently supported for PDF files.`
+                );
+                break;
+            case HeaderFooterValue.page:
+                value = `${currentPage}`;
+                break;
+            case HeaderFooterValue.title:
+                value = this.projectMetadata.title ? this.projectMetadata.title.name : '';
+                break;
+            default:
+                console.warn(
+                    `WARNING: Ignoring invalid header/footer value from config: ${headerFooterValue}`
+                );
+        }
+        return value;
     }
 
     private generateDoc(): PDFKit.PDFDocument {

@@ -51,5 +51,72 @@ compile:
     - acknowledgements.proze
 ```
 
+## Headers and Footers
+
+You can control what information is displayed in the header and footer of your book. Here is the default configuration:
+
+```yaml
+---
+compile:
+  header:
+    even:
+      left: page
+      center: author
+    odd:
+      center: title
+      right: page
+```
+
+Here's what this configuration tells the compiler to do:
+- Nothing in the footer (since there is no `footer` entry).
+- In the header
+  - On even-numbered pages
+    - Add the current page number on the left side of the header.
+    - Add the author's name in the center of the header.
+  - On odd-numbered pages
+    - Add the book title in the center of the header.
+    - Add the current page number on the right side of the header.
+
+> Even and odd pages: When publishing a physical book, even numbered pages are on the left side and odd numbered pages on the right.
+
+Available slots in the header and footer:
+
+| Slot |
+| - |
+| left |
+| center |
+| right |
+
+Available values to put in a slot:
+
+| Value | Supported Formats | Description |
+| - | - | - |
+| author | pdf | Author's name |
+| chapter | | Current chapter title (use "Chapter #" if no chapter title.) |
+| page | pdf | Current page number |
+| title | pdf | Book title |
+
+Let's create another example that has a different formatting:
+- Header
+  - Author name in the left slot on even numbered pages.
+  - Chapter name in the right slot on odd numbered pages.
+- Footer
+  - Current page number in the center slot on even and odd numbered pages
+
+```yaml
+---
+compile:
+  header:
+    even:
+      left: author
+    odd:
+      right: chapter
+  footer:
+    even:
+      center: page
+    odd:
+      center: page
+```
+
 
 [Next: Configuration Names](./config-names.md) | [Proze Language](./proze-language.md) | [Next: Syntax Highlighting](./syntax-highlighting.md)
