@@ -89,12 +89,12 @@ Available slots in the header and footer:
 
 Available values to put in a slot:
 
-| Value | Description |
-| - | - |
-| author | Author's name |
-| chapter | Current chapter title (use "Chapter #" if no chapter title.) |
-| page | Current page number |
-| title | Book title |
+| Value | Supported Formats | Description |
+| - | - | - |
+| author | pdf | Author's name |
+| chapter | | Current chapter title (use "Chapter #" if no chapter title.) |
+| page | pdf | Current page number |
+| title | pdf | Book title |
 
 Let's create another example that has a different formatting:
 - Header

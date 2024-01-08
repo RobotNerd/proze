@@ -27,7 +27,6 @@ const LeadingWhitespace = "      ";
 export class PdfFormatter implements Formatter {
 
     private blockquoteLevel: number = 0;
-    private currentChapterTitle: string = '';
     private currentTextBlock: Content[] = [];
     private docDefinition: TDocumentDefinitions;
     private isFirstParagraphOfChapter: boolean = true;
@@ -132,11 +131,10 @@ export class PdfFormatter implements Formatter {
     private addChapter(chapter: Chapter) {
         this.isFirstParagraphOfChapter = true;
         this.isFirstParagraphOfSection = false;
-        this.currentChapterTitle = chapter.getOutput();
         (this.docDefinition.content as Content[]).push({
             pageBreak: 'before',
             style: 'chapter',
-            text: this.currentChapterTitle,
+            text: chapter.getOutput(),
             tocItem: true,
         });
     }
@@ -285,7 +283,12 @@ export class PdfFormatter implements Formatter {
                 value = this.projectMetadata.author ? this.projectMetadata.author.name : '';
                 break;
             case HeaderFooterValue.chapter:
-                value = this.currentChapterTitle;
+                // NOTE: As of January 2024, the pdfmake does not appear to have a way to add
+                //   custom text to the header/footer based on the page number.
+                //   Potential workaround: https://github.com/bpampuch/pdfmake/issues/1270#issuecomment-514387900
+                console.warn(
+                    `WARNING: Chapter titles in header/footer are not currently supported for PDF files.`
+                );
                 break;
             case HeaderFooterValue.page:
                 value = `${currentPage}`;
