@@ -1,4 +1,4 @@
-import { EmDashParser } from "./em-dash";
+import { EmDashParser } from "../components/em-dash";
 import { Emphasis } from "./emphasis";
 import { Line, LineType } from "./line";
 import { Metadata } from "./metadata";

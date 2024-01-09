@@ -1,8 +1,8 @@
 import { CompilerMessages } from "../util/compiler-messages";
 import { ParseWarning } from "../util/parse-error";
 import { Component } from "./component";
-import { Line } from "./line";
-import { Metadata } from "./metadata";
+import { Line } from "../parse/line";
+import { Metadata } from "../parse/metadata";
 import { Token } from "./token";
 
 export class Chapter implements Component {

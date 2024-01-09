@@ -1,6 +1,6 @@
 import { CompileError } from '../util/compile-error';
 import { Compiler } from '../compiler';
-import { Metadata } from '../components/metadata';
+import { Metadata } from '../parse/metadata';
 import { ProzeArgs, Format } from '../util/cli-arguments';
 import { readFileSync } from 'fs';
 import { CompilerMessages } from '../util/compiler-messages';

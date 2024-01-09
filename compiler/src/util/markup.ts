@@ -1,4 +1,4 @@
-import { Line } from "../components/line";
+import { Line } from "../parse/line";
 
 export class Markup {
 

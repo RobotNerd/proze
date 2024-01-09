@@ -1,5 +1,5 @@
 import { Component } from "./component";
-import { Line, LineType } from './line';
+import { Line, LineType } from '../parse/line';
 import { Token } from "./token";
 
 const EmDashProze = '--';
