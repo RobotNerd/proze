@@ -1,6 +1,6 @@
 import { CompilerMessages } from "../util/compiler-messages";
 import { ConfigInterface } from "../util/config";
-import { Line, LineType } from "./line";
+import { Line, LineType } from "../components/line";
 import { Names } from "./names";
 import { TestUtils } from "../util/test-utils";
 

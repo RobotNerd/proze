@@ -9,7 +9,7 @@ import { Format, ProzeArgs } from './util/cli-arguments';
 import { Line, LineType } from './components/line';
 import { LineState } from './components/line-state';
 import { Metadata } from './components/metadata';
-import { Names } from './components/names';
+import { Names } from './util/names';
 import { ParseError } from './util/parse-error';
 import { PdfFormatter } from './formatters/pdf';
 import { ProzeFile } from './util/proze-file';
