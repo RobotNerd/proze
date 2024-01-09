@@ -183,15 +183,15 @@ export class PdfFormatter implements Formatter {
             bold: false,
             italics: false,
         };
-        if (text.emphasis.indexOf(EmphasisType.bold) >= 0) {
+        if (text.line.emphasis.indexOf(EmphasisType.bold) >= 0) {
             style.bold = true;
         }
-        if (text.emphasis.indexOf(EmphasisType.italic) >= 0) {
+        if (text.line.emphasis.indexOf(EmphasisType.italic) >= 0) {
             style.italics = true;
         }
-        this.blockquoteLevel = text.blockquoteLevel;
+        this.blockquoteLevel = text.line.blockquoteLevel;
         this.currentTextBlock.push({
-            text: text.text,
+            text: text.line.text,
             style: style,
         });
     }

@@ -29,7 +29,7 @@ export class TextFormatter implements Formatter {
     }
 
     private addText(text: Text) {
-        this.currentTextBlock.push(text.text);
+        this.currentTextBlock.push(text.line.text);
     }
 
     private endChapter() {
