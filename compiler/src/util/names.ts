@@ -1,7 +1,7 @@
 import { CompilerMessages } from "../util/compiler-messages";
 import { ConfigInterface } from "../util/config";
 import { ParseError } from "../util/parse-error";
-import { Line, LineType } from "./line";
+import { Line, LineType } from "../parse/line";
 import { Trie } from '../util/trie';
 
 const terminators = ['.', ' ', '?', '!', ',', '"', "'", '\n', '\t'];

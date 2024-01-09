@@ -1,9 +1,9 @@
-import { Author } from "./author";
-import { Chapter } from "./chapter";
+import { Author } from "../components/author";
+import { Chapter } from "../components/chapter";
 import { Line } from "./line";
 import { ParseError } from "../util/parse-error";
-import { Section } from "./section";
-import { Title } from "./title";
+import { Section } from "../components/section";
+import { Title } from "../components/title";
 import { CompilerMessages } from "../util/compiler-messages";
 
 enum Tag {

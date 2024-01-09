@@ -1,8 +1,8 @@
-import { EmDashParser } from "./em-dash";
+import { EmDashParser } from '../parse/em-dash-parser';
 import { Emphasis } from "./emphasis";
 import { Line, LineType } from "./line";
 import { Metadata } from "./metadata";
-import { Strip } from "./strip";
+import { Strip } from "../util/strip";
 
 export class LineState {
 

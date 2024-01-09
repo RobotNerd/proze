@@ -2,9 +2,9 @@ import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
 import { ConfigHeaderFooterSlots, HeaderFooterValue } from '../util/config';
 import { ConfigInterface } from '../util/config';
-import { EmphasisType } from '../components/line';
+import { EmphasisType } from '../parse/line';
 import { Formatting } from '../util/config';
-import { ProjectMetadata } from '../components/metadata';
+import { ProjectMetadata } from '../parse/metadata';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
 import { Token } from '../components/token';
@@ -183,15 +183,15 @@ export class PdfFormatter implements Formatter {
             bold: false,
             italics: false,
         };
-        if (text.emphasis.indexOf(EmphasisType.bold) >= 0) {
+        if (text.line.emphasis.indexOf(EmphasisType.bold) >= 0) {
             style.bold = true;
         }
-        if (text.emphasis.indexOf(EmphasisType.italic) >= 0) {
+        if (text.line.emphasis.indexOf(EmphasisType.italic) >= 0) {
             style.italics = true;
         }
-        this.blockquoteLevel = text.blockquoteLevel;
+        this.blockquoteLevel = text.line.blockquoteLevel;
         this.currentTextBlock.push({
-            text: text.text,
+            text: text.line.text,
             style: style,
         });
     }

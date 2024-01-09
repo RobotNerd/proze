@@ -1,7 +1,7 @@
 import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
 import { EmDash } from '../components/em-dash';
-import { ProjectMetadata } from '../components/metadata';
+import { ProjectMetadata } from '../parse/metadata';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
 import { Token } from '../components/token';
@@ -29,7 +29,7 @@ export class TextFormatter implements Formatter {
     }
 
     private addText(text: Text) {
-        this.currentTextBlock.push(text.text);
+        this.currentTextBlock.push(text.line.text);
     }
 
     private endChapter() {

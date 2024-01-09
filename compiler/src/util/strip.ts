@@ -1,7 +1,7 @@
 import { CompilerMessages } from "../util/compiler-messages";
 import { Markup } from "../util/markup";
 import { ParseError } from "../util/parse-error";
-import { Line } from "./line";
+import { Line } from "../parse/line";
 
 enum StrippedToken {
     BlockComment = '###',

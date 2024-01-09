@@ -1,7 +1,7 @@
 import { ProzeArgs, Format } from './cli-arguments';
 import { Compiler } from '../compiler';
 import { CompilerMessages } from "./compiler-messages";
-import { Metadata } from "../components/metadata";
+import { Metadata } from "../parse/metadata";
 
 
 export class TestUtils {
