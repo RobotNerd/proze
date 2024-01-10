@@ -1,3 +1,5 @@
+import { CompilerDirective } from "../util/compiler-directive";
+
 export enum LineType {
     emdash = 'emdash',
     emptyLine = 'emptyLine',
@@ -14,6 +16,7 @@ export enum EmphasisType {
 export class Line {
 
     emphasis: EmphasisType[] = [];
+    indentDirective: CompilerDirective | null = null;
 
     constructor(
         public text: string = '',
@@ -29,6 +32,9 @@ export class Line {
         newLine.lineType = line.lineType;
         newLine.blockquoteLevel = line.blockquoteLevel;
         newLine.emphasis = [...line.emphasis];
+        if (line.indentDirective) {
+            newLine.indentDirective = CompilerDirective.copy(line.indentDirective);
+        }
         return newLine;
     }
 }

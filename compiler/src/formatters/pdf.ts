@@ -1,4 +1,5 @@
 import { Chapter } from '../components/chapter';
+import { CompilerDirective, DirectiveType } from "../util/compiler-directive";
 import { Component } from '../components/component';
 import { ConfigHeaderFooterSlots, HeaderFooterValue } from '../util/config';
 import { ConfigInterface } from '../util/config';
@@ -29,6 +30,7 @@ export class PdfFormatter implements Formatter {
     private blockquoteLevel: number = 0;
     private currentTextBlock: Content[] = [];
     private docDefinition: TDocumentDefinitions;
+    private indentOverride: CompilerDirective | null = null;
     private isFirstParagraphOfChapter: boolean = true;
     private isFirstParagraphOfSection: boolean = false;
     private printer: PdfPrinter;
@@ -147,19 +149,35 @@ export class PdfFormatter implements Formatter {
 
     private addLeadingWhitesapace() {
         let shouldIndent: boolean = false;
-        if (this.config?.compile?.formatting === Formatting.standard) {
+        if (this.indentOverride !== null) {
+            if (this.indentOverride.directiveType === DirectiveType.indent) {
+                shouldIndent = true;
+            }
+            else if (this.indentOverride.directiveType === DirectiveType.unindent) {
+                shouldIndent = false;
+            }
+            else {
+                console.warn(
+                    'WARNING: Invalid type for indentation compiler directive: ',
+                    this.indentOverride.directiveType
+                );
+            }
+            this.indentOverride = null;
+        }
+        else if (this.config?.compile?.formatting === Formatting.standard) {
             if (this.isFirstParagraphOfChapter) {
-                this.isFirstParagraphOfChapter = false;
                 shouldIndent = this.config.compile?.indentFirst?.chapter!;
             }
             else if (this.isFirstParagraphOfSection) {
-                this.isFirstParagraphOfSection = false;
                 shouldIndent = this.config.compile?.indentFirst?.section!;
             }
             else {
                 shouldIndent = true;
             }
         }
+
+        this.isFirstParagraphOfChapter = false;
+        this.isFirstParagraphOfSection = false;
 
         if (shouldIndent) {
             this.currentTextBlock.unshift({
@@ -194,6 +212,13 @@ export class PdfFormatter implements Formatter {
             text: text.line.text,
             style: style,
         });
+    }
+
+    private overrideIndentation(text: Text) {
+        if (this.currentTextBlock.length === 0 && text.line.indentDirective) {
+            // Only apply indentation when it is set on the first line of the paragraph.
+            this.indentOverride = text.line.indentDirective;
+        }
     }
 
     private addTitle() {
@@ -327,6 +352,7 @@ export class PdfFormatter implements Formatter {
                     this.addSection(component as Section);
                     break;
                 case Token.text:
+                    this.overrideIndentation(component as Text);
                     this.addText(component as Text);
                     break;
             }

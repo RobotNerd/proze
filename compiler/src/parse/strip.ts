@@ -1,3 +1,4 @@
+import { CompilerDirective, DirectiveType } from "../util/compiler-directive";
 import { CompilerMessages } from "../util/compiler-messages";
 import { Markup } from "../util/markup";
 import { ParseError } from "../util/parse-error";
@@ -14,6 +15,21 @@ export class Strip {
 
     private inBlockComment: boolean = false;
     private inBracketBlock: boolean = false;
+    private lineDirectives: CompilerDirective[] = [];
+
+    private applyLineDirectives(line: Line) {
+        if (this.lineDirectives.length > 0) {
+            for (let lineDirective of this.lineDirectives) {
+                switch (lineDirective.directiveType) {
+                    case DirectiveType.indent:
+                    case DirectiveType.unindent:
+                        line.indentDirective = lineDirective;
+                        break;
+                }
+            }
+            this.lineDirectives = [];
+        }
+    }
 
     commentsAndBrackets(line: Line | null): Line | null {
         if (line === null) {
@@ -29,6 +45,7 @@ export class Strip {
 
         do {
             [token, index] = this.nextToken(text);
+            this.parseCompilerDirectives(text, token, index);
             if (index < 0) {
                 if (!this.inBlockComment && !this.inBracketBlock) {
                     substrings.push(text);
@@ -48,6 +65,7 @@ export class Strip {
                         break;
                     case StrippedToken.CloseBracket:
                         [parsedText, text] = this.removeBracketBlock(text, index, line.lineNumber);
+                        this.applyLineDirectives(line);
                         break;
                 }
                 if (parsedText != '') {
@@ -103,6 +121,31 @@ export class Strip {
             token = StrippedToken.CloseBracket;
         }
         return [token, index];
+    }
+
+    private parseCompilerDirectives(text: string, token: StrippedToken, index: number) {
+        let textInsideBrackets = text;
+        if (this.inBracketBlock) {
+            if (index >= 0) {
+                if (token === StrippedToken.OpenBracket) {
+                    textInsideBrackets = text.substring(index + 1, text.length);
+                }
+                else if (token === StrippedToken.CloseBracket) {
+                    textInsideBrackets = text.substring(0, index);
+                }
+            }
+            textInsideBrackets = textInsideBrackets.trim();
+
+            let directives = CompilerDirective.parse(textInsideBrackets);
+            for (let directive of directives) {
+                switch (directive?.directiveType) {
+                    case DirectiveType.indent:
+                    case DirectiveType.unindent:
+                        this.lineDirectives.push(directive);
+                        break;
+                }
+            }
+        }
     }
     
     private removeBlockComment(text: string, index: number): [string, string] {
