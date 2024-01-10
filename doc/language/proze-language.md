@@ -11,6 +11,7 @@ These documents describe the proze language format.
 - [Headers](./headers.md)
 - [Comments](./comments.md)
 - [Brackets](./brackets.md)
+- [Compiler Directives](./compiler-directives.md)
 - [Comment Tokens](./comment-tokens.md)
 - [Files](./files.md)
 - [Configuration file](./config.md)

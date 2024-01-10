@@ -17,4 +17,4 @@ A good Visual Studio Code extension you can use is
 which makes it easy to find TODO and other similar annotations in your code.
 
 
-[Previous: Brackets](./brackets.md) | [Proze Language](./proze-language.md) | [Next: Files](./files.md)
+[Previous: Compiler Directives](./compiler-directives.md) | [Proze Language](./proze-language.md) | [Next: Files](./files.md)

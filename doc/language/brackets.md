@@ -4,11 +4,9 @@ Special notes are placed inside a pair of brackets `[]`. When compiling a proze 
 
 ## Why use brackets?
 
-Bracketed text is very similar to comments in the way that they are removed from the document when compiling. You can use square brackets to add notes and comments to your proze files. However, brackets become more important when specifying metadata to change the way the proze document is compiled.
+Bracketed text is very similar to comments in the way that they are removed from the document when compiling. You can use square brackets to add notes and comments to your proze files. However, brackets become more important because they allow you to change the way the proze document is compiled. See [Compiler Directives](./compiler-directives.md) for details.
 
-> TODO overriding fonts with bracket blocks
-
-## Using brackets
+## Using brackets for notes
 
 All text between and including `[` and `]` characters is part of the bracketed block of text.
 
@@ -70,4 +68,4 @@ The escaped square brackets will be in the compiled output.
 It was a dark and stormy night; [NOT REMOVED] the rain fell in torrents—except at occasional intervals, when it was checked by a violent gust of wind which swept up the streets (for it is in London that our scene lies), rattling along the housetops, and fiercely agitating the scanty flame of the lamps that struggled against the darkness.
 ```
 
-[Previous: Comments](./comments.md) | [Proze Language](./proze-language.md) | [Next: Comment Tokens](./comment-tokens.md)
+[Previous: Comments](./comments.md) | [Proze Language](./proze-language.md) | [Next: Compiler Directives](./compiler-directives.md)
