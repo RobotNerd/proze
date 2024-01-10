@@ -21,4 +21,8 @@ Note that if the compiler directive does the same thing as the indentation behav
 Additional requirements:
 - Indentation directives must occur at the beginning of the paragraph before the first sentence. If placed anywhere else within the paragraph, it will be ignored.
 
+## Duplicate directives
+
+If you have duplicate compiler directives in the proze file, the last one overwrite the earlier ones. You should avoid having duplicate compiler directives to make it easier to understand how your document will be compiled.
+
 [Previous: Brackets](./brackets.md) | [Proze Language](./proze-language.md) | [Next: Comment Tokens](./comment-tokens.md)
