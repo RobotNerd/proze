@@ -15,6 +15,7 @@ export class Strip {
 
     private inBlockComment: boolean = false;
     private inBracketBlock: boolean = false;
+    private isBracketAtLineStart: boolean = true;
     private lineDirectives: CompilerDirective[] = [];
 
     private applyLineDirectives(line: Line) {
@@ -23,11 +24,22 @@ export class Strip {
                 switch (lineDirective.directiveType) {
                     case DirectiveType.indent:
                     case DirectiveType.unindent:
-                        line.indentDirective = lineDirective;
+                        if (this.isBracketAtLineStart) {
+                            line.indentDirective = lineDirective;
+                        }
                         break;
                 }
             }
             this.lineDirectives = [];
+        }
+    }
+
+    private checkBracketAtLineStart(substrings: string[], parsedText: string) {
+        if (substrings.length > 0) {
+            this.isBracketAtLineStart = false;
+        }
+        else if (parsedText !== '') {
+            this.isBracketAtLineStart = false;
         }
     }
 
@@ -65,6 +77,7 @@ export class Strip {
                         break;
                     case StrippedToken.CloseBracket:
                         [parsedText, text] = this.removeBracketBlock(text, index, line.lineNumber);
+                        this.checkBracketAtLineStart(substrings, parsedText);
                         this.applyLineDirectives(line);
                         break;
                 }
