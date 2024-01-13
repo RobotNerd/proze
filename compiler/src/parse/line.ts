@@ -23,6 +23,7 @@ export class Line {
         public lineNumber: number = -1,
         public lineType: LineType = LineType.unknown,
         public blockquoteLevel: number = 0,
+        public filePath: string = '',
     ) {}
 
     static copy(line: Line): Line {
@@ -32,6 +33,7 @@ export class Line {
         newLine.lineType = line.lineType;
         newLine.blockquoteLevel = line.blockquoteLevel;
         newLine.emphasis = [...line.emphasis];
+        newLine.filePath = line.filePath;
         if (line.indentDirective) {
             newLine.indentDirective = CompilerDirective.copy(line.indentDirective);
         }

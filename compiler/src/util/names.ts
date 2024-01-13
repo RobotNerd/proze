@@ -34,7 +34,8 @@ export class Names {
             CompilerMessages.getInstance().add(
                 new ParseError(
                     `Invalid name found: "${name}"`,
-                    line.lineNumber
+                    line.lineNumber,
+                    line.filePath
                 )
             );
         }

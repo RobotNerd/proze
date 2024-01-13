@@ -75,7 +75,11 @@ export class Metadata {
                 break;
             default:
                 CompilerMessages.getInstance().add(
-                    new ParseError(`Unrecognized metadata tag ${tag}`, line.lineNumber)
+                    new ParseError(
+                        `Unrecognized metadata tag ${tag}`,
+                        line.lineNumber,
+                        line.filePath
+                    )
                 );
         }
         return component;
@@ -91,7 +95,8 @@ export class Metadata {
             CompilerMessages.getInstance().add(
                 new ParseError(
                     `Invalid Author tag: no author name provided`,
-                    line.lineNumber
+                    line.lineNumber,
+                    line.filePath
                 )
             );
         }
@@ -131,7 +136,8 @@ export class Metadata {
             CompilerMessages.getInstance().add(
                 new ParseError(
                     `Invalid Title tag: no title provided`,
-                    line.lineNumber
+                    line.lineNumber,
+                    line.filePath
                 )
             );
         }
