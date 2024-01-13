@@ -24,12 +24,14 @@ export class Compiler {
     private lineState: LineState;
     private components: Component[] = [];
     private config: ConfigInterface | null = null;
+    private names: Names | null = null;;
 
     constructor(args: any) {
         this.args = args;
         this.lineState = new LineState();
         if (this.args.inputString === '') {
             this.config = ConfigParser.load(this.args.path);
+            this.names = new Names(this.config);
         }
     }
     
@@ -52,7 +54,7 @@ export class Compiler {
                 break;
             case LineType.unknown:
                 CompilerMessages.getInstance().add(
-                    new ParseError('Unparseable line', line.lineNumber)
+                    new ParseError('Unparseable line', line.lineNumber, line.filePath)
                 );
                 break;
         }
@@ -74,7 +76,7 @@ export class Compiler {
             this.parseLines();
         }
         else {
-            this.parseContent(this.args.inputString.split('\n'));
+            this.parseContent(this.args.inputString.split('\n'), '');
         }
         let formatter: Formatter;
         switch(this.args.format) {
@@ -133,11 +135,15 @@ export class Compiler {
         }
     }
 
-    private parseContent(textLines: string[]) {
+    private parseContent(textLines: string[], filePath: string) {
         for(let i=0; i < textLines.length; i++) {
-            const updatedLines: Line[] = this.lineState.update(new Line(textLines[i], i));
+            let rawLine = new Line(textLines[i], i);
+            rawLine.filePath = filePath;
+            const updatedLines: Line[] = this.lineState.update(rawLine);
             for (let line of updatedLines) {
-                Names.findInvalid(line, this.config);
+                if (this.names) {
+                    this.names.findInvalid(line);
+                }
                 this.applyLineType(line);
             }
         }
@@ -148,7 +154,7 @@ export class Compiler {
         const prozeFilePaths = ProzeFile.paths(this.args, this.config);
         for (let path of prozeFilePaths) {
             const textLines = ProzeFile.load(path);
-            this.parseContent(textLines);
+            this.parseContent(textLines, path);
         }
     }
 }

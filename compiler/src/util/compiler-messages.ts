@@ -25,7 +25,7 @@ export class CompilerMessages {
             errors.push(`ERRORS:`);
         }
         for (let error of instance.errors) {
-            errors.push(`    ${error.lineNumber}: ${error.message}`);
+            errors.push(`    ${error.filePath}:${error.lineNumber}: ${error.message}`);
         }
         return errors.join('\n');
     }
@@ -61,7 +61,7 @@ export class CompilerMessages {
             warnings.push(`WARNINGS:`);
         }
         for (let warning of instance.warnings) {
-            warnings.push(`    ${warning.lineNumber}: ${warning.message}`);
+            warnings.push(`    ${warning.filePath}:${warning.lineNumber}: ${warning.message}`);
         }
         return warnings.join('\n');
     }

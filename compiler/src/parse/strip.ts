@@ -76,7 +76,7 @@ export class Strip {
                         [parsedText, text] = this.startBracketBlock(text, index);
                         break;
                     case StrippedToken.CloseBracket:
-                        [parsedText, text] = this.removeBracketBlock(text, index, line.lineNumber);
+                        [parsedText, text] = this.removeBracketBlock(text, index, line);
                         this.checkBracketAtLineStart(substrings, parsedText);
                         this.applyLineDirectives(line);
                         break;
@@ -174,7 +174,7 @@ export class Strip {
         return [left, right];
     }
 
-    private removeBracketBlock(text: string, index: number, lineNumber: number): [string, string] {
+    private removeBracketBlock(text: string, index: number, line: Line): [string, string] {
         let left: string = '';
         let right: string;
         if (!this.inBlockComment) {
@@ -188,7 +188,7 @@ export class Strip {
                     'If you want this to be in the output, esacpe it with a "\\" character.'
                 ];
                 CompilerMessages.getInstance().add(
-                    new ParseError(message.join(' '), lineNumber)
+                    new ParseError(message.join(' '), line.lineNumber, line.filePath)
                 );
             }
         }

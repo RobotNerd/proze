@@ -21,7 +21,8 @@ export class Chapter implements Component {
             CompilerMessages.getInstance().add(
                 new ParseWarning(
                     'Some chapters have names and others do not.',
-                    this.line.lineNumber
+                    this.line.lineNumber,
+                    this.line.filePath
                 )
             );
             title = `Chapter ${this.chapterNumber}`
