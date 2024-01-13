@@ -71,4 +71,10 @@ describe("LineState", () => {
     expect(CompilerMessages.getInstance().errors.length).toBe(1);
     expect(CompilerMessages.getInstance().errors[0].message).toContain('Dr. Smith');
   });
+
+  test('does not match word that is an inner substring of another word', () => {
+    const line = new Line('Mr. DeJohn walked in the door..', 1, LineType.paragraph);
+    Names.findInvalid(line, config);
+    expect(CompilerMessages.getInstance().hasErrors()).toBe(false);
+  });
 });

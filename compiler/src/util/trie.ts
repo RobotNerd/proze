@@ -1,3 +1,5 @@
+const allowedCharsLeftOfWordStart = [' ', '\t', ','];
+
 export class TrieNode {
   children: Map<string, TrieNode>;
   isEndOfWord: boolean;
@@ -47,6 +49,22 @@ export class Trie {
     return node.isEndOfWord;
   }
 
+  // Ensure that the starting character isn't in the middle of a word.
+  private isStartOfWord(text: string, i: number): boolean {
+    if (this.root.children.has(text[i])) {
+      if (i === 0) {
+        // Word starts on the first character in the string.
+        return true;
+      }
+      if (allowedCharsLeftOfWordStart.includes(text[i-1])) {
+        // The character immediately preceeding the start of the word is
+        // in the allowed set.
+        return true;
+      }
+    }
+    return false;
+  }
+
   searchInText(text: string): string[] {
     let inProgressMatches: { node: TrieNode; startIndex: number }[] = [];
     let longestMatches: Map<number, string> = new Map();
@@ -73,7 +91,8 @@ export class Trie {
       });
 
       // Check if the current character starts a new word
-      if (this.root.children.has(char)) {
+      // if (this.root.children.has(char)) {
+      if (this.isStartOfWord(text, i)) {
         inProgressMatches.push({
           node: this.root.children.get(char)!,
           startIndex: i,
