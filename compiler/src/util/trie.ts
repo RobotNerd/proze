@@ -1,4 +1,4 @@
-const allowedCharsLeftOfWordStart = [' ', '\t', ','];
+const allowedCharsLeftOfWordStart = [' ', '\t', ',', '"', '"'];
 
 export class TrieNode {
   children: Map<string, TrieNode>;
