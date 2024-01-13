@@ -91,7 +91,6 @@ export class Trie {
       });
 
       // Check if the current character starts a new word
-      // if (this.root.children.has(char)) {
       if (this.isStartOfWord(text, i)) {
         inProgressMatches.push({
           node: this.root.children.get(char)!,
