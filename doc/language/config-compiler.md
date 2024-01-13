@@ -120,13 +120,13 @@ compile:
 
 ## Section breaks
 
-By default, untitled section breaks insert a `---` symbol between paragraphs. You can change this so that section breaks are whitespace-only. Doing so will insert two blank lines between paragraphs to denote a section break. Add this to your config file.
+By default, untitled section breaks insert a `---` symbol between paragraphs. You can change this so that section breaks are whitespace-only. Doing so will insert blank lines between paragraphs to denote a section break. Add this to your config file.
 
 ```yaml
 ---
 compile:
   section:
-    whitespace_only: true
+    whitespaceOnly: true
 ```
 
 

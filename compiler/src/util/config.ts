@@ -30,12 +30,17 @@ export interface ConfigHeaderAndFooter {
     odd?: ConfigHeaderFooterSlots;
 }
 
+export interface ConfigSection {
+    whitespaceOnly: boolean;
+}
+
 export interface ConfigCompilerOptionsInterface {
     footer?: ConfigHeaderAndFooter;
     formatting?: Formatting;
     header?: ConfigHeaderAndFooter;
     indentFirst?: ConfigParagraphIndentation;
     order?: string[];
+    section?: ConfigSection;
 }
 
 export interface ConfigNames {
@@ -73,6 +78,9 @@ const DefaultConfig: ConfigInterface = {
         indentFirst: {
             chapter: false,
             section: false,
+        },
+        section: {
+            whitespaceOnly: false,
         },
     },
 }
