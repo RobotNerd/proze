@@ -8,7 +8,16 @@ const terminators = ['.', ' ', '?', '!', ',', '"', "'", '\n', '\t'];
 
 export class Names {
 
-    private static addInvalid(trie: Trie, config: ConfigInterface) {
+    private trie: Trie | null = null;
+
+    constructor(config: ConfigInterface | null) {
+        if (config?.names?.invalid) {
+            this.trie = new Trie(terminators);
+            this.addInvalid(this.trie, config);
+        }
+    }
+
+    private addInvalid(trie: Trie, config: ConfigInterface) {
         if (config.names?.invalid) {
             for (let name of config.names.invalid) {
                 let splitNames = name.split(',').map(word => word.trim());
@@ -19,17 +28,16 @@ export class Names {
         }
     }
 
-    static findInvalid(line: Line, config: ConfigInterface | null) {
+    findInvalid(line: Line) {
+        if (!this.trie) {
+            return;
+        }
+
         if (line.lineType != LineType.metadata && line.lineType != LineType.paragraph) {
             return;
         }
-        if (!config?.names?.invalid) {
-            return
-        }
 
-        let trie = new Trie(terminators);
-        this.addInvalid(trie, config);
-        let matches: string[] = trie.searchInText(line.text);
+        let matches: string[] = this.trie.searchInText(line.text);
         for (let name of matches) {
             CompilerMessages.getInstance().add(
                 new ParseError(

@@ -24,12 +24,14 @@ export class Compiler {
     private lineState: LineState;
     private components: Component[] = [];
     private config: ConfigInterface | null = null;
+    private names: Names | null = null;;
 
     constructor(args: any) {
         this.args = args;
         this.lineState = new LineState();
         if (this.args.inputString === '') {
             this.config = ConfigParser.load(this.args.path);
+            this.names = new Names(this.config);
         }
     }
     
@@ -139,7 +141,9 @@ export class Compiler {
             rawLine.filePath = filePath;
             const updatedLines: Line[] = this.lineState.update(rawLine);
             for (let line of updatedLines) {
-                Names.findInvalid(line, this.config);
+                if (this.names) {
+                    this.names.findInvalid(line);
+                }
                 this.applyLineType(line);
             }
         }
