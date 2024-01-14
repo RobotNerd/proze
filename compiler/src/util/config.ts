@@ -31,7 +31,8 @@ export interface ConfigHeaderAndFooter {
 }
 
 export interface ConfigSection {
-    whitespaceOnly: boolean;
+    symbol?: string;
+    whitespaceOnly?: boolean;
 }
 
 export interface ConfigCompilerOptionsInterface {
@@ -80,6 +81,7 @@ const DefaultConfig: ConfigInterface = {
             section: false,
         },
         section: {
+            symbol: '---',
             whitespaceOnly: false,
         },
     },
