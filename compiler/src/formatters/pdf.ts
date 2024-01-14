@@ -1,8 +1,7 @@
 import { Chapter } from '../components/chapter';
 import { CompilerDirective, DirectiveType } from "../util/compiler-directive";
 import { Component } from '../components/component';
-import { ConfigHeaderFooterSlots, HeaderFooterValue } from '../util/config';
-import { ConfigInterface } from '../util/config';
+import { Config, ConfigHeaderFooterSlots, HeaderFooterValue } from '../util/config';
 import { EmphasisType } from '../parse/line';
 import { Formatting } from '../util/config';
 import { ProjectMetadata } from '../parse/metadata';
@@ -37,31 +36,31 @@ export class PdfFormatter implements Formatter {
 
     constructor(
         private projectMetadata: ProjectMetadata,
-        private components: Component[],
-        private config: ConfigInterface | null
+        private components: Component[]
     ) {
+        let config = Config.get();
         this.docDefinition = {
             pageSize: 'A5',
             content: [],
             header: (currentPage: number, _pageCount: number, _pageSize: ContextPageSize): Content => {
                 if (currentPage % 2 === 0) {
-                    if (config?.compile?.header?.even) {
-                        return this.formatHeaderOrFooter(config?.compile?.header?.even, currentPage)
+                    if (config.compile?.header?.even) {
+                        return this.formatHeaderOrFooter(config.compile?.header?.even, currentPage)
                     }
                 }
-                if (config?.compile?.header?.odd) {
-                    return this.formatHeaderOrFooter(config?.compile?.header?.odd, currentPage);
+                if (config.compile?.header?.odd) {
+                    return this.formatHeaderOrFooter(config.compile?.header?.odd, currentPage);
                 }
                 return { text: '' };
             },
             footer: (currentPage: number, _pageCount: number, _pageSize: ContextPageSize): Content => {
                 if (currentPage % 2 === 0) {
-                    if (config?.compile?.footer?.even) {
-                        return this.formatHeaderOrFooter(config?.compile?.footer?.even, currentPage)
+                    if (config.compile?.footer?.even) {
+                        return this.formatHeaderOrFooter(config.compile?.footer?.even, currentPage)
                     }
                 }
-                if (config?.compile?.footer?.odd) {
-                    return this.formatHeaderOrFooter(config?.compile?.footer?.odd, currentPage);
+                if (config.compile?.footer?.odd) {
+                    return this.formatHeaderOrFooter(config.compile?.footer?.odd, currentPage);
                 }
                 return { text: '' };
             },
@@ -151,6 +150,7 @@ export class PdfFormatter implements Formatter {
     }
 
     private addLeadingWhitesapace() {
+        let config = Config.get();
         let shouldIndent: boolean = false;
         if (this.indentOverride !== null) {
             if (this.indentOverride.directiveType === DirectiveType.indent) {
@@ -167,12 +167,12 @@ export class PdfFormatter implements Formatter {
             }
             this.indentOverride = null;
         }
-        else if (this.config?.compile?.formatting === Formatting.standard) {
+        else if (config.compile?.formatting === Formatting.standard) {
             if (this.isFirstParagraphOfChapter) {
-                shouldIndent = this.config.compile?.indentFirst?.chapter!;
+                shouldIndent = config.compile?.indentFirst?.chapter!;
             }
             else if (this.isFirstParagraphOfSection) {
-                shouldIndent = this.config.compile?.indentFirst?.section!;
+                shouldIndent = config.compile?.indentFirst?.section!;
             }
             else {
                 shouldIndent = true;
@@ -191,14 +191,14 @@ export class PdfFormatter implements Formatter {
     }
 
     private addSection(section: Section) {
+        let config = Config.get();
         this.isFirstParagraphOfChapter = false;
         this.isFirstParagraphOfSection = true;
         let style: string = 'sectionName';
         let text: string = section.getOutput();
         if (!section.isNamed()) {
             style = 'sectionSymbol';
-            console.log(this.config);
-            if (this.config?.compile?.section?.whitespaceOnly) {
+            if (config.compile?.section?.whitespaceOnly) {
                 text = '';
                 style = 'sectionWhitespace';
             }
@@ -276,6 +276,7 @@ export class PdfFormatter implements Formatter {
     }
 
     private endParagraph(i: number) {
+        let config = Config.get();
         if (this.currentTextBlock.length > 0) {
             this.addLeadingWhitesapace();
             (this.docDefinition.content as Content[]).push({
@@ -284,7 +285,7 @@ export class PdfFormatter implements Formatter {
             });
             this.currentTextBlock = [];
         }
-        if (this.config?.compile?.formatting === Formatting.block) {
+        if (config.compile?.formatting === Formatting.block) {
             (this.docDefinition.content as Content[]).push('\n\n');
         }
         this.blockquoteLevel = 0;
@@ -379,7 +380,8 @@ export class PdfFormatter implements Formatter {
     }
 
     private sectionMargin(): Margins {
-        if (this.config?.compile?.formatting === Formatting.standard) {
+        let config = Config.get();
+        if (config.compile?.formatting === Formatting.standard) {
             // Add vertical space above/below section break.
             return [0, 10, 0, 10];
         }

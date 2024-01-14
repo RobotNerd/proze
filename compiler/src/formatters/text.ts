@@ -1,6 +1,6 @@
 import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
-import { ConfigInterface } from '../util/config';
+import { Config } from '../util/config';
 import { EmDash } from '../components/em-dash';
 import { ProjectMetadata } from '../parse/metadata';
 import { Section } from '../components/section';
@@ -18,8 +18,7 @@ export class TextFormatter implements Formatter {
 
     constructor(
         private projectMetadata: ProjectMetadata,
-        private components: Component[],
-        private config: ConfigInterface | null
+        private components: Component[]
     ) {}
 
     private addEmDash(emdash: EmDash) {
@@ -27,8 +26,9 @@ export class TextFormatter implements Formatter {
     }
 
     private addSection(section: Section) {
+        let config = Config.get();
         let text: string = section.getOutput();
-        if (!section.isNamed() && this.config?.compile?.section?.whitespaceOnly) {
+        if (!section.isNamed() && config.compile?.section?.whitespaceOnly) {
             text = '\n';
         }
         this.content.push(text);

@@ -93,7 +93,25 @@ export class ConfigParserError extends Error {
     }
 }
 
-export class ConfigParser {
+export class Config {
+    private static instance: Config;
+    private static config: ConfigInterface = {};
+
+    private constructor() {}
+
+    static load(path: string) {
+        this.config = ConfigParser.load(path);
+    }
+
+    static get(): ConfigInterface {
+        if (!this.instance) {
+            this.instance = new Config();
+        }
+        return this.config;
+    }
+}
+
+class ConfigParser {
 
     private static allowedConfigExtensions: string[] = [
         'json',
@@ -148,7 +166,7 @@ export class ConfigParser {
         return foundConfigFiles;
     }
 
-    static load(path: string): ConfigInterface | null {
+    static load(path: string) {
         let config: ConfigInterface | null = null;
         const configPath = ConfigParser.configFilePath(path);
         if (configPath !== null) {
