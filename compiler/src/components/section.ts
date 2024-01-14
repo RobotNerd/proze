@@ -1,10 +1,10 @@
+import { Config } from "../util/config";
 import { Component } from "./component";
 import { Token } from "./token";
 
 export class Section implements Component {
 
     public token: Token = Token.section;
-    private symbol = '---';
 
     constructor(
         public name: string = ''
@@ -14,7 +14,8 @@ export class Section implements Component {
         if (this.isNamed()) {
             return this.name;
         }
-        return this.symbol;
+        let config = Config.get();
+        return config.compile?.section?.symbol!;
     }
 
     isNamed(): boolean {
