@@ -87,7 +87,11 @@ export class Compiler {
                     this.config);
                 break;
             case Format.text:
-                formatter = new TextFormatter(Metadata.getInstance().projectMetadta, this.components);
+                formatter = new TextFormatter(
+                    Metadata.getInstance().projectMetadta,
+                    this.components,
+                    this.config
+                );
                 break;
             default:
                 throw new Error(`unrecognized format: ${this.args.format}`);

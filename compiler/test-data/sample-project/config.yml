@@ -1,7 +1,5 @@
 ---
 compile:
-  section:
-    whitespaceOnly: true
   order:
     - title.proze
     - prologue.proze
