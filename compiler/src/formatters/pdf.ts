@@ -110,6 +110,9 @@ export class PdfFormatter implements Formatter {
                     fontSize: 12,
                     margin: this.sectionMargin(),
                 },
+                sectionWhitespace: {
+                    margin: this.sectionWhitespaceMargin(),
+                },
                 title: {
                     alignment: 'center',
                     bold: true,
@@ -190,9 +193,19 @@ export class PdfFormatter implements Formatter {
     private addSection(section: Section) {
         this.isFirstParagraphOfChapter = false;
         this.isFirstParagraphOfSection = true;
+        let style: string = 'sectionName';
+        let text: string = section.getOutput();
+        if (!section.isNamed()) {
+            style = 'sectionSymbol';
+            console.log(this.config);
+            if (this.config?.compile?.section?.whitespaceOnly) {
+                text = '';
+                style = 'sectionWhitespace';
+            }
+        }
         (this.docDefinition.content as Content[]).push({
-            text: section.getOutput(),
-            style: section.isNamed() ? 'sectionName' : 'sectionSymbol',
+            text: text,
+            style: style,
         });
     }
 
@@ -371,6 +384,10 @@ export class PdfFormatter implements Formatter {
             return [0, 10, 0, 10];
         }
         return 0;
+    }
+
+    private sectionWhitespaceMargin(): Margins {
+        return [0, 25, 0, 25];
     }
 
     private textMargin(): Margins {
