@@ -3,7 +3,7 @@ import { Chapter } from './components/chapter';
 import { CompileError } from './util/compile-error';
 import { CompilerMessages } from './util/compiler-messages';
 import { Component, EmptyComponent } from './components/component';
-import { ConfigInterface, ConfigParser } from './util/config';
+import { Config } from './util/config';
 import { EmDash } from './components/em-dash';
 import { Format, ProzeArgs } from './util/cli-arguments';
 import { Line, LineType } from './parse/line';
@@ -23,15 +23,14 @@ export class Compiler {
     private args: ProzeArgs;
     private lineState: LineState;
     private components: Component[] = [];
-    private config: ConfigInterface | null = null;
     private names: Names | null = null;;
 
     constructor(args: any) {
         this.args = args;
         this.lineState = new LineState();
         if (this.args.inputString === '') {
-            this.config = ConfigParser.load(this.args.path);
-            this.names = new Names(this.config);
+            Config.load(this.args.path);
+            this.names = new Names();
         }
     }
     
@@ -81,17 +80,10 @@ export class Compiler {
         let formatter: Formatter;
         switch(this.args.format) {
             case Format.pdf:
-                formatter = new PdfFormatter(
-                    Metadata.getInstance().projectMetadta,
-                    this.components,
-                    this.config);
+                formatter = new PdfFormatter(Metadata.getInstance().projectMetadta, this.components);
                 break;
             case Format.text:
-                formatter = new TextFormatter(
-                    Metadata.getInstance().projectMetadta,
-                    this.components,
-                    this.config
-                );
+                formatter = new TextFormatter(Metadata.getInstance().projectMetadta, this.components);
                 break;
             default:
                 throw new Error(`unrecognized format: ${this.args.format}`);
@@ -155,7 +147,7 @@ export class Compiler {
     }
 
     private parseLines() {
-        const prozeFilePaths = ProzeFile.paths(this.args, this.config);
+        const prozeFilePaths = ProzeFile.paths(this.args);
         for (let path of prozeFilePaths) {
             const textLines = ProzeFile.load(path);
             this.parseContent(textLines, path);

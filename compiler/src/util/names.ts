@@ -1,5 +1,5 @@
 import { CompilerMessages } from "../util/compiler-messages";
-import { ConfigInterface } from "../util/config";
+import { Config, ConfigInterface } from "../util/config";
 import { ParseError } from "../util/parse-error";
 import { Line, LineType } from "../parse/line";
 import { Trie } from '../util/trie';
@@ -10,8 +10,11 @@ export class Names {
 
     private trie: Trie | null = null;
 
-    constructor(config: ConfigInterface | null) {
-        if (config?.names?.invalid) {
+    constructor(config?: ConfigInterface) {
+        if (!config) {
+            config = Config.get();
+        }
+        if (config.names?.invalid) {
             this.trie = new Trie(terminators);
             this.addInvalid(this.trie, config);
         }

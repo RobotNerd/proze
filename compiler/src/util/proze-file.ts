@@ -1,11 +1,12 @@
-import { ConfigInterface } from './config';
+import { Config } from './config';
 import { ProzeArgs } from './cli-arguments';
 import { readdirSync, readFileSync, statSync } from 'fs';
 
 export class ProzeFile {
 
-    static paths(args: ProzeArgs, config: ConfigInterface | null): string[] {
-        if (config?.compile?.order) {
+    static paths(args: ProzeArgs): string[] {
+        let config = Config.get();
+        if (config.compile?.order) {
             return config.compile.order;
         }
         else if (statSync(args.path).isDirectory()) {
