@@ -129,5 +129,14 @@ compile:
     whitespaceOnly: true
 ```
 
+You can also choose a different text string to insert for untitled section breaks instead of using the default `---`. Here is an example configuration that changes the section break text to `\\\\\\`.
+
+```yaml
+---
+compile:
+  section:
+    symbol: \\\\\\
+```
+
 
 [Next: Configuration Names](./config-names.md) | [Proze Language](./proze-language.md) | [Next: Syntax Highlighting](./syntax-highlighting.md)
