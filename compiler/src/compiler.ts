@@ -80,10 +80,10 @@ export class Compiler {
         let formatter: Formatter;
         switch(this.args.format) {
             case Format.pdf:
-                formatter = new PdfFormatter(Metadata.getInstance().projectMetadta, this.components);
+                formatter = new PdfFormatter(this.components);
                 break;
             case Format.text:
-                formatter = new TextFormatter(Metadata.getInstance().projectMetadta, this.components);
+                formatter = new TextFormatter(this.components);
                 break;
             default:
                 throw new Error(`unrecognized format: ${this.args.format}`);

@@ -2,7 +2,7 @@ import { Chapter } from '../components/chapter';
 import { Component } from '../components/component';
 import { Config } from '../util/config';
 import { EmDash } from '../components/em-dash';
-import { ProjectMetadata } from '../parse/metadata';
+import { Metadata } from '../parse/metadata';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
 import { Token } from '../components/token';
@@ -16,10 +16,7 @@ export class TextFormatter implements Formatter {
     private currentTextBlock: string[] = [];
     private isFirstChapter: boolean = true;
 
-    constructor(
-        private projectMetadata: ProjectMetadata,
-        private components: Component[]
-    ) {}
+    constructor(private components: Component[]) {}
 
     private addEmDash(emdash: EmDash) {
         this.currentTextBlock.push(emdash.toString());
@@ -100,11 +97,12 @@ export class TextFormatter implements Formatter {
 
     private getOutputHeader(): string {
         let header = '';
-        if (this.projectMetadata.title) {
-            header += this.projectMetadata.title.name + '\n';
+        let meta = Metadata.getInstance().projectMetadta;
+        if (meta.title) {
+            header += meta.title.name + '\n';
         }
-        if (this.projectMetadata.author) {
-            header += `by ${this.projectMetadata.author.name}\n`;
+        if (meta.author) {
+            header += `by ${meta.author.name}\n`;
         }
         if (header != '') {
             header += '\n\n';
