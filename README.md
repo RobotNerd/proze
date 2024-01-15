@@ -29,6 +29,20 @@ These editors have plugins that support syntax highlighting proze.
 - [vim](https://github.com/RobotNerd/proze-english-vim)
 - [Visual Studio Code](https://github.com/RobotNerd/proze-vscode)
 
+## Feature roadmap
+
+Here are the currently planned features for future development (these are not in any particular order).
+- Support new document formats:
+    - MS Word
+    - Open Document Format (odf)
+    - ePub
+    - MOBI
+- Support for publishing to these platforms:
+    - Amazon Kindle
+    - Google Play Books
+    - Apple BOoks
+    - Smashwords
+
 ## Acknowledgements
 
 Proze was inspired by these great projects.
