@@ -42,6 +42,7 @@ Here are the currently planned features for future development (these are not in
     - Google Play Books
     - Apple BOoks
     - Smashwords
+- Add support for images in book content.
 
 ## Acknowledgements
 
