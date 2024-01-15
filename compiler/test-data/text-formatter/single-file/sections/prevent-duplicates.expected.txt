@@ -1,0 +1,31 @@
+My Document
+by Jon Doe
+
+
+Example
+
+This is the text at the beginning of the chapter.
+
+A valid section (but empty)
+
+A valid section
+
+This is the text of the next section.
+
+
+Another Example
+
+This chapter merges multiple duplicate unnamed sections into one.
+
+---
+
+This is the text of the merged section after multiple unnamed sections.
+
+
+Yet Another Example
+
+This chapter merges multiple duplicate sections, keeping only the named one.
+
+Named section
+
+This is the text of the merged section after multiple sections where only one is named.

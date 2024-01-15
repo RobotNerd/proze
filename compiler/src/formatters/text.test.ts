@@ -192,6 +192,13 @@ describe('text formatter', () => {
         expect(compiler.compile()).toBe(loadExpectedOutput(expected));
     });
 
+    test('prevents unnamed sections', () => {
+        mockArgs.path = 'test-data/text-formatter/single-file/sections/prevent-duplicates.proze';
+        let expected = 'test-data/text-formatter/single-file/sections/prevent-duplicates.expected.txt';
+        const compiler = new Compiler(mockArgs);
+        expect(compiler.compile()).toBe(loadExpectedOutput(expected));
+    });
+
     // Comments
 
     test('ignores line comments', () => {

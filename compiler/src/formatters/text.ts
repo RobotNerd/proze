@@ -28,6 +28,7 @@ export class TextFormatter implements Formatter {
         if (!section.isNamed() && config.compile?.section?.whitespaceOnly) {
             text = '\n';
         }
+        text = `${text}\n\n`
         this.content.push(text);
     }
 
