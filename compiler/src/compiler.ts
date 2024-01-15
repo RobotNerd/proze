@@ -68,6 +68,7 @@ export class Compiler {
                 this.components.push(metadata as Section);
                 break;
         }
+        Section.preventInvalid(this.components);
     }
 
     compile() {
@@ -77,13 +78,15 @@ export class Compiler {
         else {
             this.parseContent(this.args.inputString.split('\n'), '');
         }
+        Section.removeLastEmpty(this.components);
+
         let formatter: Formatter;
         switch(this.args.format) {
             case Format.pdf:
-                formatter = new PdfFormatter(Metadata.getInstance().projectMetadta, this.components);
+                formatter = new PdfFormatter(this.components);
                 break;
             case Format.text:
-                formatter = new TextFormatter(Metadata.getInstance().projectMetadta, this.components);
+                formatter = new TextFormatter(this.components);
                 break;
             default:
                 throw new Error(`unrecognized format: ${this.args.format}`);
@@ -124,8 +127,9 @@ export class Compiler {
         let lastComponent = this.lastActiveComponent();
         if (
             lastComponent !== null &&
-            lastComponent.token != Token.end_paragraph &&
-            lastComponent.token != Token.chapter
+            lastComponent.token !== Token.end_paragraph &&
+            lastComponent.token !== Token.chapter && 
+            lastComponent.token !== Token.section
         ) {
             this.components.push(new EmptyComponent(Token.end_paragraph));
         }

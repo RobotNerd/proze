@@ -1,0 +1,44 @@
+Title: My Document
+Author: Jon Doe
+
+
+Chapter: Example
+
+Section: ## unnecessary empty section at the beginning of the chapter
+
+This is the text at the beginning of the chapter.
+
+Section: A valid section (but empty)
+
+Section: A valid section
+
+This is the text of the next section.
+
+Section: ## unnecessary empty section at the end of the chapter
+
+
+Chapter: Another Example
+
+This chapter merges multiple duplicate unnamed sections into one.
+
+Section:
+Section:
+Section:
+
+Section:
+
+This is the text of the merged section after multiple unnamed sections.
+
+
+Chapter: Yet Another Example
+
+This chapter merges multiple duplicate sections, keeping only the named one.
+
+Section:
+Section:
+Section: Named section
+Section:
+
+This is the text of the merged section after multiple sections where only one is named.
+
+Section: ## remove empty section at the end of the document

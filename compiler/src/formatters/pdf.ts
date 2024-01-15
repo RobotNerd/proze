@@ -4,7 +4,7 @@ import { Component } from '../components/component';
 import { Config, ConfigHeaderFooterSlots, HeaderFooterValue } from '../util/config';
 import { EmphasisType } from '../parse/line';
 import { Formatting } from '../util/config';
-import { ProjectMetadata } from '../parse/metadata';
+import { Metadata } from '../parse/metadata';
 import { Section } from '../components/section';
 import { Text } from '../components/text';
 import { Token } from '../components/token';
@@ -34,10 +34,7 @@ export class PdfFormatter implements Formatter {
     private isFirstParagraphOfSection: boolean = false;
     private printer: PdfPrinter;
 
-    constructor(
-        private projectMetadata: ProjectMetadata,
-        private components: Component[]
-    ) {
+    constructor(private components: Component[]) {
         let config = Config.get();
         this.docDefinition = {
             pageSize: 'A5',
@@ -235,16 +232,17 @@ export class PdfFormatter implements Formatter {
     }
 
     private addTitle() {
-        if (this.projectMetadata.title) {
+        let meta = Metadata.getInstance().projectMetadta;
+        if (meta.title) {
             (this.docDefinition.content as Content[]).push({
-                text: this.projectMetadata.title.name,
+                text: meta.title.name,
                 style: 'title',
             });
         }
 
-        if (this.projectMetadata.author) {
+        if (meta.author) {
             (this.docDefinition.content as Content[]).push({
-                text: `by ${this.projectMetadata.author.name}\n`,
+                text: `by ${meta.author.name}\n`,
                 style: 'author',
         });
         }
@@ -317,9 +315,10 @@ export class PdfFormatter implements Formatter {
 
     private getHeaderFooterValue(headerFooterValue: HeaderFooterValue, currentPage: number): string {
         let value: string = '';
+        let meta = Metadata.getInstance().projectMetadta;
         switch(headerFooterValue) {
             case HeaderFooterValue.author:
-                value = this.projectMetadata.author ? this.projectMetadata.author.name : '';
+                value = meta.author ? meta.author.name : '';
                 break;
             case HeaderFooterValue.chapter:
                 // NOTE: As of January 2024, the pdfmake does not appear to have a way to add
@@ -333,7 +332,7 @@ export class PdfFormatter implements Formatter {
                 value = `${currentPage}`;
                 break;
             case HeaderFooterValue.title:
-                value = this.projectMetadata.title ? this.projectMetadata.title.name : '';
+                value = meta.title ? meta.title.name : '';
                 break;
             default:
                 console.warn(
