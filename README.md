@@ -31,7 +31,7 @@ These editors have plugins that support syntax highlighting proze.
 
 ## Feature roadmap
 
-Here are the currently planned features for future development (these are not in any particular order).
+The currently planned features for future development (these are not in any particular order).
 - Support new document formats:
     - MS Word
     - Open Document Format (odf)
