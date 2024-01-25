@@ -5,7 +5,7 @@ import { ParseError } from "../util/parse-error";
 import { Line } from "../parse/line";
 
 
-export class Strip {
+export class CommentsAndBrackets {
 
     private inBlockComment: boolean = false;
     private inBracketBlock: boolean = false;
@@ -37,7 +37,7 @@ export class Strip {
         }
     }
 
-    commentsAndBrackets(line: Line | null): Line | null {
+    parse(line: Line | null): Line | null {
         if (line === null) {
             return null;
         }

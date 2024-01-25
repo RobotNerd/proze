@@ -1,9 +1,10 @@
-import { EscapeCharacter } from './escape-character';
+import { CommentsAndBrackets } from './comments-and-brackets';
 import { EmDashParser } from '../parse/em-dash-parser';
 import { Emphasis } from "./emphasis";
+import { EscapeCharacter } from './escape-character';
 import { Line, LineType } from "./line";
 import { Metadata } from "./metadata";
-import { Strip } from "../parse/strip";
+
 
 export class LineState {
 
@@ -12,11 +13,11 @@ export class LineState {
     isWhitespaceOnly: boolean = false;
     
     private emphasis: Emphasis;
-    private strip: Strip;
+    private commentsAndBrackets: CommentsAndBrackets;
 
     constructor() {
         this.emphasis = new Emphasis();
-        this.strip = new Strip();
+        this.commentsAndBrackets = new CommentsAndBrackets();
     }
 
     private applyEmphasis(line: Line | null): Line[] {
@@ -106,7 +107,7 @@ export class LineState {
 
     update(line: Line): Line[] {
         let updatedLines: Line[];
-        let strippedLine = this.strip.commentsAndBrackets(line);
+        let strippedLine = this.commentsAndBrackets.parse(line);
         this.checkWhitespaceOnlyLine(line, strippedLine);
 
         if (this.isWhitespaceOnly) {
@@ -133,6 +134,6 @@ export class LineState {
 
     reset() {
         this.inParagraph = false;
-        this.strip.reset();
+        this.commentsAndBrackets.reset();
     }
 }
