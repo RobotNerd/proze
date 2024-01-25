@@ -1,3 +1,4 @@
+import { EscapeCharacter } from './escape-character';
 import { EmDashParser } from '../parse/em-dash-parser';
 import { Emphasis } from "./emphasis";
 import { Line, LineType } from "./line";
@@ -83,7 +84,7 @@ export class LineState {
 
     private onMetadata(strippedLine: Line): Line[] {
         strippedLine.lineType = LineType.metadata;
-        this.strip.escapeCharacter(strippedLine);
+        EscapeCharacter.removeAll(strippedLine);
         this.emphasis.removeEscapeCharacter(strippedLine);
         return [strippedLine];
     }
@@ -97,7 +98,7 @@ export class LineState {
             if (updatedLine.lineType === LineType.unknown) {
                 updatedLine.lineType = LineType.paragraph;
             }
-            this.strip.escapeCharacter(updatedLine);
+            EscapeCharacter.removeAll(updatedLine);
             this.emphasis.removeEscapeCharacter(updatedLine);
         }
         return updatedLines;

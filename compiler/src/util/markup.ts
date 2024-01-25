@@ -1,5 +1,12 @@
 import { Line } from "../parse/line";
 
+export enum StrippedToken {
+    BlockComment = '###',
+    LineComment = '##',
+    OpenBracket = '[',
+    CloseBracket = ']',
+}
+
 export class Markup {
 
     static escapeChar = '\\';

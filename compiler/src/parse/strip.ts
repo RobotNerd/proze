@@ -1,15 +1,9 @@
 import { CompilerDirective, DirectiveType } from "../util/compiler-directive";
 import { CompilerMessages } from "../util/compiler-messages";
-import { Markup } from "../util/markup";
+import { Markup, StrippedToken } from "../util/markup";
 import { ParseError } from "../util/parse-error";
 import { Line } from "../parse/line";
 
-enum StrippedToken {
-    BlockComment = '###',
-    LineComment = '##',
-    OpenBracket = '[',
-    CloseBracket = ']',
-}
 
 export class Strip {
 
@@ -104,12 +98,6 @@ export class Strip {
             }
         }
         return text.substring(0, i);
-    }
-
-    escapeCharacter(line: Line) {
-        Markup.removeEsacpe(line, StrippedToken.BlockComment[0]);
-        Markup.removeEsacpe(line, StrippedToken.OpenBracket);
-        Markup.removeEsacpe(line, StrippedToken.CloseBracket);
     }
 
     private nextToken(text: string): [StrippedToken, number] {
