@@ -35,14 +35,7 @@ export class Line {
     public lineType: LineType;
     public text: string;
 
-    constructor(
-        fields: LineFields = {}
-        // public text: string = '',
-        // public lineNumber: number = -1,
-        // public lineType: LineType = LineType.unknown,
-        // public blockquoteLevel: number = 0,
-        // public filePath: string = '',
-    ) {
+    constructor(fields: LineFields = {}) {
         this.blockquoteLevel = fields.blockquoteLevel ? fields.blockquoteLevel : 0; 
         this.breakDirective = fields.breakDirective ? fields.breakDirective : null;
         this.emphasis = fields.emphasis ? [...fields.emphasis] : [];
