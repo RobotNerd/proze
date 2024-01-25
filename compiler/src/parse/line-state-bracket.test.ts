@@ -113,7 +113,7 @@ describe('LineState', () => {
     });
 
     test('throws compile error on unescaped closing bracket without matching opening bracket', () => {
-        const line = new Line('this will fail with ] an error', 0);
+        const line = new Line({text: 'this will fail with ] an error', lineNumber: 0});
         const lineState = new LineState();
         const newLine = lineState.update(line);
         expect(CompilerMessages.getInstance().hasErrors()).toBe(true);

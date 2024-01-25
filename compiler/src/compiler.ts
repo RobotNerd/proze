@@ -137,7 +137,10 @@ export class Compiler {
 
     private parseContent(textLines: string[], filePath: string) {
         for(let i=0; i < textLines.length; i++) {
-            let rawLine = new Line(textLines[i], i);
+            let rawLine = new Line({
+                lineNumber: i,
+                text: textLines[i],
+            });
             rawLine.filePath = filePath;
             const updatedLines: Line[] = this.lineState.update(rawLine);
             for (let line of updatedLines) {

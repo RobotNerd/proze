@@ -20,7 +20,11 @@ describe("LineState", () => {
   });
 
   test('flags an invalid name at the beginning of the line', () => {
-    const line = new Line('John went to the store.', 1, LineType.paragraph);
+    const line = new Line({
+      text: 'John went to the store.',
+      lineNumber: 1,
+      lineType: LineType.paragraph
+    });
     let names = new Names(config);
     names.findInvalid(line);
     expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
@@ -28,7 +32,11 @@ describe("LineState", () => {
   });
 
   test('flags an invalid name at the end of the line', () => {
-    const line = new Line('His name was John.', 1, LineType.paragraph);
+    const line = new Line
+    ({text: 'His name was John.',
+    lineNumber: 1,
+    lineType: LineType.paragraph
+  });
     let names = new Names(config);
     names.findInvalid(line);
     expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
@@ -36,7 +44,11 @@ describe("LineState", () => {
   });
 
   test('flags an invalid name in the middle of the line', () => {
-    const line = new Line('That was John who went to the store.', 1, LineType.paragraph);
+    const line = new Line({
+      text: 'That was John who went to the store.',
+      lineNumber: 1,
+      lineType: LineType.paragraph
+    });
     let names = new Names(config);
     names.findInvalid(line);
     expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
@@ -44,7 +56,11 @@ describe("LineState", () => {
   });
 
   test('matches only the longest invalid name among substrings', () => {
-    const line = new Line('Johnny is one name.', 1, LineType.paragraph);
+    const line = new Line
+    ({text: 'Johnny is one name.',
+    lineNumber: 1,
+    lineType: LineType.paragraph
+  });
     let names = new Names(config);
     names.findInvalid(line);
     expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
@@ -52,7 +68,11 @@ describe("LineState", () => {
   });
 
   test('does not match shorter invalid name if part of a larger non-invalid word', () => {
-    const line = new Line('Johnathan Smith is one name.', 1, LineType.paragraph);
+    const line = new Line({
+      text: 'Johnathan Smith is one name.',
+      lineNumber: 1,
+      lineType: LineType.paragraph
+    });
     let names = new Names(config);
     names.findInvalid(line);
     expect(CompilerMessages.getInstance().hasErrors()).toBe(false);
@@ -60,7 +80,11 @@ describe("LineState", () => {
 
   test('matches shorter invalid name among substrings when longer name not matched', () => {
     config.names!.invalid = ['John,John Smith'];
-    const line = new Line('John Smalls is one name.', 1, LineType.paragraph);
+    const line = new Line({
+      text: 'John Smalls is one name.',
+      lineNumber: 1,
+      lineType: LineType.paragraph
+    });
     let names = new Names(config);
     names.findInvalid(line);
     expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
@@ -71,7 +95,11 @@ describe("LineState", () => {
 
   test('matches invalid words that include terminator characters', () => {
     config.names!.invalid = ['John,Dr. Smith'];
-    const line = new Line('I heard that Dr. Smith is back in town.', 1, LineType.paragraph);
+    const line = new Line({
+      text: 'I heard that Dr. Smith is back in town.',
+      lineNumber: 1,
+      lineType: LineType.paragraph
+    });
     let names = new Names(config);
     names.findInvalid(line);
     expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
@@ -80,7 +108,11 @@ describe("LineState", () => {
   });
 
   test('does not match word that is an inner substring of another word', () => {
-    const line = new Line('Mr. DeJohn walked in the door..', 1, LineType.paragraph);
+    const line = new Line({text: 
+      'Mr. DeJohn walked in the door..',
+      lineNumber: 1,
+      lineType: LineType.paragraph
+    });
     let names = new Names(config);
     names.findInvalid(line);
     expect(CompilerMessages.getInstance().hasErrors()).toBe(false);

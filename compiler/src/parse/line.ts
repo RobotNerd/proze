@@ -13,19 +13,45 @@ export enum EmphasisType {
     italic = 'italic',
 }
 
+export interface LineFields {
+    blockquoteLevel?: number;
+    breakDirective?: CompilerDirective;
+    emphasis?: EmphasisType[];
+    filePath?: string;
+    indentDirective?: CompilerDirective;
+    lineNumber?: number;
+    lineType?: LineType;
+    text?: string;
+}
+
 export class Line {
 
-    emphasis: EmphasisType[] = [];
-    breakDirective: CompilerDirective | null = null;
-    indentDirective: CompilerDirective | null = null;
+    public blockquoteLevel: number;
+    public breakDirective: CompilerDirective | null;
+    public emphasis: EmphasisType[];
+    public filePath: string;
+    public indentDirective: CompilerDirective | null;
+    public lineNumber: number;
+    public lineType: LineType;
+    public text: string;
 
     constructor(
-        public text: string = '',
-        public lineNumber: number = -1,
-        public lineType: LineType = LineType.unknown,
-        public blockquoteLevel: number = 0,
-        public filePath: string = '',
-    ) {}
+        fields: LineFields = {}
+        // public text: string = '',
+        // public lineNumber: number = -1,
+        // public lineType: LineType = LineType.unknown,
+        // public blockquoteLevel: number = 0,
+        // public filePath: string = '',
+    ) {
+        this.blockquoteLevel = fields.blockquoteLevel ? fields.blockquoteLevel : 0; 
+        this.breakDirective = fields.breakDirective ? fields.breakDirective : null;
+        this.emphasis = fields.emphasis ? [...fields.emphasis] : [];
+        this.filePath = fields.filePath ? fields.filePath : '';
+        this.indentDirective = fields.indentDirective ? fields.indentDirective : null;
+        this.lineNumber = fields.lineNumber ? fields.lineNumber : -1;
+        this.lineType = fields.lineType ? fields.lineType : LineType.unknown;
+        this.text = fields.text ? fields.text : '';
+    }
 
     static copy(line: Line): Line {
         let newLine: Line = new Line();

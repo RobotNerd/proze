@@ -17,7 +17,10 @@ describe('LineState', () => {
         entireLine('*abcd*', [EmphasisType.italic]);
     });
     function entireLine(given: string, emphasis: EmphasisType[]) {
-        const results: Line[] = [new Line('abcd', 0), new Line(' ', 0)];
+        const results: Line[] = [
+            new Line({text: 'abcd', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
+        ];
         results[0].emphasis =emphasis;
         testSingleLine(given, results);
     }
@@ -27,7 +30,10 @@ describe('LineState', () => {
         entireLineLeadingWhitespace('    *abcd*', [EmphasisType.italic]);
     });
     function entireLineLeadingWhitespace(given: string, emphasis: EmphasisType[]) {
-        const results: Line[] = [new Line('abcd', 0), new Line(' ', 0)];
+        const results: Line[] = [
+            new Line({text: 'abcd', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
+        ];
         results[0].emphasis = emphasis;
         testSingleLine(given, results);
     }
@@ -38,10 +44,10 @@ describe('LineState', () => {
     });
     function noLeadingWhitespaceRequired(given: string, emphasis: EmphasisType[]) {
         const results: Line[] = [
-            new Line('a', 0),
-            new Line('b', 0),
-            new Line('cd', 0),
-            new Line(' ', 0),
+            new Line({text: 'a', lineNumber: 0}),
+            new Line({text: 'b', lineNumber: 0}),
+            new Line({text: 'cd', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
         ];
         results[0].emphasis = [];
         results[1].emphasis = emphasis;
@@ -56,9 +62,9 @@ describe('LineState', () => {
     });
     function beginningOfLine(given: string, emphasis: EmphasisType[]) {
         const results: Line[] = [
-            new Line('a', 0),
-            new Line(' b', 0),
-            new Line(' ', 0),
+            new Line({text: 'a', lineNumber: 0}),
+            new Line({text: ' b', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
         ];
         results[0].emphasis = emphasis;
         results[1].emphasis = [];
@@ -72,10 +78,10 @@ describe('LineState', () => {
     });
     function middleOfLine(given: string, emphasis: EmphasisType[]) {
         const results: Line[] = [
-            new Line('a ', 0),
-            new Line('b', 0),
-            new Line(' c', 0),
-            new Line(' ', 0),
+            new Line({text: 'a ', lineNumber: 0}),
+            new Line({text: 'b', lineNumber: 0}),
+            new Line({text: ' c', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
         ];
         results[0].emphasis = [];
         results[1].emphasis = emphasis;
@@ -90,9 +96,9 @@ describe('LineState', () => {
     });
     function endOfLine(given: string, emphasis: EmphasisType[]) {
         const results: Line[] = [
-            new Line('a ', 0),
-            new Line('b', 0),
-            new Line(' ', 0),
+            new Line({text: 'a ', lineNumber: 0}),
+            new Line({text: 'b', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
         ];
         results[0].emphasis = [];
         results[1].emphasis = emphasis;
@@ -105,14 +111,14 @@ describe('LineState', () => {
     });
     function multipleLines(given: string[], emphasis: EmphasisType[]) {
         const results: Line[] = [
-            new Line('a ', 0),
-            new Line('b', 0),
-            new Line(' ', 0),
-            new Line('c', 1),
-            new Line(' ', 1),
-            new Line('d', 2),
-            new Line(' e', 2),
-            new Line(' ', 2),
+            new Line({text: 'a ', lineNumber: 0}),
+            new Line({text: 'b', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
+            new Line({text: 'c', lineNumber: 1}),
+            new Line({text: ' ', lineNumber: 1}),
+            new Line({text: 'd', lineNumber: 2}),
+            new Line({text: ' e', lineNumber: 2}),
+            new Line({text: ' ', lineNumber: 2}),
         ];
         results[0].emphasis = [];
         results[1].emphasis = emphasis;
@@ -132,13 +138,13 @@ describe('LineState', () => {
     });
     function noClosingToken(given: string[], emphasis: EmphasisType[]) {
         const results: Line[] = [
-            new Line('a ', 0),
-            new Line('b', 0),
-            new Line(' ', 0),
-            new Line('c', 1),
-            new Line(' ', 1),
-            new Line('d e', 2),
-            new Line(' ', 2),
+            new Line({text: 'a ', lineNumber: 0}),
+            new Line({text: 'b', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
+            new Line({text: 'c', lineNumber: 1}),
+            new Line({text: ' ', lineNumber: 1}),
+            new Line({text: 'd e', lineNumber: 2}),
+            new Line({text: ' ', lineNumber: 2}),
         ];
         results[0].emphasis = [];
         results[1].emphasis = emphasis;
@@ -161,13 +167,13 @@ describe('LineState', () => {
     });
     function closingTokenHidden(given: string[], emphasis: EmphasisType[]) {
         const results: Line[] = [
-            new Line('a ', 0),
-            new Line('b', 0),
-            new Line(' ', 0),
-            new Line('c', 1),
-            new Line(' ', 1),
-            new Line('d e', 2),
-            new Line(' ', 2),
+            new Line({text: 'a ', lineNumber: 0}),
+            new Line({text: 'b', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
+            new Line({text: 'c', lineNumber: 1}),
+            new Line({text: ' ', lineNumber: 1}),
+            new Line({text: 'd e', lineNumber: 2}),
+            new Line({text: ' ', lineNumber: 2}),
         ];
         results[0].emphasis = [];
         results[1].emphasis = emphasis;
@@ -184,7 +190,10 @@ describe('LineState', () => {
         markupCommentedOutSingleLine('a ### * ### b ### * ###');
     });
     function markupCommentedOutSingleLine(given: string) {
-        const results: Line[] = [new Line('a b', 0), new Line(' ', 0)];
+        const results: Line[] = [
+            new Line({text: 'a b', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
+        ];
         results[0].emphasis = [];
         testSingleLine(given, results);
     }
@@ -196,7 +205,10 @@ describe('LineState', () => {
         escapeStartingToken('a\\*b', 'a*b');
     });
     function escapeStartingToken(given: string, expected: string) {
-        const results: Line[] = [new Line(expected, 0), new Line(' ', 0)];
+        const results: Line[] = [
+            new Line({text: expected, lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
+        ];
         results[0].emphasis = [];
         testSingleLine(given, results);
     }
@@ -207,13 +219,13 @@ describe('LineState', () => {
     });
     function escapeClosingToken(given: string[], token: string, emphasis: EmphasisType[]) {
         const results: Line[] = [
-            new Line('a ', 0),
-            new Line('b', 0),
-            new Line(' ', 0),
-            new Line(`c ${token}`, 1),
-            new Line(' ', 1),
-            new Line('d e', 2),
-            new Line(' ', 2),
+            new Line({text: 'a ', lineNumber: 0}),
+            new Line({text: 'b', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
+            new Line({text: `c ${token}`, lineNumber: 1}),
+            new Line({text: ' ', lineNumber: 1}),
+            new Line({text: 'd e', lineNumber: 2}),
+            new Line({text: ' ', lineNumber: 2}),
         ];
         results[0].emphasis = [];
         results[1].emphasis = emphasis;
@@ -253,12 +265,12 @@ describe('LineState', () => {
     });
     function nested(given: string, emphasis: EmphasisType[][]) {
         const results: Line[] = [
-            new Line('a', 0),
-            new Line('b', 0),
-            new Line('c', 0),
-            new Line('d', 0),
-            new Line('e', 0),
-            new Line(' ', 0),
+            new Line({text: 'a', lineNumber: 0}),
+            new Line({text: 'b', lineNumber: 0}),
+            new Line({text: 'c', lineNumber: 0}),
+            new Line({text: 'd', lineNumber: 0}),
+            new Line({text: 'e', lineNumber: 0}),
+            new Line({text: ' ', lineNumber: 0}),
         ];
         for (let i=0; i < results.length; i++) {
             results[i].emphasis = emphasis[i];

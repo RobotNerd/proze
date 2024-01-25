@@ -16,7 +16,15 @@ export function testSingleLine(given: string, results: Line[] | Line | string) {
             testMultiLine([given], [results as Line]);
             break;
         case typeof(results) == "string":
-            testMultiLine([given], [new Line(results as string, 0)]);
+            testMultiLine(
+                [given],
+                [
+                    new Line({
+                        lineNumber: 0,
+                        text: results as string,
+                    })
+                ]
+            );
             break;
     }
 }
@@ -25,7 +33,10 @@ export function testMultiLine(given: string[], results: Line[]) {
     const lineState = new LineState();
     let newLines: Line[] = [];
     for (let i=0; i < given.length; i++) {
-        const line = new Line(given[i], i);
+        const line = new Line({
+            lineNumber: i,
+            text: given[i],
+        });
         newLines = newLines.concat(lineState.update(line));
     }
     expect(newLines.length).toBe(results.length);
