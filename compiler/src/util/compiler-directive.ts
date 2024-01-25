@@ -1,5 +1,7 @@
 export enum DirectiveType {
   indent = 'indent',
+  lineBreak = 'line',
+  pageBreak = 'page',
   unindent = 'unindent',
   unknown = 'unknown',
 }
@@ -19,7 +21,7 @@ export class CompilerDirective {
     let directives: CompilerDirective[] = [];
     let blocks = text.split(';').map((v: string) => v.trim().toLowerCase());
     for (let block of blocks) {
-      let directive = this.parseIndent(block);
+      let directive = this.parseType(block);
       if (directive) {
         directives.push(directive);
       }
@@ -28,12 +30,16 @@ export class CompilerDirective {
     return directives;
   }
 
-  static parseIndent(text: string): CompilerDirective | null {
-    if (text === 'indent:true') {
-      return new CompilerDirective(DirectiveType.indent);
-    }
-    else if (text === 'indent:false') {
-      return new CompilerDirective(DirectiveType.unindent);
+  static parseType(text: string): CompilerDirective | null {
+    switch(text) {
+      case 'break:line':
+        return new CompilerDirective(DirectiveType.lineBreak);
+      case 'break:page':
+        return new CompilerDirective(DirectiveType.pageBreak);
+      case 'indent:true':
+        return new CompilerDirective(DirectiveType.indent);
+      case 'indent:false':
+        return new CompilerDirective(DirectiveType.unindent);
     }
     return null;
   }

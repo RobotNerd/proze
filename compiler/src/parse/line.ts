@@ -16,6 +16,7 @@ export enum EmphasisType {
 export class Line {
 
     emphasis: EmphasisType[] = [];
+    breakDirective: CompilerDirective | null = null;
     indentDirective: CompilerDirective | null = null;
 
     constructor(
@@ -34,6 +35,9 @@ export class Line {
         newLine.blockquoteLevel = line.blockquoteLevel;
         newLine.emphasis = [...line.emphasis];
         newLine.filePath = line.filePath;
+        if (line.breakDirective) {
+            newLine.breakDirective = CompilerDirective.copy(line.breakDirective);
+        }
         if (line.indentDirective) {
             newLine.indentDirective = CompilerDirective.copy(line.indentDirective);
         }
