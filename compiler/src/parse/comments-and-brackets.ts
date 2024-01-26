@@ -43,7 +43,7 @@ export class CommentsAndBrackets {
         }
 
         let index: number;
-        let leadingSpaces: string = this.leadingSpaces(line.text);
+        let leadingSpaces: string = this.parseLeadingSpaces(line.text);
         let substrings: string[] = [];
         let text = line.text;
         let token: StrippedToken;
@@ -80,7 +80,22 @@ export class CommentsAndBrackets {
             }
         } while (index != -1);
 
-        let updatedLines: Line[] = [];
+        return this.mergeParsedSubstrings(substrings, line, leadingSpaces);
+    }
+
+    // Preserve leading spaces so that can be used later for setting block quote level.
+    private parseLeadingSpaces(text: string): string {
+        let i = 0;
+        for (; i < text.length; i++) {
+            if (text[i] !== ' ') {
+                break;
+            }
+        }
+        return text.substring(0, i);
+    }
+
+    private mergeParsedSubstrings(substrings: string[], line: Line, leadingSpaces: string): Line[] {
+      let updatedLines: Line[] = [];
         if (substrings.length > 0) {
             let updatedLine = Line.copy(line);
             updatedLine.text = substrings.join(' ').trim();
@@ -93,17 +108,6 @@ export class CommentsAndBrackets {
             }
         }
         return updatedLines;
-    }
-
-    // Preserve leading spaces so that can be used later for setting block quote level.
-    private leadingSpaces(text: string): string {
-        let i = 0;
-        for (; i < text.length; i++) {
-            if (text[i] !== ' ') {
-                break;
-            }
-        }
-        return text.substring(0, i);
     }
 
     private nextToken(text: string): [StrippedToken, number] {
