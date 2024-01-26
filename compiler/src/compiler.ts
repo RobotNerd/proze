@@ -137,7 +137,8 @@ export class Compiler {
     }
 
     private parseContent(textLines: string[], filePath: string) {
-        let parsedLines = CommentsAndBrackets.removeAll(textLines, filePath);
+        let commentsAndBrackets = new CommentsAndBrackets();
+        let parsedLines = commentsAndBrackets.removeAll(textLines, filePath);
         for (let line of parsedLines) {
             const updatedLines: Line[] = this.lineState.update(line);
             for (let updatedLine of updatedLines) {

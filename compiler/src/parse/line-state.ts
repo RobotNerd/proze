@@ -101,7 +101,6 @@ export class LineState {
         let updatedLines: Line[];
         this.checkWhitespaceOnlyLine(line);
 
-
         if (this.isWhitespaceOnly) {
             updatedLines = this.onEmptyLine(line);
         }
