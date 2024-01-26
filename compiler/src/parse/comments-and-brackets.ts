@@ -83,17 +83,6 @@ export class CommentsAndBrackets {
         return this.mergeParsedSubstrings(substrings, line, leadingSpaces);
     }
 
-    // Preserve leading spaces so that can be used later for setting block quote level.
-    private parseLeadingSpaces(text: string): string {
-        let i = 0;
-        for (; i < text.length; i++) {
-            if (text[i] !== ' ') {
-                break;
-            }
-        }
-        return text.substring(0, i);
-    }
-
     private mergeParsedSubstrings(substrings: string[], line: Line, leadingSpaces: string): Line[] {
       let updatedLines: Line[] = [];
         if (substrings.length > 0) {
@@ -157,6 +146,17 @@ export class CommentsAndBrackets {
                 }
             }
         }
+    }
+
+    // Preserve leading spaces so that can be used later for setting block quote level.
+    private parseLeadingSpaces(text: string): string {
+        let i = 0;
+        for (; i < text.length; i++) {
+            if (text[i] !== ' ') {
+                break;
+            }
+        }
+        return text.substring(0, i);
     }
 
     removeAll(textLines: string[], filePath: string): Line[] {
