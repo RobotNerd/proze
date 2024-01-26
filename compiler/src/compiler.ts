@@ -1,5 +1,6 @@
 import type { Formatter } from './formatters/formatter';
 import { Chapter } from './components/chapter';
+import { CommentsAndBrackets } from './parse/comments-and-brackets';
 import { CompileError } from './util/compile-error';
 import { CompilerMessages } from './util/compiler-messages';
 import { Component, EmptyComponent } from './components/component';
@@ -21,8 +22,8 @@ import { Token } from './components/token';
 export class Compiler {
 
     private args: ProzeArgs;
-    private lineState: LineState;
     private components: Component[] = [];
+    private lineState: LineState;
     private names: Names | null = null;;
 
     constructor(args: any) {
@@ -136,18 +137,14 @@ export class Compiler {
     }
 
     private parseContent(textLines: string[], filePath: string) {
-        for(let i=0; i < textLines.length; i++) {
-            let rawLine = new Line({
-                lineNumber: i,
-                text: textLines[i],
-            });
-            rawLine.filePath = filePath;
-            const updatedLines: Line[] = this.lineState.update(rawLine);
-            for (let line of updatedLines) {
+        let parsedLines = CommentsAndBrackets.removeAll(textLines, filePath);
+        for (let line of parsedLines) {
+            const updatedLines: Line[] = this.lineState.update(line);
+            for (let updatedLine of updatedLines) {
                 if (this.names) {
-                    this.names.findInvalid(line);
+                    this.names.findInvalid(updatedLine);
                 }
-                this.applyLineType(line);
+                this.applyLineType(updatedLine);
             }
         }
         this.components.push(new EmptyComponent(Token.eof));

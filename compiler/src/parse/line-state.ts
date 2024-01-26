@@ -1,4 +1,3 @@
-import { CommentsAndBrackets } from './comments-and-brackets';
 import { EmDashParser } from '../parse/em-dash-parser';
 import { Emphasis } from "./emphasis";
 import { EscapeCharacter } from './escape-character';
@@ -13,11 +12,9 @@ export class LineState {
     isWhitespaceOnly: boolean = false;
     
     private emphasis: Emphasis;
-    private commentsAndBrackets: CommentsAndBrackets;
 
     constructor() {
         this.emphasis = new Emphasis();
-        this.commentsAndBrackets = new CommentsAndBrackets();
     }
 
     private applyEmphasis(line: Line | null): Line[] {
@@ -42,13 +39,8 @@ export class LineState {
         return updatedLines;
     }
 
-    private checkWhitespaceOnlyLine(line: Line | null, strippedLine: Line | null) {
-        this.isWhitespaceOnly = false;
-        if (line && strippedLine) {
-            this.isWhitespaceOnly =
-                line.text.length == strippedLine.text.length &&
-                line.text.trim().length === 0;
-        }
+    private checkWhitespaceOnlyLine(line: Line | null) {
+        this.isWhitespaceOnly = line ? line.text.trim() === '' : false;
     }
 
     private isMetadata(strippedLine: Line): boolean {
@@ -107,20 +99,17 @@ export class LineState {
 
     update(line: Line): Line[] {
         let updatedLines: Line[];
-        let strippedLine = this.commentsAndBrackets.parse(line);
-        this.checkWhitespaceOnlyLine(line, strippedLine);
+        this.checkWhitespaceOnlyLine(line);
+
 
         if (this.isWhitespaceOnly) {
             updatedLines = this.onEmptyLine(line);
         }
-        else if (strippedLine === null || strippedLine.text.trim() === '') {
-            updatedLines = [];
-        }
-        else if (this.isMetadata(strippedLine)) {
-            updatedLines = this.onMetadata(strippedLine);
+        else if (this.isMetadata(line)) {
+            updatedLines = this.onMetadata(line);
         }
         else {
-            updatedLines = this.onText(strippedLine);
+            updatedLines = this.onText(line);
 
             // Add single space to join text separated only by '\n' into a single paragraph.
             let newLine = Line.copy(line);
@@ -134,6 +123,5 @@ export class LineState {
 
     reset() {
         this.inParagraph = false;
-        this.commentsAndBrackets.reset();
     }
 }

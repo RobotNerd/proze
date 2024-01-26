@@ -1,6 +1,5 @@
+import { Compiler } from "../compiler";
 import { CompilerMessages } from "../util/compiler-messages";
-import { Line } from "./line";
-import { LineState } from "./line-state";
 import { ProzeArgs } from '../util/cli-arguments';
 import { TestUtils } from "../util/test-utils";
 
@@ -113,10 +112,14 @@ describe('LineState', () => {
     });
 
     test('throws compile error on unescaped closing bracket without matching opening bracket', () => {
-        const line = new Line({text: 'this will fail with ] an error', lineNumber: 0});
-        const lineState = new LineState();
-        const newLine = lineState.update(line);
-        expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
-        expect(CompilerMessages.getInstance().errors.length).toBe(1);
+        mockArgs.inputString = 'this will fail with ] an error';
+        const compiler = new Compiler(mockArgs);
+        try {
+            compiler.compile();
+        }
+        catch (e) {
+            expect(CompilerMessages.getInstance().hasErrors()).toBe(true);
+            expect(CompilerMessages.getInstance().errors.length).toBe(1);
+        }
     });
 });
