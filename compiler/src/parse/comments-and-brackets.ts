@@ -1,41 +1,13 @@
-import { CompilerDirective, DirectiveType } from "../util/compiler-directive";
-import { CompilerMessages } from "../util/compiler-messages";
-import { Markup, StrippedToken } from "../util/markup";
-import { ParseError } from "../util/parse-error";
+import { Bracket } from "./bracket";
+import { Comment } from "./comment";
 import { Line } from "../parse/line";
+import { Markup, StrippedToken } from "../util/markup";
 
 
 export class CommentsAndBrackets {
 
-    private inBlockComment: boolean = false;
-    private inBracketBlock: boolean = false;
-    private isBracketAtLineStart: boolean = true;
-    private lineDirectives: CompilerDirective[] = [];
-
-    private applyLineDirectives(line: Line) {
-        if (this.lineDirectives.length > 0) {
-            for (let lineDirective of this.lineDirectives) {
-                switch (lineDirective.directiveType) {
-                    case DirectiveType.indent:
-                    case DirectiveType.unindent:
-                        if (this.isBracketAtLineStart) {
-                            line.indentDirective = lineDirective;
-                        }
-                        break;
-                }
-            }
-            this.lineDirectives = [];
-        }
-    }
-
-    private checkBracketAtLineStart(substrings: string[], parsedText: string) {
-        if (substrings.length > 0) {
-            this.isBracketAtLineStart = false;
-        }
-        else if (parsedText !== '') {
-            this.isBracketAtLineStart = false;
-        }
-    }
+    private bracket = new Bracket();
+    private comment = new Comment();
 
     private parse(line: Line | null): Line[] {
         if (line === null) {
@@ -50,9 +22,9 @@ export class CommentsAndBrackets {
 
         do {
             [token, index] = this.nextToken(text);
-            this.parseCompilerDirectives(text, token, index);
+            this.bracket.parseCompilerDirectives(text, token, index);
             if (index < 0) {
-                if (!this.inBlockComment && !this.inBracketBlock) {
+                if (!this.comment.inBlockComment && !this.bracket.inBracketBlock) {
                     substrings.push(text);
                 }
             }
@@ -60,18 +32,18 @@ export class CommentsAndBrackets {
                 let parsedText: string = '';
                 switch(token) {
                     case StrippedToken.BlockComment:
-                        [parsedText, text] = this.removeBlockComment(text, index);
+                        [parsedText, text] = this.comment.removeBlockComment(text, index, this.bracket.inBracketBlock);
                         break;
                     case StrippedToken.LineComment:
-                        [parsedText, text] = this.removeLineComment(text, index);
+                        [parsedText, text] = this.comment.removeLineComment(text, index, this.bracket.inBracketBlock);
                         break;
                     case StrippedToken.OpenBracket:
-                        [parsedText, text] = this.startBracketBlock(text, index);
+                        [parsedText, text] = this.bracket.startBracketBlock(text, index, this.comment.inBlockComment);
                         break;
                     case StrippedToken.CloseBracket:
-                        [parsedText, text] = this.removeBracketBlock(text, index, line);
-                        this.checkBracketAtLineStart(substrings, parsedText);
-                        this.applyLineDirectives(line);
+                        [parsedText, text] = this.bracket.removeBracketBlock(text, index, line, this.comment.inBlockComment);
+                        this.bracket.checkBracketAtLineStart(substrings, parsedText);
+                        this.bracket.applyLineDirectives(line);
                         break;
                 }
                 if (parsedText != '') {
@@ -123,31 +95,6 @@ export class CommentsAndBrackets {
         return [token, index];
     }
 
-    private parseCompilerDirectives(text: string, token: StrippedToken, index: number) {
-        let textInsideBrackets = text;
-        if (this.inBracketBlock) {
-            if (index >= 0) {
-                if (token === StrippedToken.OpenBracket) {
-                    textInsideBrackets = text.substring(index + 1, text.length);
-                }
-                else if (token === StrippedToken.CloseBracket) {
-                    textInsideBrackets = text.substring(0, index);
-                }
-            }
-            textInsideBrackets = textInsideBrackets.trim();
-
-            let directives = CompilerDirective.parse(textInsideBrackets);
-            for (let directive of directives) {
-                switch (directive?.directiveType) {
-                    case DirectiveType.indent:
-                    case DirectiveType.unindent:
-                        this.lineDirectives.push(directive);
-                        break;
-                }
-            }
-        }
-    }
-
     // Preserve leading spaces so that can be used later for setting block quote level.
     private parseLeadingSpaces(text: string): string {
         let i = 0;
@@ -175,63 +122,10 @@ export class CommentsAndBrackets {
       }
       return lines;
     }
-    
-    private removeBlockComment(text: string, index: number): [string, string] {
-        let left: string = '';
-        let right: string;
-        if (!this.inBracketBlock) {
-            if (!this.inBlockComment) {
-                left = text.substring(0, index).trim();
-            }
-            this.inBlockComment = !this.inBlockComment;
-        }
-        right = text.substring(index + StrippedToken.BlockComment.length).trim();
-        return [left, right];
-    }
-
-    private removeBracketBlock(text: string, index: number, line: Line): [string, string] {
-        let left: string = '';
-        let right: string;
-        if (!this.inBlockComment) {
-            if (this.inBracketBlock) {
-                this.inBracketBlock = false;
-            }
-            else {
-                left = text.substring(0, index).trim();
-                let message = [
-                    'Closing bracket "]" found without prior matching opening bracket.',
-                    'If you want this to be in the output, esacpe it with a "\\" character.'
-                ];
-                CompilerMessages.getInstance().add(
-                    new ParseError(message.join(' '), line.lineNumber, line.filePath)
-                );
-            }
-        }
-        right = text.substring(index + StrippedToken.CloseBracket.length).trim();
-        return [left, right];
-    }
-
-    private removeLineComment(text: string, index: number): [string, string] {
-        if (this.inBlockComment || this.inBracketBlock) {
-            return ['', text.substring(index + StrippedToken.LineComment.length).trim()];
-        }
-        return [text.substring(0, index).trim(), ''];
-    }
 
     reset() {
-        this.inBlockComment = false;
-        this.inBracketBlock = false;
-    }
-
-    private startBracketBlock(text: string, index: number): [string, string] {
-        let left: string = '';
-        let right: string;
-        if (!this.inBlockComment && !this.inBracketBlock) {
-            left = text.substring(0, index).trim();
-            this.inBracketBlock = true;
-        }
-        right = text.substring(index + StrippedToken.OpenBracket.length).trim();
-        return [left, right];
+        this.comment.reset();
+        this.bracket.reset();
     }
 }
 
