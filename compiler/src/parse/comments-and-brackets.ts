@@ -37,9 +37,9 @@ export class CommentsAndBrackets {
         }
     }
 
-    private parse(line: Line | null): Line | null {
+    private parse(line: Line | null): Line[] {
         if (line === null) {
-            return null;
+            return [];
         }
 
         let index: number;
@@ -47,7 +47,6 @@ export class CommentsAndBrackets {
         let substrings: string[] = [];
         let text = line.text;
         let token: StrippedToken;
-        let updatedLine: Line | null = null;
 
         do {
             [token, index] = this.nextToken(text);
@@ -81,18 +80,19 @@ export class CommentsAndBrackets {
             }
         } while (index != -1);
 
+        let updatedLines: Line[] = [];
         if (substrings.length > 0) {
-            updatedLine = Line.copy(line);
+            let updatedLine = Line.copy(line);
             updatedLine.text = substrings.join(' ').trim();
             updatedLine.text = leadingSpaces + updatedLine?.text;
-
+            updatedLines.push(updatedLine);
             if (updatedLine.text.trim() === '' && line.text.trim() !== '') {
               // The entire line contained commented/bracketed text with possible additional whitespace.
               // Return null so this line doesn't get counted as an empty line.
-              return null;
+              return [];
             }
         }
-        return updatedLine;
+        return updatedLines;
     }
 
     // Preserve leading spaces so that can be used later for setting block quote level.
@@ -158,15 +158,15 @@ export class CommentsAndBrackets {
     removeAll(textLines: string[], filePath: string): Line[] {
       let lines: Line[] = [];
       for(let i=0; i < textLines.length; i++) {
-          let line = this.parse(
+          let parsedLines = this.parse(
               new Line({
                   filePath: filePath,
                   lineNumber: i,
                   text: textLines[i],
               })
           );
-          if (line) {
-              lines.push(line);
+          if (parsedLines.length > 0) {
+              lines = [...lines, ...parsedLines];
           }
       }
       return lines;
