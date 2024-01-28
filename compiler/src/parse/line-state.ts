@@ -69,10 +69,10 @@ export class LineState {
         this.blockquoteLevel = 0;
         this.inParagraph = false;
         this.emphasis.reset();
-        let newLine = Line.copy(line);
-        newLine.text = '';
-        newLine.lineType = LineType.emptyLine;
-        return [newLine];
+        return [Line.copy(line, {
+            lineType: LineType.emptyLine,
+            text: '',
+        })];
     }
 
     private onMetadata(strippedLine: Line): Line[] {
@@ -111,11 +111,11 @@ export class LineState {
             updatedLines = this.onText(line);
 
             // Add single space to join text separated only by '\n' into a single paragraph.
-            let newLine = Line.copy(line);
-            newLine.text = ' ';
-            newLine.lineType = LineType.paragraph;
-            newLine.blockquoteLevel = this.blockquoteLevel;
-            updatedLines.push(newLine);
+            updatedLines.push(Line.copy(line, {
+                blockquoteLevel: this.blockquoteLevel,
+                lineType: LineType.paragraph,
+                text: ' ',
+            }));
         }
         return updatedLines;
     }

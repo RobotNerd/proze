@@ -26,27 +26,47 @@ export interface LineFields {
 
 export class Line {
 
-    public blockquoteLevel: number;
-    public breakDirective: CompilerDirective | null;
-    public emphasis: EmphasisType[];
-    public filePath: string;
-    public indentDirective: CompilerDirective | null;
-    public lineNumber: number;
-    public lineType: LineType;
-    public text: string;
+    public blockquoteLevel: number = 0;
+    public breakDirective: CompilerDirective | null = null;
+    public emphasis: EmphasisType[] = [];
+    public filePath: string = '';
+    public indentDirective: CompilerDirective | null = null;
+    public lineNumber: number = -1;
+    public lineType: LineType = LineType.unknown;
+    public text: string = '';
 
     constructor(fields: LineFields = {}) {
-        this.blockquoteLevel = fields.blockquoteLevel ? fields.blockquoteLevel : 0; 
-        this.breakDirective = fields.breakDirective ? fields.breakDirective : null;
-        this.emphasis = fields.emphasis ? [...fields.emphasis] : [];
-        this.filePath = fields.filePath ? fields.filePath : '';
-        this.indentDirective = fields.indentDirective ? fields.indentDirective : null;
-        this.lineNumber = fields.lineNumber ? fields.lineNumber : -1;
-        this.lineType = fields.lineType ? fields.lineType : LineType.unknown;
-        this.text = fields.text ? fields.text : '';
+        Line.applyLineFields(this, fields);
     }
 
-    static copy(line: Line): Line {
+    private static applyLineFields(line: Line, fields: LineFields) {
+        if (fields.blockquoteLevel !== undefined) {
+            line.blockquoteLevel = fields.blockquoteLevel; 
+        }
+        if (fields.breakDirective !== undefined) {
+            line.breakDirective =  fields.breakDirective;
+        }
+        if (fields.emphasis !== undefined) {
+            line.emphasis = [...fields.emphasis];
+        }
+        if (fields.filePath !== undefined) {
+            line.filePath = fields.filePath;
+        }
+        if (fields.indentDirective !== undefined) {
+            line.indentDirective = fields.indentDirective;
+        }
+        if (fields.lineNumber !== undefined) {
+            line.lineNumber = fields.lineNumber;
+        }
+        if (fields.lineType !== undefined) {
+            line.lineType = fields.lineType;
+        }
+        if (fields.text !== undefined) {
+            line.text = fields.text;
+        }
+    }
+
+    static copy(line: Line, fields: LineFields = {}): Line {
         let newLine: Line = new Line();
         newLine.text = line.text;
         newLine.lineNumber = line.lineNumber;
@@ -60,6 +80,7 @@ export class Line {
         if (line.indentDirective) {
             newLine.indentDirective = CompilerDirective.copy(line.indentDirective);
         }
+        Line.applyLineFields(newLine, fields);
         return newLine;
     }
 }
